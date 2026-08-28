@@ -1,0 +1,76 @@
+
+
+/* ==========================================
+   1. GRILLA CONTENEDORA DE TARJETAS
+   ========================================== */
+.cards-grid {
+  display: grid;
+  /* Crea 4 columnas de igual tamaño en una misma fila */
+  grid-template-columns: repeat(4, 1fr);
+  /* Espacio de separación entre tarjetas */
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Para pantallas chicas (celulares), pasa a 1 sola columna */
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================
+   2. ESTRUCTURA BÁSICA DE CADA TARJETA
+   ========================================== */
+.card-container {
+  width: 100%;
+  padding: 20px;
+  border-radius: 12px;
+  box-sizing: border-box; /* Previene que el padding deforme el tamaño */
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-family: sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.card-amount {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.card-label {
+  font-size: 14px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.card-icon {
+  width: 36px;
+  height: 36px;
+}
+
+/* ==========================================
+   3. COLORES ESPECÍFICOS POR ID
+   ========================================== */
+#verde {
+  background-color: #d6f0e0;
+  color: #1e5e34;
+}
+
+#amarillo {
+  background-color: #fef4d6;
+  color: #8c6d1f;
+}
+
+#azul {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+#gris {
+  background-color: #e5e7eb;
+  color: #374151;
+}
