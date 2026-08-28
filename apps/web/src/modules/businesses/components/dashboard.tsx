@@ -15,6 +15,8 @@ import {
   ChevronDown 
 } from 'lucide-react';
 
+import Card from './card';
+
 interface DashboardProps {
   role?: string; // O role?: 'admin' | 'business' | 'client';
   onLogout?: () => void;
@@ -124,6 +126,15 @@ export default function AdminDashboard({ role, onLogout }: DashboardProps) {
         <div className="bg-rose-100 border border-rose-200 text-rose-600 px-4 py-3 rounded-md mb-6 text-sm">
           This template is under maintenance!
         </div>
+
+        {/* GRILLA DE TARJETAS EN CSS PURO */}
+        <div className="cards-grid">
+          <Card id="verde" amount="$ 153.000" label="Revenue" icon="money.svg" />
+          <Card id="amarillo" amount="20" label="Sales" icon="cart.svg" />
+          <Card id="azul" amount="20" label="Customer" icon="badge.svg" />
+          <Card id="gris" amount="20" label="Employee" icon="gift.svg" />
+        </div>
+
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
