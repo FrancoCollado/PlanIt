@@ -29,12 +29,16 @@ const BlurredBackground = styled.div`
   z-index: -1;
 `;
 
-export const AuthPage: React.FC = () => {
+interface AuthPageProps {
+  onLoginSuccess?: () => void;
+}
+
+export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
   return (
     <PageWrapper>
       <BlurredBackground />
       <AuthCard
-        loginForm={<LoginForm />}
+        loginForm={<LoginForm onLoginSuccess={onLoginSuccess} />}
         registerForm={<RegisterForm />}
       />
     </PageWrapper>

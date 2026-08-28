@@ -1,10 +1,6 @@
 // apps/web/src/modules/auth/components/LoginForm.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
-// Puedes usar una librería de iconos como 'react-icons' o SVGs
-// import { FiMail, FiLock, FiLogIn, FiUser, FiCheckCircle } from 'react-icons/fi';
-// import { FcGoogle } from 'react-icons/fc';
-// import { FaFacebook } from 'react-icons/fa';
 
 // --- Styled Components de UI Compartida ---
 
@@ -48,12 +44,11 @@ export const IconPlaceholder = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Reemplazar por Iconos reales: height: 16px; width: 16px; */
 `;
 
 export const StyledInput = styled.input`
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 2.8rem; /* Espacio extra a la izquierda para el icono */
+  padding: 0.8rem 1rem 0.8rem 2.8rem;
   border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
   font-size: 0.95rem;
@@ -94,7 +89,7 @@ export const ForgotPasswordLink = styled.a`
 `;
 
 export const PrimaryButton = styled.button<{ color?: string }>`
-  background-color: ${props => props.color || '#009688'}; /* Teal por defecto */
+  background-color: ${props => props.color || '#009688'};
   color: white;
   border: none;
   border-radius: 2rem;
@@ -147,26 +142,35 @@ const SocialIconCircle = styled.button`
   }
 `;
 
-// --- Componente ---
+// --- Componente Principal ---
 
-export const LoginForm: React.FC = () => {
-  // Estado local para los inputs (SOLO UI)
+interface LoginFormProps {
+  onLoginSuccess?: () => void;
+}
+
+export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('ejemplo@correo.com');
   const [password, setPassword] = useState('**********');
   const [remember, setRemember] = useState(false);
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Notifica el inicio de sesión exitoso hacia AuthPage / App
+    if (onLoginSuccess) {
+      onLoginSuccess();
+    }
+  };
+
   return (
-    <form onSubmit={(e) => e.preventDefault()}> {/* Prevenir recarga de página por ahora */}
+    <form onSubmit={handleSubmit}>
       <FormTitle>INICIAR SESIÓN</FormTitle>
       <FormSubtitle>¡Bienvenido de nuevo! Ingresa tus datos.</FormSubtitle>
 
       <InputGroup>
         <Label>Correo Electrónico</Label>
         <InputWrapper>
-          <IconPlaceholder>
-            {/* Reemplazar por <FiMail size={16} /> */}
-            [@]
-          </IconPlaceholder>
+          <IconPlaceholder>[@]</IconPlaceholder>
           <StyledInput
             type="email"
             value={email}
@@ -178,10 +182,7 @@ export const LoginForm: React.FC = () => {
       <InputGroup>
         <Label>Contraseña</Label>
         <InputWrapper>
-          <IconPlaceholder>
-             {/* Reemplazar por <FiLock size={16} /> */}
-             [#]
-          </IconPlaceholder>
+          <IconPlaceholder>[#]</IconPlaceholder>
           <StyledInput
             type="password"
             value={password}
@@ -202,7 +203,6 @@ export const LoginForm: React.FC = () => {
         <ForgotPasswordLink href="#">¿Olvidaste tu contraseña?</ForgotPasswordLink>
       </OptionsRow>
 
-      {/* Botón color Teal de la imagen */}
       <PrimaryButton type="submit" color="#009688">
         INGRESAR AL SISTEMA
       </PrimaryButton>
@@ -210,14 +210,8 @@ export const LoginForm: React.FC = () => {
       <SocialLoginContainer>
         <SocialText>O inicia sesión con:</SocialText>
         <SocialIconsRow>
-          <SocialIconCircle>
-            {/* Reemplazar por <FcGoogle size={20} /> */}
-            G
-          </SocialIconCircle>
-          <SocialIconCircle>
-             {/* Reemplazar por <FaFacebook size={20} color="#1877F2"/> */}
-             F
-          </SocialIconCircle>
+          <SocialIconCircle type="button">G</SocialIconCircle>
+          <SocialIconCircle type="button">F</SocialIconCircle>
         </SocialIconsRow>
       </SocialLoginContainer>
     </form>
