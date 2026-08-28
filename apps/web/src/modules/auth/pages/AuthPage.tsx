@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { AuthCard } from '../components/AuthCard';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
+import type { UserRole } from '../components/LoginForm';
 
 const PageWrapper = styled.div`
   width: 100vw;
@@ -30,7 +31,7 @@ const BlurredBackground = styled.div`
 `;
 
 interface AuthPageProps {
-  onLoginSuccess?: () => void;
+  onLoginSuccess?: (role: UserRole) => void;
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
@@ -44,5 +45,4 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
     </PageWrapper>
   );
 };
-
 export default AuthPage;

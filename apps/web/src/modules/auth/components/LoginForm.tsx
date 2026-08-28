@@ -2,11 +2,24 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-// --- Styled Components de UI Compartida ---
+export type UserRole = 'admin' | 'business' | 'client';
+
+interface LoginFormProps {
+  onLoginSuccess?: (role: UserRole) => void;
+}
+
+// 1. Definición de las 3 credenciales hardcodeadas
+const MOCK_USERS = [
+  { email: 'admin@planit.com', password: '123', role: 'admin' as UserRole },
+  { email: 'empresa@planit.com', password: '123', role: 'business' as UserRole },
+  { email: 'cliente@planit.com', password: '123', role: 'client' as UserRole },
+];
+
+// --- Styled Components ---
 
 export const FormTitle = styled.h2`
   font-size: 1.6rem;
-  color: #1a237e; /* Azul oscuro */
+  color: #1a237e;
   font-weight: 800;
   text-transform: uppercase;
   margin-bottom: 0.2rem;
@@ -142,23 +155,38 @@ const SocialIconCircle = styled.button`
   }
 `;
 
+const ErrorText = styled.p`
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+`;
+
 // --- Componente Principal ---
 
-interface LoginFormProps {
-  onLoginSuccess?: () => void;
-}
-
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('ejemplo@correo.com');
-  const [password, setPassword] = useState('**********');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
+  // 2. Función de autenticación al enviar el formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
 
-    // Notifica el inicio de sesión exitoso hacia AuthPage / App
-    if (onLoginSuccess) {
-      onLoginSuccess();
+    // Validación de la lista MOCK
+    const foundUser = MOCK_USERS.find(
+      user => user.email.toLowerCase() === email.trim().toLowerCase() && user.password === password
+    );
+
+    if (foundUser) {
+      if (onLoginSuccess) {
+        onLoginSuccess(foundUser.role);
+      }
+    } else {
+      setErrorMessage('Credenciales inválidas. Probá con admin@planit.com / 123');
     }
   };
 
@@ -173,8 +201,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           <IconPlaceholder>[@]</IconPlaceholder>
           <StyledInput
             type="email"
+            placeholder="ejemplo@correo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </InputWrapper>
       </InputGroup>
@@ -185,8 +215,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           <IconPlaceholder>[#]</IconPlaceholder>
           <StyledInput
             type="password"
+            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </InputWrapper>
       </InputGroup>
@@ -202,6 +234,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         </CheckboxLabel>
         <ForgotPasswordLink href="#">¿Olvidaste tu contraseña?</ForgotPasswordLink>
       </OptionsRow>
+
+      {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
 
       <PrimaryButton type="submit" color="#009688">
         INGRESAR AL SISTEMA

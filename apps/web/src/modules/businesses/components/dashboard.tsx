@@ -15,11 +15,12 @@ import {
   ChevronDown 
 } from 'lucide-react';
 
-interface AdminDashboardProps {
+interface DashboardProps {
+  role?: string; // O role?: 'admin' | 'business' | 'client';
   onLogout?: () => void;
 }
 
-export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
+export default function AdminDashboard({ role, onLogout }: DashboardProps) {
   const [uiComponentsOpen, setUiComponentsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
 
