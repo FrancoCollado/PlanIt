@@ -1,4 +1,6 @@
 // apps/web/src/modules/auth/components/RegisterForm.tsx
+
+/* Importo el useState y los componentes de estilo que cree en LoginForm.tsx*/
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -6,81 +8,80 @@ import {
   FormSubtitle,
   InputGroup,
   Label,
-  InputWrapper,
-  IconPlaceholder,
+  ContenedorInput,
   StyledInput,
   OptionsRow,
   CheckboxLabel,
   PrimaryButton
 } from './LoginForm';
 
-const CompactInputGroup = styled(InputGroup)`
-  margin-bottom: 0.6rem; /* Reducido de 1rem a 0.6rem para ganar espacio */
-`;
+
 
 const CompactInput = styled(StyledInput)`
-  padding: 0.6rem 1rem 0.6rem 2.5rem; /* Altura de input un poco más compacta */
+  padding: 0.6rem 1rem /* compacto la altura del input */
 `;
 
-export const RegisterForm: React.FC = () => {
-  const [fullName, setFullName] = useState('Juan Pérez');
-  const [email, setEmail] = useState('ejemplo@correo.com');
-  const [password, setPassword] = useState('**********');
-  const [confirmPassword, setConfirmPassword] = useState('**********');
+/* Creo constante RegisterForm y la exporto para import en otro archivo*/
+export const RegisterForm= () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <FormTitle>REGISTRARSE</FormTitle>
-      <FormSubtitle style={{ marginBottom: '1rem' }}>¿Eres nuevo? Crea tu cuenta.</FormSubtitle>
+  
+/* El preventDefault es para que el navegador no envie y recargue de una*/
 
-      <CompactInputGroup>
+  return (
+    <form onSubmit={(e) => e.preventDefault()}>  
+
+      <FormTitle>REGISTRARSE</FormTitle>
+
+      <FormSubtitle style={{ marginBottom: '1rem' }}>¿Sos nuevo? Crea tu cuenta.</FormSubtitle>
+
+      <InputGroup>
         <Label>Nombre Completo</Label>
-        <InputWrapper>
-          <IconPlaceholder>[U]</IconPlaceholder>
+        <ContenedorInput>
           <CompactInput
             type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}  /* Con esto le ajusto el nombre si se detectan cambios*/
           />
-        </InputWrapper>
-      </CompactInputGroup>
+        </ContenedorInput>
+      </InputGroup>
 
-      <CompactInputGroup>
+      <InputGroup>
         <Label>Correo Electrónico</Label>
-        <InputWrapper>
-          <IconPlaceholder>[@]</IconPlaceholder>
+        <ContenedorInput>
           <CompactInput
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </InputWrapper>
-      </CompactInputGroup>
+        </ContenedorInput>
+      </InputGroup>
 
-      <CompactInputGroup>
+      <InputGroup>
         <Label>Contraseña</Label>
-        <InputWrapper>
-          <IconPlaceholder>[#]</IconPlaceholder>
+        <ContenedorInput>
           <CompactInput
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)} 
           />
-        </InputWrapper>
-      </CompactInputGroup>
+        </ContenedorInput>
+      </InputGroup>
 
-      <CompactInputGroup>
+      <InputGroup>
         <Label>Confirmar Contraseña</Label>
-        <InputWrapper>
-          <IconPlaceholder>[✓]</IconPlaceholder>
+        <ContenedorInput>
           <CompactInput
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-        </InputWrapper>
-      </CompactInputGroup>
+        </ContenedorInput>
+      </InputGroup>
 
       <OptionsRow style={{ marginBottom: '1rem' }}>
         <CheckboxLabel>
@@ -93,7 +94,7 @@ export const RegisterForm: React.FC = () => {
         </CheckboxLabel>
       </OptionsRow>
 
-      <PrimaryButton type="submit" color="#1a237e">
+      <PrimaryButton type="submit" color="#f3d736">
         CREAR CUENTA
       </PrimaryButton>
     </form>

@@ -9,7 +9,7 @@ const CardContainer = styled.div`
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem; /* Relleno ajustado */
+  padding: 2rem; 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,7 +76,7 @@ export const AuthCard: React.FC<AuthCardProps> = ({ loginForm, registerForm }) =
     <CardContainer>
       <LogoContainer>
         <LogoTitle>PlanIt</LogoTitle>
-        <LogoSubtitle>PlanIt - Acceso Integral</LogoSubtitle>
+        <LogoSubtitle>- Organizacion de Eventos -</LogoSubtitle>
       </LogoContainer>
 
       <ColumnsContainer>

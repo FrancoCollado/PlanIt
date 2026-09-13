@@ -1,15 +1,13 @@
-// apps/web/src/modules/auth/components/LoginForm.tsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
-export type UserRole = 'admin' | 'business' | 'client';
+export type UserRole = 'admin' | 'empresa' | 'cliente';
 
 interface LoginFormProps {
   onLoginSuccess?: (role: UserRole) => void;
 }
 
-// 1. Definición de las 3 credenciales hardcodeadas
-const MOCK_USERS = [
+// Credenciales Harcodeadas por ahora
+const mock_users = [
   { email: 'admin@planit.com', password: '123', role: 'admin' as UserRole },
   { email: 'empresa@planit.com', password: '123', role: 'business' as UserRole },
   { email: 'cliente@planit.com', password: '123', role: 'client' as UserRole },
@@ -44,24 +42,15 @@ export const Label = styled.label`
   margin-bottom: 0.3rem;
 `;
 
-export const InputWrapper = styled.div`
+export const ContenedorInput = styled.div`
   position: relative;
   display: flex;
   align-items: center;
 `;
 
-export const IconPlaceholder = styled.div`
-  position: absolute;
-  left: 1rem;
-  color: #bdbdbd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 export const StyledInput = styled.input`
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 2.8rem;
+  padding: 0.8rem 1rem ;
   border: 1px solid #e0e0e0;
   border-radius: 0.5rem;
   font-size: 0.95rem;
@@ -86,7 +75,6 @@ export const CheckboxLabel = styled.label`
   align-items: center;
   color: #616161;
   cursor: pointer;
-
   input {
     margin-right: 0.5rem;
   }
@@ -95,7 +83,6 @@ export const CheckboxLabel = styled.label`
 export const ForgotPasswordLink = styled.a`
   color: #616161;
   text-decoration: none;
-
   &:hover {
     text-decoration: underline;
   }
@@ -177,7 +164,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setErrorMessage('');
 
     // Validación de la lista MOCK
-    const foundUser = MOCK_USERS.find(
+    const foundUser = mock_users.find(
       user => user.email.toLowerCase() === email.trim().toLowerCase() && user.password === password
     );
 
@@ -194,11 +181,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     <form onSubmit={handleSubmit}>
       <FormTitle>INICIAR SESIÓN</FormTitle>
       <FormSubtitle>¡Bienvenido de nuevo! Ingresa tus datos.</FormSubtitle>
-
       <InputGroup>
         <Label>Correo Electrónico</Label>
-        <InputWrapper>
-          <IconPlaceholder>[@]</IconPlaceholder>
+        <ContenedorInput>
           <StyledInput
             type="email"
             placeholder="ejemplo@correo.com"
@@ -206,13 +191,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </InputWrapper>
+        </ContenedorInput>
       </InputGroup>
 
       <InputGroup>
         <Label>Contraseña</Label>
-        <InputWrapper>
-          <IconPlaceholder>[#]</IconPlaceholder>
+        <ContenedorInput>
           <StyledInput
             type="password"
             placeholder="••••••••"
@@ -220,7 +204,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </InputWrapper>
+        </ContenedorInput>
       </InputGroup>
 
       <OptionsRow>
