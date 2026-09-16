@@ -1,0 +1,203 @@
+/* Todas las clases llevan el prefijo "admin-" para no chocar con
+   las clases (con el mismo nombre) de los módulos "businesses" y "clientes". */
+
+.admin-container {
+  width: 100%;
+  min-height: 100vh;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.admin-main {
+  background-color: rgb(255, 255, 255);
+  padding: 20px;
+}
+
+#admin-subtitulo {
+  border: 1px solid black;
+  margin: 10px;
+  padding: 1px;
+  color: black;
+}
+
+/* ==========================================
+   TITULO "Dashboard" + botón de logout
+   ========================================== */
+.admin-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-dashboard-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+  padding-left: 0.75rem;
+  border-left: 6px solid #2563eb;
+}
+
+.admin-boton-logout {
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.admin-boton-logout:hover {
+  background-color: #f3f4f6;
+}
+
+/* ==========================================
+   2 TARJETAS VERTICALES DE ADMIN
+   ========================================== */
+.admin-acciones-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .admin-acciones-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-accion-card {
+  display: flex;
+  flex-direction: column; /* vertical: ícono arriba, texto abajo */
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-top: 4px solid #2563eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-accion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.admin-accion-icono {
+  color: #2563eb;
+}
+
+.admin-accion-titulo {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-accion-descripcion {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* ==========================================
+   MODAL con lista (servicios / perfiles)
+   ========================================== */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-modal-card {
+  width: 90%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.admin-modal-titulo {
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+}
+
+.admin-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+.admin-fila-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-fila-nombre {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.admin-fila-detalle {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.admin-fila-botones {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.admin-boton-icono {
+  border: none;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #374151;
+}
+
+.admin-boton-icono:hover {
+  background-color: #e5e7eb;
+}
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.admin-modal-actions button {
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: #e5e7eb;
+  color: #374151;
+}

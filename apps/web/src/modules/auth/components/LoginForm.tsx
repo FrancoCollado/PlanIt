@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-export type UserRole = 'admin' | 'empresa' | 'cliente';
+export type UserRole = 'admin' | 'business' | 'client';
 
 interface LoginFormProps {
   onLoginSuccess?: (role: UserRole) => void;
