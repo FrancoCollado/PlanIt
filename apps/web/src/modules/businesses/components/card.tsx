@@ -11,11 +11,14 @@ interface CardProps {
 export default function Card({ id, amount, label, icon }: CardProps) {
   return (
     <div id={id} className="card-container">
-      <div className="card-text">
-        <div className="card-amount">{amount}</div>
-        <div className="card-label">{label}</div>
+      <div className="card-accent" />
+      <div className="card-body">
+        <div className="card-text">
+          <div className="card-amount">{amount}</div>
+          <div className="card-label">{label}</div>
+        </div>
+        <img className="card-icon" src={icon} alt="icono" />
       </div>
-      <img className="card-icon" src={icon} alt="icono" />
     </div>
   );
 }

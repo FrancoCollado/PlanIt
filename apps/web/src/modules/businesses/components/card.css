@@ -24,27 +24,43 @@
    ========================================== */
 .card-container {
   width: 100%;
-  padding: 20px;
-  border-radius: 12px;
   box-sizing: border-box; /* Previene que el padding deforme el tamaño */
 
   display: flex;
+  flex-direction: row;
+  overflow: hidden;
+
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: sans-serif;
+}
+
+.card-accent {
+  width: 6px;
+  flex-shrink: 0;
+}
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem 1.25rem;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-
-  font-family: sans-serif;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .card-amount {
   font-size: 26px;
   font-weight: bold;
+  color: #1f2937;
 }
 
 .card-label {
   font-size: 14px;
   margin-top: 4px;
-  opacity: 0.8;
+  color: #6b7280;
 }
 
 .card-icon {
@@ -53,24 +69,20 @@
 }
 
 /* ==========================================
-   3. COLORES ESPECÍFICOS POR ID
+   3. COLORES ESPECÍFICOS POR ID (barra de acento)
    ========================================== */
-#verde {
-  background-color: #d6f0e0;
-  color: #1e5e34;
+#verde .card-accent {
+  background-color: #1e5e34;
 }
 
-#amarillo {
-  background-color: #fef4d6;
-  color: #8c6d1f;
+#amarillo .card-accent {
+  background-color: #8c6d1f;
 }
 
-#azul {
-  background-color: #dbeafe;
-  color: #00155a;
+#azul .card-accent {
+  background-color: #00155a;
 }
 
-#gris {
-  background-color: #e5e7eb;
-  color: #374151;
+#gris .card-accent {
+  background-color: #374151;
 }
