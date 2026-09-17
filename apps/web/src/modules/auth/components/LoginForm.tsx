@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { loginRequest } from '../services/authService';
 export type UserRole = 'admin' | 'business' | 'client';
 
 interface LoginFormProps {
   onLoginSuccess?: (role: UserRole) => void;
 }
 
-// Credenciales Harcodeadas por ahora
-const mock_users = [
-  { email: 'admin@planit.com', password: '123', role: 'admin' as UserRole },
-  { email: 'empresa@planit.com', password: '123', role: 'business' as UserRole },
-  { email: 'cliente@planit.com', password: '123', role: 'client' as UserRole },
-];
+// Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
+const mapRolToUserRole = (rol: string): UserRole | null => {
+  switch (rol.trim().toLowerCase()) {
+    case 'administrador':
+      return 'admin';
+    case 'empresa':
+      return 'business';
+    case 'cliente':
+      return 'client';
+    default:
+      return null;
+  }
+};
 
 // --- Styled Components ---
 
@@ -158,22 +166,23 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [remember, setRemember] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // 2. Función de autenticación al enviar el formulario
-  const handleSubmit = (e: React.FormEvent) => {
+  // Autenticación real contra la API (tabla `usuarios`)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
-    // Validación de la lista MOCK
-    const foundUser = mock_users.find(
-      user => user.email.toLowerCase() === email.trim().toLowerCase() && user.password === password
-    );
+    try {
+      const { user } = await loginRequest(email.trim(), password);
+      const rol = mapRolToUserRole(user.rol);
 
-    if (foundUser) {
-      if (onLoginSuccess) {
-        onLoginSuccess(foundUser.role);
+      if (!rol) {
+        setErrorMessage('Rol de usuario desconocido');
+        return;
       }
-    } else {
-      setErrorMessage('Credenciales inválidas. Probá con admin@planit.com / 123');
+
+      onLoginSuccess?.(rol);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Credenciales inválidas');
     }
   };
 
@@ -185,8 +194,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         <Label>Correo Electrónico</Label>
         <ContenedorInput>
           <StyledInput
-            type="email"
-            placeholder="ejemplo@correo.com"
+            type="text"
+            placeholder="Tu correo o usuario"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
