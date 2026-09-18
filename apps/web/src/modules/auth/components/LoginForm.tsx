@@ -192,7 +192,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       <FormSubtitle>¡Bienvenido de nuevo! Ingresa tus datos.</FormSubtitle>
       <InputGroup>
         <Label>Correo Electrónico</Label>
-        <ContenedorInput>
           <StyledInput
             type="text"
             placeholder="Tu correo o usuario"
@@ -200,12 +199,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </ContenedorInput>
       </InputGroup>
 
       <InputGroup>
         <Label>Contraseña</Label>
-        <ContenedorInput>
           <StyledInput
             type="password"
             placeholder="••••••••"
@@ -213,7 +210,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </ContenedorInput>
       </InputGroup>
 
       <OptionsRow>
@@ -230,7 +226,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
       {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
 
-      <PrimaryButton type="submit" color="#009688">
+      <PrimaryButton type="submit">
         INGRESAR AL SISTEMA
       </PrimaryButton>
 
