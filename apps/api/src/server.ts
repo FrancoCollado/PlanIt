@@ -1,8 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import pool, { testConnection } from './config/database';
+
+import { MikroORM } from '@mikro-orm/mysql';
+import mikroOrmConfig from './config/mikro-orm.config';
+
 import authRoutes from './modules/auth/routes/auth.routes';
+
+import { setOrm } from './config/orm';
 
 dotenv.config();
 
@@ -16,21 +21,32 @@ app.use('/api/auth', authRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'API de planIt funcionando' });
+  res.json({
+    status: 'ok',
+    message: 'API de planIt funcionando'
+  });
 });
 
-// Ruta de prueba de conexión a la base de datos
-app.get('/api/db-test', async (req, res) => {
+async function iniciarServidor() {
   try {
-    const [rows] = await pool.query('SELECT NOW() AS fecha_actual');
-    res.json({ message: 'Consulta exitosa', data: rows });
+
+    const orm = await MikroORM.init(mikroOrmConfig);
+
+    await orm.connect();
+    setOrm(orm);
+
+    console.log('Base de datos conectada con MikroORM');
+
+    app.listen(PORT, () => {
+      console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
+    });
+
   } catch (error) {
-    res.status(500).json({ error: 'Error al consultar la base de datos' });
+
+    console.error('Error al iniciar el servidor:');
+    console.error(error);
+
   }
-});
+}
 
-testConnection();
-
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend escuchando en http://localhost:${PORT}`);
-});
+iniciarServidor();

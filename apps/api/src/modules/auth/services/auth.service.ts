@@ -1,22 +1,43 @@
-import pool from '../../../config/database';
+import { getOrm } from '../../../config/orm';
+import { User } from '../../../entities/usuario';
 
-export interface AuthUser {
-  id: number;
-  nombre: string;
-  email: string;
-  rol: string;
-  creado_en: string;
-}
 
-// Busca un usuario que coincida con email y contraseña en la tabla `usuarios`
+// Busca un usuario por email y contraseña
 export const findUserByCredentials = async (
   email: string,
   password: string
-): Promise<AuthUser | null> => {
-  const [rows] = await pool.query(
-    'SELECT id, nombre, email, rol, creado_en FROM usuarios WHERE email = ? AND contraseña = ? LIMIT 1',
-    [email, password]
-  );
-  const users = rows as AuthUser[];
-  return users[0] ?? null;
+): Promise<User | null> => {
+
+  const orm = getOrm();
+  const em = orm.em.fork();
+
+  const user = await em.findOne(User, {
+    email,
+    password
+  });
+
+  return user;
+};
+
+
+// Crea un nuevo usuario
+export const createUser = async (
+  name: string,
+  email: string,
+  password: string
+): Promise<User> => {
+
+  const orm = getOrm();
+  const em = orm.em.fork();
+
+  const user = em.create(User, {
+    nombre: name,
+    email: email,
+    password: password,
+    rol: 'cliente'
+  });
+
+  await em.persist(user).flush();
+
+  return user;
 };
