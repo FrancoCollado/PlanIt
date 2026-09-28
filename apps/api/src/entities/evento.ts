@@ -25,4 +25,8 @@ export class Evento {
 
   @Property({ type: 'string', length: 255, nullable: true })
   imagen?: string;
+
+  // Indica si el evento todavía es un borrador (no visible/publicado) o ya está confirmado
+  @Property({ type: 'boolean', default: true })
+  draft: boolean = true;
 }

@@ -24,7 +24,9 @@ export const findUserByCredentials = async (
 export const createUser = async (
   name: string,
   email: string,
-  password: string
+  password: string,
+  role: 'cliente' | 'empresa',
+  businessData?: { zona: string; cuit: number; telefono: number }
 ): Promise<User> => {
 
   const orm = getOrm();
@@ -34,7 +36,8 @@ export const createUser = async (
     nombre: name,
     email: email,
     password: password,
-    rol: 'cliente'
+    rol: role,
+    ...(businessData ?? {})
   });
 
   await em.persist(user).flush();

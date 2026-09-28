@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { AuthCard } from '../components/AuthCard';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
-import type { UserRole } from '../components/LoginForm';
+import type { AuthUser } from '../components/LoginForm';
 
 const PageWrapper = styled.div`
   width: 100vw;
@@ -31,13 +31,13 @@ const BlurredBackground = styled.div`
 `;
 
 interface AuthPageProps {
-  onLoginSuccess?: (role: UserRole) => void;
+  onLoginSuccess?: (user: AuthUser) => void;
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
-  // Al registrarse con éxito, si conocemos el rol, dejamos al usuario logueado directamente
-  const handleRegisterSuccess = (role?: UserRole) => {
-    if (role) onLoginSuccess?.(role);
+  // Al registrarse con éxito, si conocemos el usuario, lo dejamos logueado directamente
+  const handleRegisterSuccess = (user?: AuthUser) => {
+    if (user) onLoginSuccess?.(user);
   };
 
   return (

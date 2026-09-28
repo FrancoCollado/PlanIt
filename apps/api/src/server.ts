@@ -7,6 +7,11 @@ import { MikroORM } from '@mikro-orm/mysql';
 import mikroOrmConfig from './config/mikro-orm.config';
 
 import authRoutes from './modules/auth/routes/auth.routes';
+import eventoRoutes from './modules/events/routes/evento.routes';
+import usuarioRoutes from './modules/users/routes/usuario.routes';
+import statsRoutes from './modules/stats/routes/stats.routes';
+import categoriaRoutes from './modules/categories/routes/categoria.routes';
+import servicioRoutes from './modules/services/routes/servicio.routes';
 
 import { setOrm } from './config/orm';
 
@@ -19,6 +24,11 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/eventos', eventoRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/categorias', categoriaRoutes);
+app.use('/api/servicios', servicioRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {

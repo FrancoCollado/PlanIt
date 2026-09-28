@@ -29,6 +29,19 @@ export class User {
   })
   rol: 'cliente' | 'administrador' | 'empresa' = 'cliente';
 
+  @Property({ type: 'string', length: 100, nullable: true })
+  zona?: string;
+
+  @Property({ type: 'number', nullable: true })
+  cuit?: number;
+
+  @Property({ type: 'number', nullable: true })
+  telefono?: number;
+
+  // Permite suspender (desactivar) una cuenta sin borrarla, usado para empresas
+  @Property({ type: 'boolean', default: true })
+  activo: boolean = true;
+
   @Property({
     type: 'Date',
     fieldName: 'creado_en',

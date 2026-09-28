@@ -30,6 +30,12 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   font-family: sans-serif;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-card-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .admin-card-accent {
@@ -63,8 +69,17 @@
   height: 36px;
 }
 
+.admin-card-icon-lucide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 /* ==========================================
-   3. COLORES ESPECÍFICOS POR ID (barra de acento)
+   3. COLORES ESPECÍFICOS POR ID (barra de acento + ícono)
    ========================================== */
 #admin-verde .admin-card-accent {
   background-color: #1e5e34;
@@ -76,6 +91,34 @@
 
 #admin-azul .admin-card-accent {
   background-color: #00155a;
+}
+
+#admin-empresas-activas .admin-card-accent {
+  background-color: #0f766e;
+}
+#admin-empresas-activas .admin-card-icon-lucide {
+  background-color: #0f766e;
+}
+
+#admin-eventos-publicados .admin-card-accent {
+  background-color: #15803d;
+}
+#admin-eventos-publicados .admin-card-icon-lucide {
+  background-color: #15803d;
+}
+
+#admin-eventos-borrador .admin-card-accent {
+  background-color: #b45309;
+}
+#admin-eventos-borrador .admin-card-icon-lucide {
+  background-color: #b45309;
+}
+
+#admin-clientes-registrados .admin-card-accent {
+  background-color: #1d4ed8;
+}
+#admin-clientes-registrados .admin-card-icon-lucide {
+  background-color: #1d4ed8;
 }
 
 #admin-gris .admin-card-accent {

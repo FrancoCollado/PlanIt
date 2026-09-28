@@ -40,4 +40,8 @@ export class Servicio {
     fieldName: 'creado_en'
   })
   creadoEn!: Date;
+
+  // Indica si el servicio ya está publicado (activo) o todavía es un borrador
+  @Property({ type: 'boolean', default: true })
+  draft: boolean = true;
 }

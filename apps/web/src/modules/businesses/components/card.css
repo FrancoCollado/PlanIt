@@ -35,6 +35,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   font-family: sans-serif;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .card-accent {
@@ -68,6 +69,20 @@
   height: 36px;
 }
 
+.card-icon-lucide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.card-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
 /* ==========================================
    3. COLORES ESPECÍFICOS POR ID (barra de acento)
    ========================================== */
@@ -86,3 +101,15 @@
 #gris .card-accent {
   background-color: #374151;
 }
+
+#biz-servicios-activos .card-accent { background-color: #15803d; }
+#biz-servicios-activos .card-icon-lucide { background-color: #15803d; }
+
+#biz-servicios-borrador .card-accent { background-color: #b45309; }
+#biz-servicios-borrador .card-icon-lucide { background-color: #b45309; }
+
+#biz-guardados .card-accent { background-color: #7c3aed; }
+#biz-guardados .card-icon-lucide { background-color: #7c3aed; }
+
+#biz-categorias .card-accent { background-color: #1d4ed8; }
+#biz-categorias .card-icon-lucide { background-color: #1d4ed8; }

@@ -13,11 +13,22 @@
   padding: 20px;
 }
 
+/* ==========================================
+   MARCO SUPERIOR: título + logout + bajada
+   ========================================== */
+.admin-hero {
+  background: linear-gradient(135deg, #1e293b 0%, #1d4ed8 100%);
+  border-radius: 12px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.25);
+}
+
 #admin-subtitulo {
-  border: 1px solid black;
-  margin: 10px;
-  padding: 1px;
-  color: black;
+  margin: 0.5rem 0 0 0.75rem;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
 }
 
 /* ==========================================
@@ -33,16 +44,16 @@
 .admin-dashboard-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #1f2937;
-  margin: 0 0 0.25rem 0;
+  color: #ffffff;
+  margin: 0;
   padding-left: 0.75rem;
-  border-left: 6px solid #2563eb;
+  border-left: 6px solid #60a5fa;
 }
 
 .admin-boton-logout {
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
-  color: #374151;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   border-radius: 6px;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
@@ -50,17 +61,23 @@
 }
 
 .admin-boton-logout:hover {
-  background-color: #f3f4f6;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* ==========================================
-   2 TARJETAS VERTICALES DE ADMIN
+   TARJETAS VERTICALES DE ADMIN (acciones)
    ========================================== */
 .admin-acciones-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-top: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .admin-acciones-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 600px) {
@@ -88,6 +105,11 @@
 .admin-accion-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.admin-accion-card-activa {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
 }
 
 .admin-accion-icono {
@@ -200,4 +222,136 @@
   cursor: pointer;
   background-color: #e5e7eb;
   color: #374151;
+}
+
+/* ==========================================
+   MODAL "GESTIONAR EVENTOS" (lista + formulario)
+   ========================================== */
+.admin-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.admin-boton-crear {
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.admin-badge-draft {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+}
+
+.admin-badge-draft.es-borrador {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.admin-badge-draft.publicado {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.admin-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  color: #4b5563;
+  gap: 0.25rem;
+}
+
+.admin-form-checkbox {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}
+
+.admin-form input,
+.admin-form textarea {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.admin-form select {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background-color: #ffffff;
+}
+
+.admin-boton-crear:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+.admin-error-text {
+  color: #d32f2f;
+  font-size: 0.85rem;
+}
+
+/* ==========================================
+   PANEL DE EVENTOS / PERFILES (inline, sin ventana emergente)
+   ========================================== */
+.admin-panel {
+  margin-top: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.admin-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.admin-panel-header-botones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-panel-titulo {
+  margin: 0;
+  color: #1f2937;
+}
+
+.admin-boton-cerrar-panel {
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.admin-boton-cerrar-panel:hover {
+  background-color: #f3f4f6;
 }

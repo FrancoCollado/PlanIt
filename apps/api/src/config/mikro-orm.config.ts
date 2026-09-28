@@ -11,6 +11,9 @@ import { User } from '../entities/usuario';
 import { Evento } from '../entities/evento';
 import { Categoria } from '../entities/categoria';
 import { Servicio } from '../entities/servicio';
+import { EventoCategoria } from '../entities/evento-categoria';
+import { Tablero } from '../entities/tablero';
+import { TableroServicio } from '../entities/tablero-servicio';
 
 export default defineConfig({
 
@@ -28,7 +31,10 @@ export default defineConfig({
     User,
     Evento,
     Categoria,
-    Servicio
+    Servicio,
+    EventoCategoria,
+    Tablero,
+    TableroServicio
   ],
 
   metadataProvider: ReflectMetadataProvider,

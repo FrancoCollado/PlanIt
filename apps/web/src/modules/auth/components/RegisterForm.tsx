@@ -14,7 +14,7 @@ import {
   CheckboxLabel,
   PrimaryButton
 } from './LoginForm';
-import type { UserRole } from './LoginForm';
+import type { UserRole, AuthUser } from './LoginForm';
 import { registerRequest } from '../services/authService';
 
 
@@ -23,7 +23,7 @@ const CompactInput = styled(StyledInput)`
 `;
 
 interface RegisterFormProps {
-  onRegisterSuccess?: (role?: UserRole) => void;
+  onRegisterSuccess?: (user?: AuthUser) => void;
 }
 
 // Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
@@ -49,6 +49,11 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
 
+  const [role, setRole] = useState<'cliente' | 'empresa'>('cliente');
+  const [zona, setZona] = useState('');
+  const [cuit, setCuit] = useState('');
+  const [telefono, setTelefono] = useState('');
+
   const [message, setMessage] = useState('');
 
 
@@ -60,6 +65,11 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
 
     setMessage('');
 
+    if (role === 'empresa' && (!zona || !cuit || !telefono)) {
+      setMessage('Zona, CUIT y teléfono son requeridos para cuentas de empresa');
+      return;
+    }
+
     try {
 
       const data = await registerRequest({
@@ -67,7 +77,9 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
         email,
         password,
         confirmPassword,
-        acceptTerms
+        acceptTerms,
+        role,
+        ...(role === 'empresa' ? { zona, cuit: Number(cuit), telefono: Number(telefono) } : {})
       });
 
       // Registro correcto
@@ -79,8 +91,13 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
       setPassword('');
       setConfirmPassword('');
       setAcceptTerms(false);
+      setRole('cliente');
+      setZona('');
+      setCuit('');
+      setTelefono('');
 
-      onRegisterSuccess?.(mapRolToUserRole(data.user.rol) ?? undefined);
+      const rol = mapRolToUserRole(data.user.rol);
+      onRegisterSuccess?.(rol ? { id: data.user.id, role: rol } : undefined);
 
     } catch (error) {
 
@@ -179,6 +196,83 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
         </ContenedorInput>
 
       </InputGroup>
+
+
+      <InputGroup>
+
+        <Label>
+          Tipo de cuenta
+        </Label>
+
+        <OptionsRow>
+
+          <CheckboxLabel>
+            <input
+              type="radio"
+              name="role"
+              checked={role === 'cliente'}
+              onChange={() => setRole('cliente')}
+            />
+            Cliente
+          </CheckboxLabel>
+
+          <CheckboxLabel>
+            <input
+              type="radio"
+              name="role"
+              checked={role === 'empresa'}
+              onChange={() => setRole('empresa')}
+            />
+            Empresa
+          </CheckboxLabel>
+
+        </OptionsRow>
+
+      </InputGroup>
+
+
+      {role === 'empresa' && (
+        <>
+          <InputGroup>
+            <Label>
+              Zona
+            </Label>
+            <ContenedorInput>
+              <CompactInput
+                type="text"
+                value={zona}
+                onChange={(e) => setZona(e.target.value)}
+              />
+            </ContenedorInput>
+          </InputGroup>
+
+          <InputGroup>
+            <Label>
+              CUIT
+            </Label>
+            <ContenedorInput>
+              <CompactInput
+                type="number"
+                value={cuit}
+                onChange={(e) => setCuit(e.target.value)}
+              />
+            </ContenedorInput>
+          </InputGroup>
+
+          <InputGroup>
+            <Label>
+              Teléfono
+            </Label>
+            <ContenedorInput>
+              <CompactInput
+                type="number"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+              />
+            </ContenedorInput>
+          </InputGroup>
+        </>
+      )}
 
 
       <OptionsRow style={{ marginBottom: '1rem' }}>

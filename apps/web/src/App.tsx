@@ -3,18 +3,20 @@ import AuthPage from './modules/auth/pages/AuthPage';
 import Dashboard from './modules/businesses/components/dashboard';
 import ClienteDashboard from './modules/clientes/components/dashboard';
 import AdminDashboard from './modules/admin/components/dashboard';
-import type { UserRole } from './modules/auth/components/LoginForm';
+import type { AuthUser } from './modules/auth/components/LoginForm';
 
 export default function App() {
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
 
-  if (!userRole) {
+  if (!authUser) {
     return (
       <main className="w-full min-h-screen">
-        <AuthPage onLoginSuccess={(role) => setUserRole(role)} />
+        <AuthPage onLoginSuccess={(user) => setAuthUser(user)} />
       </main>
     );
   }
+
+  const userRole = authUser.role;
 
   // Si el rol es "client", mostramos el dashboard de clientes.
   // Si el rol es "admin", mostramos el dashboard de administración.
@@ -22,7 +24,7 @@ export default function App() {
   if (userRole === 'client') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
-        <ClienteDashboard onLogout={() => setUserRole(null)} />
+        <ClienteDashboard onLogout={() => setAuthUser(null)} />
       </main>
     );
   }
@@ -30,7 +32,7 @@ export default function App() {
   if (userRole === 'admin') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
-        <AdminDashboard onLogout={() => setUserRole(null)} />
+        <AdminDashboard onLogout={() => setAuthUser(null)} />
       </main>
     );
   }
@@ -39,7 +41,7 @@ export default function App() {
     <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
       
       {/* 1. Primero el Dashboard */}
-      <Dashboard role={userRole} onLogout={() => setUserRole(null)} />
+      <Dashboard role={userRole} usuarioId={authUser.id} onLogout={() => setAuthUser(null)} />
 
     </main>
   );

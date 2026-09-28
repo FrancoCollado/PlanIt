@@ -3,8 +3,13 @@ import styled from 'styled-components';
 import { loginRequest } from '../services/authService';
 export type UserRole = 'admin' | 'business' | 'client';
 
+export interface AuthUser {
+  id: number;
+  role: UserRole;
+}
+
 interface LoginFormProps {
-  onLoginSuccess?: (role: UserRole) => void;
+  onLoginSuccess?: (user: AuthUser) => void;
   onGoogleLogin?: () => void;
   onFacebookLogin?: () => void;
 }
@@ -193,7 +198,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLo
         return;
       }
 
-      onLoginSuccess?.(rol);
+      onLoginSuccess?.({ id: user.id, role: rol });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Credenciales inválidas');
     }
@@ -242,14 +247,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLo
       <PrimaryButton type="submit">
         INGRESAR AL SISTEMA
       </PrimaryButton>
-
-      <SocialLoginContainer>
-        <SocialText>O inicia sesión con:</SocialText>
-        <SocialIconsRow>
-          <SocialIconCircle type="button" onClick={handleGoogleLogin} aria-label="Iniciar sesión con Google">G</SocialIconCircle>
-          <SocialIconCircle type="button" onClick={handleFacebookLogin} aria-label="Iniciar sesión con Facebook">F</SocialIconCircle>
-        </SocialIconsRow>
-      </SocialLoginContainer>
     </form>
   );
 };

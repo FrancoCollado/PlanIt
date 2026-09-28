@@ -1,335 +1,335 @@
-import React, { useState } from 'react';
-import { 
-  LayoutDashboard, 
-  Boxes, 
-  FileText, 
-  Table, 
-  Plus, 
-  DollarSign, 
-  ShoppingCart, 
-  Users, 
-  Gift, 
-  MessageSquare, 
-  Bell, 
-  Power, 
-  ChevronDown,
-  Pencil,
-  Trash2
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Boxes, Pencil, Trash2, Plus, PackageCheck, FileEdit, BookMarked, Tags, ChevronDown, ChevronUp } from 'lucide-react';
 
 import Card from './card';
-import { HorizontalCard } from './HorizontalCard';
 import './dashboard.css';
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  precio: string;
-  descripcion: string;
-}
-
-interface NuevoServicio {
-  nombre: string;
-  precio: string;
-  descripcion: string;
-}
+import {
+  listServiciosRequest,
+  createServicioRequest,
+  updateServicioRequest,
+  deleteServicioRequest
+} from '../services/servicioService';
+import type { Servicio } from '../services/servicioService';
+import { getBusinessStatsRequest } from '../services/statsService';
+import type { BusinessStats } from '../services/statsService';
+import { listCategoriasRequest } from '../../events/services/categoriaService';
+import type { Categoria } from '../../events/services/categoriaService';
 
 interface DashboardProps {
   role?: string; // O role?: 'admin' | 'business' | 'client';
   onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
-  servicios?: Servicio[];
-  onCreateServicio?: (servicio: NuevoServicio) => void;
-  onEditServicio?: (servicio: Servicio) => void;
-  onDeleteServicio?: (servicio: Servicio) => void;
+  usuarioId?: number;
 }
 
-// Lista falsa de servicios, usada como valor por defecto si no se pasa la prop "servicios"
-const serviciosFalsosPorDefecto: Servicio[] = [
-  { id: 1, nombre: 'Corte de pelo', precio: '$ 5.000', descripcion: 'Corte clásico para caballero' },
-  { id: 2, nombre: 'Manicura', precio: '$ 8.000', descripcion: 'Manicura completa con esmalte' },
-  { id: 3, nombre: 'Masaje relajante', precio: '$ 15.000', descripcion: 'Masaje de 30 minutos' },
-];
+const servicioVacio = { nombre: '', descripcion: '', imagen: '', categoriaId: 0, draft: true };
+const statsVacias: BusinessStats = {
+  serviciosActivos: 0,
+  serviciosBorrador: 0,
+  vecesGuardadoEnTableros: 0,
+  categoriasPresentes: 0
+};
 
-export default function AdminDashboard({
-  role,
-  onLogout,
-  servicios = serviciosFalsosPorDefecto,
-  onCreateServicio,
-  onEditServicio,
-  onDeleteServicio
-}: DashboardProps) {
-  // Controla si el menú lateral (sidebar) muestra sus sub-items o no
-  const [uiComponentsOpen, setUiComponentsOpen] = useState(true);
-  const [activeTab, setActiveTab] = useState('dashboard');
-
-  // Botón "Volver a iniciar sesión": simplemente llama a onLogout,
-  // que en App.tsx borra el usuario logueado y por eso vuelve a mostrarse AuthPage
+export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
   function volverAIniciarSesion() {
     onLogout?.();
   }
 
-  // Estado del modal "Crear Servicio" y de los campos del formulario
-  const [showCrearServicio, setShowCrearServicio] = useState(false);
-  const [nombreServicio, setNombreServicio] = useState('');
-  const [precioServicio, setPrecioServicio] = useState('');
-  const [descripcionServicio, setDescripcionServicio] = useState('');
+  // --- Estadísticas reales de la base de datos (MikroORM) para las tarjetas superiores ---
+  const [stats, setStats] = useState<BusinessStats>(statsVacias);
+
+  function cargarStats() {
+    if (!usuarioId) return;
+    getBusinessStatsRequest(usuarioId).then(setStats).catch(() => {});
+  }
+
+  useEffect(() => {
+    cargarStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuarioId]);
+
+  // --- Gestión de servicios propios de la empresa (CRUD real contra la API con MikroORM) ---
+  const [desplegado, setDesplegado] = useState(false);
+  const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [cargandoServicios, setCargandoServicios] = useState(false);
+  const [errorServicios, setErrorServicios] = useState('');
+
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  const [mostrarFormServicio, setMostrarFormServicio] = useState(false);
+  const [servicioEnEdicion, setServicioEnEdicion] = useState<Servicio | null>(null);
+  const [formServicio, setFormServicio] = useState(servicioVacio);
+
+  async function cargarServicios() {
+    if (!usuarioId) return;
+    setCargandoServicios(true);
+    setErrorServicios('');
+
+    try {
+      const data = await listServiciosRequest(usuarioId);
+      setServicios(data);
+    } catch (error) {
+      setErrorServicios(error instanceof Error ? error.message : 'Error al cargar los servicios');
+    } finally {
+      setCargandoServicios(false);
+    }
+  }
+
+  async function cargarCategorias() {
+    try {
+      const data = await listCategoriasRequest();
+      setCategorias(data);
+    } catch {
+      setCategorias([]);
+    }
+  }
+
+  function alternarDesplegado() {
+    if (!desplegado) {
+      setMostrarFormServicio(false);
+      cargarServicios();
+      cargarCategorias();
+    }
+    setDesplegado(!desplegado);
+  }
 
   function abrirCrearServicio() {
-    setShowCrearServicio(true);
+    setServicioEnEdicion(null);
+    setFormServicio({ ...servicioVacio, categoriaId: categorias[0]?.id ?? 0 });
+    setMostrarFormServicio(true);
   }
 
-  function cerrarCrearServicio() {
-    setShowCrearServicio(false);
-    setNombreServicio('');
-    setPrecioServicio('');
-    setDescripcionServicio('');
+  function abrirEditarServicio(servicio: Servicio) {
+    setServicioEnEdicion(servicio);
+    setFormServicio({
+      nombre: servicio.nombre,
+      descripcion: servicio.descripcion ?? '',
+      imagen: servicio.imagen ?? '',
+      categoriaId: servicio.categoria.id,
+      draft: servicio.draft
+    });
+    setMostrarFormServicio(true);
   }
 
-  function guardarServicio(e: React.FormEvent) {
-    e.preventDefault(); // evita que el formulario recargue la página
-    const nuevoServicio: NuevoServicio = {
-      nombre: nombreServicio,
-      precio: precioServicio,
-      descripcion: descripcionServicio
-    };
-
-    if (onCreateServicio) onCreateServicio(nuevoServicio);
-    else alert(`Servicio creado:\nNombre: ${nombreServicio}\nPrecio: ${precioServicio}\nDescripción: ${descripcionServicio}`);
-
-    cerrarCrearServicio();
+  function cerrarFormServicio() {
+    setMostrarFormServicio(false);
+    setServicioEnEdicion(null);
+    setFormServicio(servicioVacio);
   }
 
-  // Lista falsa de servicios, usada como valor por defecto si no se pasa la prop "servicios"
-  const serviciosFalsos = servicios;
+  async function guardarServicio(e: React.FormEvent) {
+    e.preventDefault();
+    setErrorServicios('');
 
-  // Indica si mostramos la lista para "editar" o para "eliminar" (o ninguna, null)
-  const [listaServicios, setListaServicios] = useState<'editar' | 'eliminar' | null>(null);
+    if (!usuarioId) return;
 
-  function abrirListaEditar() {
-    setListaServicios('editar');
+    if (!formServicio.categoriaId) {
+      setErrorServicios('Tenés que elegir una categoría para el servicio');
+      return;
+    }
+
+    try {
+      if (servicioEnEdicion) {
+        await updateServicioRequest(servicioEnEdicion.id, usuarioId, formServicio);
+      } else {
+        await createServicioRequest(usuarioId, formServicio);
+      }
+
+      await cargarServicios();
+      cerrarFormServicio();
+      cargarStats();
+    } catch (error) {
+      setErrorServicios(error instanceof Error ? error.message : 'Error al guardar el servicio');
+    }
   }
 
-  function abrirListaEliminar() {
-    setListaServicios('eliminar');
-  }
+  async function borrarServicio(servicio: Servicio) {
+    if (!usuarioId) return;
 
-  function cerrarListaServicios() {
-    setListaServicios(null);
-  }
+    const confirmado = window.confirm(`¿Seguro que querés borrar el servicio "${servicio.nombre}"? Esta acción no se puede deshacer.`);
+    if (!confirmado) return;
 
-  function editarServicio(servicio: Servicio) {
-    if (onEditServicio) onEditServicio(servicio);
-    else alert(`Editar servicio: ${servicio.nombre}`);
+    try {
+      await deleteServicioRequest(servicio.id, usuarioId);
+      await cargarServicios();
+      cargarStats();
+    } catch (error) {
+      setErrorServicios(error instanceof Error ? error.message : 'Error al eliminar el servicio');
+    }
   }
-
-  function eliminarServicio(servicio: Servicio) {
-    if (onDeleteServicio) onDeleteServicio(servicio);
-    else alert(`Servicio eliminado: ${servicio.nombre}`);
-  }
-
-  // Datos para las 3 tarjetas exclusivas de la empresa
-  const businessCardsData = [
-    {
-      id: 'card-1',
-      category: 'Crear Servicio',
-      title: ' Crea bienes o servicios',
-      description: 'Amplia tu oferta para que más gente te vea',
-      date: '10 de Octubre',
-      action: abrirCrearServicio
-    },
-    {
-      id: 'card-2',
-      category: 'Actualizar Servicios',
-      title: 'Actualiza tus Bienes o Servicios ya creados',
-      description: 'Puedes modificar los servicios que tiene disponibles hasta el momento',
-      date: '12 de Octubre',
-      action: abrirListaEditar
-    },
-    {
-      id: 'card-3',
-      category: 'Eliminar Servicios',
-      title: 'Da de baja un servicio',
-      description: 'Puedes eliminar servicios que no uses',
-      date: '15 de Octubre',
-      action: abrirListaEliminar
-    },
-  ];
 
   return (
-    // Contenedor general de toda la pantalla del dashboard
-    <div className='container'>
-      {/* Navegacion */}
-      <aside>
-        <div>
-          {/* Logo  */}
-          <div> </div>
+    <div className="biz-container">
+      <main className="biz-main">
+        {/* Encabezado: título, botón de logout y bajada, todo dentro de un mismo marco */}
+        <div className="biz-hero">
+          <div className="biz-dashboard-header">
+            <h1 className="biz-dashboard-title">Dashboard</h1>
+            <button className="biz-boton-logout" onClick={volverAIniciarSesion}>
+              Volver a iniciar sesión
+            </button>
+          </div>
 
-          <nav>
-            {/* Menu Item */}
-            <div>
-              {/* Sub-items: solo se muestran si uiComponentsOpen es true */}
-              {uiComponentsOpen && (
-                <div>
-                </div>
+          <p className="biz-subtitulo">Observa tus estadísticas</p>
+        </div>
+
+        {/* TARJETAS SUPERIORES: estadísticas reales, calculadas en la base de datos con MikroORM */}
+        <div className="cards-grid">
+          <Card
+            id="biz-servicios-activos"
+            amount={String(stats.serviciosActivos)}
+            label="Servicios activos"
+            icon={<PackageCheck size={20} />}
+          />
+          <Card
+            id="biz-servicios-borrador"
+            amount={String(stats.serviciosBorrador)}
+            label="Servicios en borrador"
+            icon={<FileEdit size={20} />}
+          />
+          <Card
+            id="biz-guardados"
+            amount={String(stats.vecesGuardadoEnTableros)}
+            label="Guardados por clientes"
+            icon={<BookMarked size={20} />}
+          />
+          <Card
+            id="biz-categorias"
+            amount={String(stats.categoriasPresentes)}
+            label="Categorías presentes"
+            icon={<Tags size={20} />}
+          />
+        </div>
+
+        {/* Única acción de la empresa: una sola card "Gestionar Servicios" con su desplegable debajo */}
+        <section className={`biz-gestion-card ${desplegado ? 'biz-gestion-card-activa' : ''}`}>
+          <button className="biz-accion-card" onClick={alternarDesplegado} aria-expanded={desplegado}>
+            <Boxes size={32} className="biz-accion-icono" />
+            <h3 className="biz-accion-titulo">Gestionar Servicios</h3>
+            <p className="biz-accion-descripcion">Publicá tus servicios, guardalos como borrador o edítalos</p>
+            <span className="biz-accion-chevron">
+              {desplegado ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </span>
+          </button>
+
+          {desplegado && (
+            <div className="biz-panel">
+              {!mostrarFormServicio ? (
+                <>
+                  <div className="biz-panel-header">
+                    <h3 className="biz-panel-titulo">Tus servicios</h3>
+                    <div className="biz-panel-header-botones">
+                      <button className="biz-boton-crear" onClick={abrirCrearServicio} disabled={categorias.length === 0}>
+                        <Plus size={16} /> Nuevo servicio
+                      </button>
+                      <button className="biz-boton-cerrar-panel" onClick={alternarDesplegado}>Cerrar</button>
+                    </div>
+                  </div>
+
+                  {errorServicios && <p className="biz-error-text">{errorServicios}</p>}
+                  {cargandoServicios && <p>Cargando servicios...</p>}
+                  {!cargandoServicios && categorias.length === 0 && <p>Todavía no hay categorías cargadas; pedile al administrador que cree alguna antes de publicar servicios.</p>}
+                  {!cargandoServicios && categorias.length > 0 && servicios.length === 0 && <p>Todavía no publicaste ningún servicio.</p>}
+
+                  <div className="biz-servicios-grid">
+                    {servicios.map((servicio) => (
+                      <article key={servicio.id} className={`biz-servicio-card ${servicio.draft ? 'es-borrador' : 'publicado'}`}>
+                        <div className="biz-servicio-media">
+                          {servicio.imagen
+                            ? <img src={servicio.imagen} alt={servicio.nombre} />
+                            : <Boxes size={36} className="biz-servicio-media-icono" />}
+                          <span className={`biz-servicio-estado ${servicio.draft ? 'es-borrador' : 'publicado'}`}>
+                            {servicio.draft ? 'Borrador' : 'Publicado'}
+                          </span>
+                        </div>
+
+                        <div className="biz-servicio-body">
+                          <span className="biz-servicio-categoria">{servicio.categoria.nombre}</span>
+                          <h4 className="biz-servicio-nombre">{servicio.nombre}</h4>
+                          {servicio.descripcion && <p className="biz-servicio-descripcion">{servicio.descripcion}</p>}
+                        </div>
+
+                        <div className="biz-servicio-footer">
+                          <button className="biz-servicio-accion" onClick={() => abrirEditarServicio(servicio)}>
+                            <Pencil size={15} /> Editar
+                          </button>
+                          <button className="biz-servicio-accion biz-servicio-accion-borrar" onClick={() => borrarServicio(servicio)}>
+                            <Trash2 size={15} /> Borrar
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="biz-panel-header">
+                    <h3 className="biz-panel-titulo">{servicioEnEdicion ? 'Editar servicio' : 'Nuevo servicio'}</h3>
+                  </div>
+
+                  {errorServicios && <p className="biz-error-text">{errorServicios}</p>}
+
+                  <form onSubmit={guardarServicio} className="biz-form">
+                    <label>
+                      Nombre
+                      <input
+                        type="text"
+                        value={formServicio.nombre}
+                        onChange={(e) => setFormServicio({ ...formServicio, nombre: e.target.value })}
+                        required
+                      />
+                    </label>
+
+                    <label>
+                      Descripción
+                      <textarea
+                        value={formServicio.descripcion}
+                        onChange={(e) => setFormServicio({ ...formServicio, descripcion: e.target.value })}
+                      />
+                    </label>
+
+                    <label>
+                      Imagen (URL)
+                      <input
+                        type="text"
+                        value={formServicio.imagen}
+                        onChange={(e) => setFormServicio({ ...formServicio, imagen: e.target.value })}
+                      />
+                    </label>
+
+                    <label>
+                      Categoría
+                      <select
+                        value={formServicio.categoriaId}
+                        onChange={(e) => setFormServicio({ ...formServicio, categoriaId: Number(e.target.value) })}
+                        required
+                      >
+                        <option value={0} disabled>Elegí una categoría</option>
+                        {categorias.map((categoria) => (
+                          <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="biz-form-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={formServicio.draft}
+                        onChange={(e) => setFormServicio({ ...formServicio, draft: e.target.checked })}
+                      />
+                      Guardar como borrador
+                    </label>
+
+                    <div className="biz-form-actions">
+                      <button type="button" onClick={cerrarFormServicio}>Cancelar</button>
+                      <button type="submit">Guardar</button>
+                    </div>
+                  </form>
+                </>
               )}
             </div>
-          </nav>
-        </div>
-      </aside>
-
-      <main>
-        {/* Fila de arriba: título a la izquierda y botón de logout a la derecha */}
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">Dashboard</h1>
-          <button className="boton-logout" onClick={volverAIniciarSesion}>
-            Volver a iniciar sesión
-          </button>
-        </div>
-
-        {/* Banner */}
-        <div id="subtitulo"> Observa tus estadísticas </div>
-
-        {/* TARJETAS SUPERIORES: solo muestran datos fijos de ejemplo */}
-        <div className="cards-grid">
-          <Card id="verde" amount="$ 153.000" label="Ingresos" icon="money.svg" />
-          <Card id="amarillo" amount="20" label="Ventas" icon="cart.svg" />
-          <Card id="azul" amount="20" label="Clientes" icon="badge.svg" />
-          <Card id="gris" amount="20" label="Empleados" icon="gift.svg" />
-        </div>
-
-        {/* --- POSICIÓN MEDIA: 3 Tarjetas distintas para 'business' --- */}
-        {/* Solo se ven si el usuario logueado tiene rol 'business' */}
-        {role === 'business' && (
-          <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
-            {/* Recorremos businessCardsData y dibujamos una HorizontalCard por cada una */}
-            {businessCardsData.map((card) => (
-              <HorizontalCard
-                key={card.id}
-                category={card.category}
-                title={card.title}
-                description={card.description}
-                date={card.date}
-                onClick={card.action} // al hacer click se ejecuta la función guardada en "action"
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Paneles Principales (todavía vacío, reservado para más contenido) */}
-        <div>
-        </div>
+          )}
+        </section>
       </main>
-
-      {/* Modal simple para crear un servicio, con el mismo estilo que las cards */}
-      {/* Solo se dibuja en pantalla cuando showCrearServicio es true */}
-      {showCrearServicio && (
-        <div className="modal-overlay" onClick={cerrarCrearServicio}>
-          <div
-            className="horizontal-card modal-card"
-            onClick={(e) => e.stopPropagation()} // evita cerrar el modal al hacer click adentro
-          >
-            <div className="card-accent" />
-            <div className="card-content">
-              <div className="card-header">
-                <span className="card-category">Crear Servicio</span>
-              </div>
-              <h3 className="card-title">Completa los datos del servicio</h3>
-
-              <form onSubmit={guardarServicio} className="modal-form">
-                <label>
-                  Nombre
-                  <input
-                    type="text"
-                    value={nombreServicio}
-                    onChange={(e) => setNombreServicio(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Precio
-                  <input
-                    type="number"
-                    value={precioServicio}
-                    onChange={(e) => setPrecioServicio(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <label>
-                  Descripción
-                  <textarea
-                    value={descripcionServicio}
-                    onChange={(e) => setDescripcionServicio(e.target.value)}
-                    required
-                  />
-                </label>
-
-                <div className="modal-actions">
-                  <button type="button" onClick={cerrarCrearServicio}>Cancelar</button>
-                  <button type="submit">Guardar</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal simple con la lista de servicios, para editar o eliminar */}
-      {/* Se reutiliza el mismo modal para los dos casos: solo cambia el texto y el ícono del botón */}
-      {listaServicios && (
-        <div className="modal-overlay" onClick={cerrarListaServicios}>
-          <div
-            className="horizontal-card modal-card modal-card-lista"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="card-accent" />
-            <div className="card-content">
-              <div className="card-header">
-                <span className="card-category">
-                  {listaServicios === 'editar' ? 'Actualizar Servicios' : 'Eliminar Servicios'}
-                </span>
-              </div>
-              <h3 className="card-title">
-                {listaServicios === 'editar' ? 'Elige un servicio para editar' : 'Elige un servicio para eliminar'}
-              </h3>
-
-              <div className="service-list">
-                {serviciosFalsos.map((servicio) => (
-                  <div key={servicio.id} className="service-row">
-                    <div className="service-row-info">
-                      <span className="service-row-nombre">{servicio.nombre}</span>
-                      <span className="service-row-precio">{servicio.precio}</span>
-                    </div>
-
-                    {listaServicios === 'editar' ? (
-                      <button
-                        className="service-row-boton"
-                        onClick={() => editarServicio(servicio)}
-                        aria-label="Editar servicio"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                    ) : (
-                      <button
-                        className="service-row-boton"
-                        onClick={() => eliminarServicio(servicio)}
-                        aria-label="Eliminar servicio"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="modal-actions">
-                <button type="button" onClick={cerrarListaServicios}>Cerrar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

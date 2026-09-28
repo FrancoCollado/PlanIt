@@ -31,6 +31,12 @@ export const login = async (
       });
     }
 
+    if (!user.activo) {
+      return res.status(403).json({
+        error: 'Tu cuenta fue suspendida por un administrador. Contactá a soporte para más información.'
+      });
+    }
+
     res.json({
       message: 'Inicio de sesión exitoso',
       user: {
@@ -63,7 +69,11 @@ export const register = async (
     email,
     password,
     confirmPassword,
-    acceptTerms
+    acceptTerms,
+    role,
+    zona,
+    cuit,
+    telefono
   } = req.body;
 
   // Verifico que estén todos los campos
@@ -87,8 +97,28 @@ export const register = async (
     });
   }
 
+  // El rol solo puede ser 'cliente' o 'empresa' desde el registro público (admins ya vienen cargados)
+  if (role !== 'cliente' && role !== 'empresa') {
+    return res.status(400).json({
+      error: 'Rol inválido, debe ser "cliente" o "empresa"'
+    });
+  }
+
+  // Si es empresa, exijo los datos adicionales
+  if (role === 'empresa' && (!zona || cuit === undefined || telefono === undefined)) {
+    return res.status(400).json({
+      error: 'Zona, CUIT y teléfono son requeridos para cuentas de empresa'
+    });
+  }
+
   try {
-    const user = await createUser(name, email, password);
+    const user = await createUser(
+      name,
+      email,
+      password,
+      role,
+      role === 'empresa' ? { zona: zona!, cuit: Number(cuit), telefono: Number(telefono) } : undefined
+    );
 
     res.status(201).json({
       message: 'Usuario creado correctamente',

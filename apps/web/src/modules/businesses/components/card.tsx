@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import "./card.css";
 // 1. Definimos los tipos de datos para TypeScript
 interface CardProps {
   id: string;
   amount: string;
   label: string;
-  icon: string;
+  icon: string | ReactNode;
 }
 
 // 2. Le indicamos a React que las props usan esa interfaz (: CardProps)
@@ -17,7 +18,9 @@ export default function Card({ id, amount, label, icon }: CardProps) {
           <div className="card-amount">{amount}</div>
           <div className="card-label">{label}</div>
         </div>
-        <img className="card-icon" src={icon} alt="icono" />
+        {typeof icon === 'string'
+          ? <img className="card-icon" src={icon} alt="icono" />
+          : <div className="card-icon card-icon-lucide">{icon}</div>}
       </div>
     </div>
   );

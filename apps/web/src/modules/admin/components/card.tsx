@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import "./card.css";
 
 // Copia de la tarjeta vertical de "businesses" (icono + monto + etiqueta),
@@ -8,7 +9,7 @@ interface CardProps {
   id: string;
   amount: string;
   label: string;
-  icon: string;
+  icon: string | ReactNode;
 }
 
 export default function Card({ id, amount, label, icon }: CardProps) {
@@ -20,7 +21,9 @@ export default function Card({ id, amount, label, icon }: CardProps) {
           <div className="admin-card-amount">{amount}</div>
           <div className="admin-card-label">{label}</div>
         </div>
-        <img className="admin-card-icon" src={icon} alt="icono" />
+        {typeof icon === 'string'
+          ? <img className="admin-card-icon" src={icon} alt="icono" />
+          : <div className="admin-card-icon admin-card-icon-lucide">{icon}</div>}
       </div>
     </div>
   );
