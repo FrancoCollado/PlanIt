@@ -5,14 +5,14 @@
 * legajo - Apellido(s), Nombre(s)
 
 ### Repositorios
-* [frontend app]([http://hyperlinkToGihubOrGitlab](https://github.com/FrancoCollado/PlanI)/apps/web)
-* [backend app](http://hyperlinkToGihubOrGitlab](https://github.com/FrancoCollado/PlanI)/apps/api)
+* [frontend app]([http://hyperlinkToGihubOrGitlab](FrancoCollado/PlanI)/apps/web)
+* [backend app]([http://hyperlinkToGihubOrGitlab](FrancoCollado/PlanI)/apps/api)
 
 ## Tema
 ### Descripción
 Una aplicación estilo “marketplace” para bienes y servicios relacionados a eventos, donde las personas puedan acceder en un solo lugar a diferentes propuestas por parte de los negocios. Nuestra intención es que la persona pueda organizar el evento en su totalidad a través de la app, es una especie de vidriera virtual.
 
-### Modelo[cite: 1]
+### Modelo
 ![Dsp subo modelo]()
 
 ## Alcance Funcional
