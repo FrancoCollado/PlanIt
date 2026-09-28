@@ -2,11 +2,13 @@
 
 ## Grupo
 ### Integrantes
-* legajo - Apellido(s), Nombre(s)
+* 54461 - Collado, Franco
+* 54315 - Massagli, Franco
+* 54283 - Aleart, Tomas
 
 ### Repositorios
-* [frontend app]([http://hyperlinkToGihubOrGitlab](FrancoCollado/PlanI)/apps/web)
-* [backend app]([http://hyperlinkToGihubOrGitlab](FrancoCollado/PlanI)/apps/api)
+* [frontend app](https://github.com/FrancoCollado/PlanIt/apps/web)
+* [backend app](https://github.com/FrancoCollado/PlanIt/apps/api)
 
 ## Tema
 ### Descripción
