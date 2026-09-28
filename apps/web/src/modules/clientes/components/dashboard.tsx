@@ -1,15 +1,25 @@
 import Card from './card';
 import './dashboard.css';
 
+interface Servicio {
+  id: number;
+  nombre: string;
+  precio: string;
+  descripcion: string;
+  imagen: string;
+}
+
 interface ClienteDashboardProps {
   onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
+  servicios?: Servicio[];
+  onContratar?: (servicio: Servicio) => void;
 }
 
 // Lista falsa de servicios que un cliente podría contratar.
 // Son datos "hardcodeados" (fijos en el código), no vienen de ninguna base de datos todavía.
 // La imagen viene de picsum.photos, un sitio que da fotos random gratis para pruebas.
 // Usamos "seed" (semilla) para que cada servicio muestre siempre la misma foto.
-const serviciosDisponibles = [
+const serviciosDisponibles: Servicio[] = [
   {
     id: 1,
     nombre: 'Corte de pelo',
@@ -40,16 +50,17 @@ const serviciosDisponibles = [
   },
 ];
 
-export default function ClienteDashboard({ onLogout }: ClienteDashboardProps) {
+export default function ClienteDashboard({ onLogout, servicios = serviciosDisponibles, onContratar }: ClienteDashboardProps) {
   // Botón "Volver a iniciar sesión": llama a onLogout (viene de App.tsx)
   // y eso hace que la app vuelva a mostrar la pantalla de login.
   function volverAIniciarSesion() {
     onLogout?.();
   }
 
-  // Por ahora "Contratar" no hace nada real, solo avisa que está en construcción.
-  function contratarServicio(nombre: string) {
-    alert(`Todavía no se puede contratar "${nombre}". ¡Función en construcción!`);
+  // Si el padre pasa un callback lo usamos, si no avisamos que está en construcción.
+  function contratarServicio(servicio: Servicio) {
+    if (onContratar) onContratar(servicio);
+    else alert(`Todavía no se puede contratar "${servicio.nombre}". ¡Función en construcción!`);
   }
 
   return (
@@ -80,7 +91,7 @@ export default function ClienteDashboard({ onLogout }: ClienteDashboardProps) {
 
         {/* Lista de servicios: usa el mismo estilo visual (fondo blanco, barra de color, sombra) */}
         <div className="cliente-servicios-lista">
-          {serviciosDisponibles.map((servicio) => (
+          {servicios.map((servicio) => (
             <div key={servicio.id} className="cliente-servicio-card">
               <div className="cliente-servicio-accent" />
               <img className="cliente-servicio-imagen" src={servicio.imagen} alt={servicio.nombre} />
@@ -91,10 +102,10 @@ export default function ClienteDashboard({ onLogout }: ClienteDashboardProps) {
                 </div>
                 <p className="cliente-servicio-descripcion">{servicio.descripcion}</p>
 
-                {/* Botón que por el momento no lleva a ningún lado */}
+                {/* Botón conectado al callback onContratar (o al aviso de "en construcción" si no se pasa) */}
                 <button
                   className="cliente-boton-contratar"
-                  onClick={() => contratarServicio(servicio.nombre)}
+                  onClick={() => contratarServicio(servicio)}
                 >
                   Contratar
                 </button>

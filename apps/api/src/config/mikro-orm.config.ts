@@ -1,5 +1,8 @@
+import path from 'path';
 import 'reflect-metadata';
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 import { defineConfig } from '@mikro-orm/mysql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';

@@ -35,12 +35,17 @@ interface AuthPageProps {
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
+  // Al registrarse con éxito, si conocemos el rol, dejamos al usuario logueado directamente
+  const handleRegisterSuccess = (role?: UserRole) => {
+    if (role) onLoginSuccess?.(role);
+  };
+
   return (
     <PageWrapper>
       <BlurredBackground />
       <AuthCard
         loginForm={<LoginForm onLoginSuccess={onLoginSuccess} />}
-        registerForm={<RegisterForm />}
+        registerForm={<RegisterForm onRegisterSuccess={handleRegisterSuccess} />}
       />
     </PageWrapper>
   );

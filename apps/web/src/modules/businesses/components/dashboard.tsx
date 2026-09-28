@@ -21,12 +21,43 @@ import Card from './card';
 import { HorizontalCard } from './HorizontalCard';
 import './dashboard.css';
 
+interface Servicio {
+  id: number;
+  nombre: string;
+  precio: string;
+  descripcion: string;
+}
+
+interface NuevoServicio {
+  nombre: string;
+  precio: string;
+  descripcion: string;
+}
+
 interface DashboardProps {
   role?: string; // O role?: 'admin' | 'business' | 'client';
   onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
+  servicios?: Servicio[];
+  onCreateServicio?: (servicio: NuevoServicio) => void;
+  onEditServicio?: (servicio: Servicio) => void;
+  onDeleteServicio?: (servicio: Servicio) => void;
 }
 
-export default function AdminDashboard({ role, onLogout }: DashboardProps) {
+// Lista falsa de servicios, usada como valor por defecto si no se pasa la prop "servicios"
+const serviciosFalsosPorDefecto: Servicio[] = [
+  { id: 1, nombre: 'Corte de pelo', precio: '$ 5.000', descripcion: 'Corte clásico para caballero' },
+  { id: 2, nombre: 'Manicura', precio: '$ 8.000', descripcion: 'Manicura completa con esmalte' },
+  { id: 3, nombre: 'Masaje relajante', precio: '$ 15.000', descripcion: 'Masaje de 30 minutos' },
+];
+
+export default function AdminDashboard({
+  role,
+  onLogout,
+  servicios = serviciosFalsosPorDefecto,
+  onCreateServicio,
+  onEditServicio,
+  onDeleteServicio
+}: DashboardProps) {
   // Controla si el menú lateral (sidebar) muestra sus sub-items o no
   const [uiComponentsOpen, setUiComponentsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -56,16 +87,20 @@ export default function AdminDashboard({ role, onLogout }: DashboardProps) {
 
   function guardarServicio(e: React.FormEvent) {
     e.preventDefault(); // evita que el formulario recargue la página
-    alert(`Servicio creado:\nNombre: ${nombreServicio}\nPrecio: ${precioServicio}\nDescripción: ${descripcionServicio}`);
+    const nuevoServicio: NuevoServicio = {
+      nombre: nombreServicio,
+      precio: precioServicio,
+      descripcion: descripcionServicio
+    };
+
+    if (onCreateServicio) onCreateServicio(nuevoServicio);
+    else alert(`Servicio creado:\nNombre: ${nombreServicio}\nPrecio: ${precioServicio}\nDescripción: ${descripcionServicio}`);
+
     cerrarCrearServicio();
   }
 
-  // Lista falsa de servicios, solo para mostrar cómo se vería
-  const serviciosFalsos = [
-    { id: 1, nombre: 'Corte de pelo', precio: '$ 5.000', descripcion: 'Corte clásico para caballero' },
-    { id: 2, nombre: 'Manicura', precio: '$ 8.000', descripcion: 'Manicura completa con esmalte' },
-    { id: 3, nombre: 'Masaje relajante', precio: '$ 15.000', descripcion: 'Masaje de 30 minutos' },
-  ];
+  // Lista falsa de servicios, usada como valor por defecto si no se pasa la prop "servicios"
+  const serviciosFalsos = servicios;
 
   // Indica si mostramos la lista para "editar" o para "eliminar" (o ninguna, null)
   const [listaServicios, setListaServicios] = useState<'editar' | 'eliminar' | null>(null);
@@ -82,12 +117,14 @@ export default function AdminDashboard({ role, onLogout }: DashboardProps) {
     setListaServicios(null);
   }
 
-  function editarServicio(nombre: string) {
-    alert(`Editar servicio: ${nombre}`);
+  function editarServicio(servicio: Servicio) {
+    if (onEditServicio) onEditServicio(servicio);
+    else alert(`Editar servicio: ${servicio.nombre}`);
   }
 
-  function eliminarServicio(nombre: string) {
-    alert(`Servicio eliminado: ${nombre}`);
+  function eliminarServicio(servicio: Servicio) {
+    if (onDeleteServicio) onDeleteServicio(servicio);
+    else alert(`Servicio eliminado: ${servicio.nombre}`);
   }
 
   // Datos para las 3 tarjetas exclusivas de la empresa
@@ -268,7 +305,7 @@ export default function AdminDashboard({ role, onLogout }: DashboardProps) {
                     {listaServicios === 'editar' ? (
                       <button
                         className="service-row-boton"
-                        onClick={() => editarServicio(servicio.nombre)}
+                        onClick={() => editarServicio(servicio)}
                         aria-label="Editar servicio"
                       >
                         <Pencil size={18} />
@@ -276,7 +313,7 @@ export default function AdminDashboard({ role, onLogout }: DashboardProps) {
                     ) : (
                       <button
                         className="service-row-boton"
-                        onClick={() => eliminarServicio(servicio.nombre)}
+                        onClick={() => eliminarServicio(servicio)}
                         aria-label="Eliminar servicio"
                       >
                         <Trash2 size={18} />

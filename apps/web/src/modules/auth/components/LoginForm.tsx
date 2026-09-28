@@ -5,6 +5,8 @@ export type UserRole = 'admin' | 'business' | 'client';
 
 interface LoginFormProps {
   onLoginSuccess?: (role: UserRole) => void;
+  onGoogleLogin?: () => void;
+  onFacebookLogin?: () => void;
 }
 
 // Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
@@ -160,11 +162,22 @@ const ErrorText = styled.p`
 
 // --- Componente Principal ---
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLogin, onFacebookLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Login social: todavía no hay integración real, solo se avisa si el padre no maneja el evento
+  const handleGoogleLogin = () => {
+    if (onGoogleLogin) onGoogleLogin();
+    else alert('El inicio de sesión con Google todavía no está disponible.');
+  };
+
+  const handleFacebookLogin = () => {
+    if (onFacebookLogin) onFacebookLogin();
+    else alert('El inicio de sesión con Facebook todavía no está disponible.');
+  };
 
   // Autenticación real contra la API (tabla `usuarios`)
   const handleSubmit = async (e: React.FormEvent) => {
@@ -233,8 +246,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       <SocialLoginContainer>
         <SocialText>O inicia sesión con:</SocialText>
         <SocialIconsRow>
-          <SocialIconCircle type="button">G</SocialIconCircle>
-          <SocialIconCircle type="button">F</SocialIconCircle>
+          <SocialIconCircle type="button" onClick={handleGoogleLogin} aria-label="Iniciar sesión con Google">G</SocialIconCircle>
+          <SocialIconCircle type="button" onClick={handleFacebookLogin} aria-label="Iniciar sesión con Facebook">F</SocialIconCircle>
         </SocialIconsRow>
       </SocialLoginContainer>
     </form>

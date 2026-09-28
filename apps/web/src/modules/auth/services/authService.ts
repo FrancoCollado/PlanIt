@@ -26,3 +26,38 @@ export const loginRequest = async (email: string, password: string): Promise<Log
 
   return data;
 };
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+}
+
+export interface RegisterResponse {
+  message: string;
+  user: {
+    id: number;
+    nombre: string;
+    email: string;
+    rol: string;
+    creadoEn?: string;
+  };
+}
+
+export const registerRequest = async (payload: RegisterPayload): Promise<RegisterResponse> => {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Error al registrar usuario');
+  }
+
+  return data;
+};

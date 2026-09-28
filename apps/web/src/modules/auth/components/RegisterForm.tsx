@@ -14,14 +14,34 @@ import {
   CheckboxLabel,
   PrimaryButton
 } from './LoginForm';
+import type { UserRole } from './LoginForm';
+import { registerRequest } from '../services/authService';
 
 
 const CompactInput = styled(StyledInput)`
   padding: 0.6rem 1rem;
 `;
 
+interface RegisterFormProps {
+  onRegisterSuccess?: (role?: UserRole) => void;
+}
 
-export const RegisterForm = () => {
+// Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
+const mapRolToUserRole = (rol: string): UserRole | null => {
+  switch (rol.trim().toLowerCase()) {
+    case 'administrador':
+      return 'admin';
+    case 'empresa':
+      return 'business';
+    case 'cliente':
+      return 'client';
+    default:
+      return null;
+  }
+};
+
+
+export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -42,32 +62,13 @@ export const RegisterForm = () => {
 
     try {
 
-      const response = await fetch('http://localhost:4000/api/auth/register', {
-        method: 'POST',
-
-        headers: {
-          'Content-Type': 'application/json'
-        },
-
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          confirmPassword,
-          acceptTerms
-        })
+      const data = await registerRequest({
+        name,
+        email,
+        password,
+        confirmPassword,
+        acceptTerms
       });
-
-
-      const data = await response.json();
-
-
-      // Si el backend respondió con un error
-      if (!response.ok) {
-        setMessage(data.error);
-        return;
-      }
-
 
       // Registro correcto
       setMessage(data.message);
@@ -79,11 +80,13 @@ export const RegisterForm = () => {
       setConfirmPassword('');
       setAcceptTerms(false);
 
+      onRegisterSuccess?.(mapRolToUserRole(data.user.rol) ?? undefined);
+
     } catch (error) {
 
       console.error('Error al registrar usuario:', error);
 
-      setMessage('No se pudo conectar con el servidor');
+      setMessage(error instanceof Error ? error.message : 'No se pudo conectar con el servidor');
     }
   };
 
