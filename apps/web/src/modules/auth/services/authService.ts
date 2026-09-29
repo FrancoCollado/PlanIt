@@ -2,6 +2,7 @@ const API_URL = 'http://localhost:4000';
 
 export interface LoginResponse {
   message: string;
+  token: string;
   user: {
     id: number;
     nombre: string;
@@ -41,6 +42,7 @@ export interface RegisterPayload {
 
 export interface RegisterResponse {
   message: string;
+  token: string;
   user: {
     id: number;
     nombre: string;

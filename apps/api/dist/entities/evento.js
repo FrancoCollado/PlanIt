@@ -17,28 +17,38 @@ let Evento = class Evento {
     descripcion;
     creadoEn;
     imagen;
+    // Indica si el evento todavía es un borrador (no visible/publicado) o ya está confirmado
+    draft = true;
 };
 exports.Evento = Evento;
 __decorate([
-    (0, legacy_1.PrimaryKey)(),
+    (0, legacy_1.PrimaryKey)({ type: 'number' }),
     __metadata("design:type", Number)
 ], Evento.prototype, "id", void 0);
 __decorate([
-    (0, legacy_1.Property)({ length: 100 }),
+    (0, legacy_1.Property)({ type: 'string', length: 100 }),
     __metadata("design:type", String)
 ], Evento.prototype, "nombre", void 0);
 __decorate([
-    (0, legacy_1.Property)({ columnType: 'text', nullable: true }),
+    (0, legacy_1.Property)({ type: 'string', columnType: 'text', nullable: true }),
     __metadata("design:type", String)
 ], Evento.prototype, "descripcion", void 0);
 __decorate([
-    (0, legacy_1.Property)({ fieldName: 'creado_en', nullable: true }),
+    (0, legacy_1.Property)({
+        type: 'Date',
+        fieldName: 'creado_en',
+        nullable: true
+    }),
     __metadata("design:type", Date)
 ], Evento.prototype, "creadoEn", void 0);
 __decorate([
-    (0, legacy_1.Property)({ length: 255, nullable: true }),
+    (0, legacy_1.Property)({ type: 'string', length: 255, nullable: true }),
     __metadata("design:type", String)
 ], Evento.prototype, "imagen", void 0);
+__decorate([
+    (0, legacy_1.Property)({ type: 'boolean', default: true }),
+    __metadata("design:type", Boolean)
+], Evento.prototype, "draft", void 0);
 exports.Evento = Evento = __decorate([
     (0, legacy_1.Entity)({ tableName: 'eventos' })
 ], Evento);

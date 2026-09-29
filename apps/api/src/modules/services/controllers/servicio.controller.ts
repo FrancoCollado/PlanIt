@@ -81,15 +81,17 @@ export const buscarServicios = async (
   res: Response
 ) => {
   const nombre = String(req.query.nombre ?? '').trim();
+  const zona = String(req.query.zona ?? '').trim();
+  const empresa = String(req.query.empresa ?? '').trim();
 
-  if (!nombre) {
+  if (!nombre && !zona && !empresa) {
     return res.status(400).json({
-      error: 'El parámetro "nombre" es requerido'
+      error: 'Ingresá un nombre, una zona o una empresa para buscar'
     });
   }
 
   try {
-    const servicios = await buscarServiciosPorNombre(nombre);
+    const servicios = await buscarServiciosPorNombre(nombre, zona, empresa);
 
     res.json({
       servicios: servicios.map(serializeServicio)

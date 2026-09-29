@@ -17,6 +17,11 @@ let User = class User {
     email;
     password;
     rol = 'cliente';
+    zona;
+    cuit;
+    telefono;
+    // Permite suspender (desactivar) una cuenta sin borrarla, usado para empresas
+    activo = true;
     creadoEn;
 };
 exports.User = User;
@@ -46,6 +51,22 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], User.prototype, "rol", void 0);
+__decorate([
+    (0, legacy_1.Property)({ type: 'string', length: 100, nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "zona", void 0);
+__decorate([
+    (0, legacy_1.Property)({ type: 'number', nullable: true }),
+    __metadata("design:type", Number)
+], User.prototype, "cuit", void 0);
+__decorate([
+    (0, legacy_1.Property)({ type: 'number', nullable: true }),
+    __metadata("design:type", Number)
+], User.prototype, "telefono", void 0);
+__decorate([
+    (0, legacy_1.Property)({ type: 'boolean', default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "activo", void 0);
 __decorate([
     (0, legacy_1.Property)({
         type: 'Date',

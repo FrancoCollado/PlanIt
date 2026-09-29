@@ -24,6 +24,7 @@ export default function App() {
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
         <ClienteDashboard
           nombreUsuario={authUser.nombre}
+          token={authUser.token}
           onLogout={() => setAuthUser(null)}
         />
       </main>

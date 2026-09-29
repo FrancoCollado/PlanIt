@@ -21,10 +21,13 @@ let Servicio = class Servicio {
     descripcion;
     imagen;
     creadoEn;
+    // Indica si el servicio ya está publicado (activo)
+    // o todavía es un borrador
+    draft = true;
 };
 exports.Servicio = Servicio;
 __decorate([
-    (0, legacy_1.PrimaryKey)(),
+    (0, legacy_1.PrimaryKey)({ type: 'number' }),
     __metadata("design:type", Number)
 ], Servicio.prototype, "id", void 0);
 __decorate([
@@ -42,21 +45,39 @@ __decorate([
     __metadata("design:type", usuario_1.User)
 ], Servicio.prototype, "usuario", void 0);
 __decorate([
-    (0, legacy_1.Property)({ length: 100 }),
+    (0, legacy_1.Property)({ type: 'string', length: 100 }),
     __metadata("design:type", String)
 ], Servicio.prototype, "nombre", void 0);
 __decorate([
-    (0, legacy_1.Property)({ columnType: 'text', nullable: true }),
+    (0, legacy_1.Property)({
+        type: 'string',
+        columnType: 'text',
+        nullable: true
+    }),
     __metadata("design:type", String)
 ], Servicio.prototype, "descripcion", void 0);
 __decorate([
-    (0, legacy_1.Property)({ length: 255, nullable: true }),
+    (0, legacy_1.Property)({
+        type: 'string',
+        length: 255,
+        nullable: true
+    }),
     __metadata("design:type", String)
 ], Servicio.prototype, "imagen", void 0);
 __decorate([
-    (0, legacy_1.Property)({ fieldName: 'creado_en' }),
+    (0, legacy_1.Property)({
+        type: 'Date',
+        fieldName: 'creado_en'
+    }),
     __metadata("design:type", Date)
 ], Servicio.prototype, "creadoEn", void 0);
+__decorate([
+    (0, legacy_1.Property)({
+        type: 'boolean',
+        default: true
+    }),
+    __metadata("design:type", Boolean)
+], Servicio.prototype, "draft", void 0);
 exports.Servicio = Servicio = __decorate([
     (0, legacy_1.Entity)({ tableName: 'servicios' })
 ], Servicio);

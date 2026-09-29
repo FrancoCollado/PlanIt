@@ -97,7 +97,7 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
       setTelefono('');
 
       const rol = mapRolToUserRole(data.user.rol);
-      onRegisterSuccess?.(rol ? { id: data.user.id, role: rol } : undefined);
+      onRegisterSuccess?.(rol ? { id: data.user.id, nombre: data.user.nombre, role: rol, token: data.token } : undefined);
 
     } catch (error) {
 

@@ -32,7 +32,9 @@ export const listServiciosByUsuario = async (
 // ======================================================
 
 export const buscarServiciosPorNombre = async (
-  nombre: string
+  nombre: string,
+  zona = '',
+  empresa = ''
 ): Promise<Servicio[]> => {
   const orm = getOrm();
   const em = orm.em.fork();
@@ -40,8 +42,14 @@ export const buscarServiciosPorNombre = async (
   return em.find(
     Servicio,
     {
-      nombre: { $like: `%${nombre}%` },
-      draft: false
+      ...(nombre && { nombre: { $like: `%${nombre}%` } }),
+      draft: false,
+      usuario: {
+        rol: 'empresa',
+        activo: true,
+        ...(zona && { zona: { $like: `%${zona}%` } }),
+        ...(empresa && { nombre: { $like: `%${empresa}%` } })
+      }
     },
     {
       populate: ['categoria'],

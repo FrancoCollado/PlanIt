@@ -1,14 +1,32 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findUserByCredentials = void 0;
-const database_1 = __importDefault(require("../../../config/database"));
-// Busca un usuario que coincida con email y contraseña en la tabla `usuarios`
+exports.createUser = exports.findUserByCredentials = void 0;
+const orm_1 = require("../../../config/orm");
+const usuario_1 = require("../../../entities/usuario");
+// Busca un usuario por email y contraseña
 const findUserByCredentials = async (email, password) => {
-    const [rows] = await database_1.default.query('SELECT id, nombre, email, rol, creado_en FROM usuarios WHERE email = ? AND contraseña = ? LIMIT 1', [email, password]);
-    const users = rows;
-    return users[0] ?? null;
+    const orm = (0, orm_1.getOrm)();
+    const em = orm.em.fork();
+    const user = await em.findOne(usuario_1.User, {
+        email,
+        password
+    });
+    return user;
 };
 exports.findUserByCredentials = findUserByCredentials;
+// Crea un nuevo usuario
+const createUser = async (name, email, password, role, businessData) => {
+    const orm = (0, orm_1.getOrm)();
+    const em = orm.em.fork();
+    const user = em.create(usuario_1.User, {
+        nombre: name,
+        email: email,
+        password: password,
+        rol: role,
+        activo: true,
+        ...(businessData ?? {})
+    });
+    await em.persist(user).flush();
+    return user;
+};
+exports.createUser = createUser;

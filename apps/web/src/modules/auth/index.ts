@@ -7,7 +7,6 @@ export { default as AuthPage } from './pages/AuthPage';
 // apps/web/src/modules/auth/index.ts
 // apps/web/src/modules/auth/index.ts
 
-export { AuthPage } from './pages/AuthPage';
 export { AuthCard } from './components/AuthCard';
 export { LoginForm } from './components/LoginForm';
 export { RegisterForm } from './components/RegisterForm';

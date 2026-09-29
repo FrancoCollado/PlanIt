@@ -6,6 +6,12 @@ import {
 
 import type { LoginDto } from '../dtos/login.dto';
 import type { RegisterDto } from '../dtos/register.dto';
+import jwt from 'jsonwebtoken';
+
+const issueToken = (id: number, rol: string) => {
+  if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET no está configurado');
+  return jwt.sign({ rol }, process.env.JWT_SECRET, { subject: String(id), expiresIn: '12h' });
+};
 
 
 // LOGIN
@@ -39,6 +45,7 @@ export const login = async (
 
     res.json({
       message: 'Inicio de sesión exitoso',
+      token: issueToken(user.id, user.rol),
       user: {
         id: user.id,
         nombre: user.nombre,
@@ -122,6 +129,7 @@ export const register = async (
 
     res.status(201).json({
       message: 'Usuario creado correctamente',
+      token: issueToken(user.id, user.rol),
       user: {
         id: user.id,
         nombre: user.nombre,

@@ -7,6 +7,7 @@ export interface AuthUser {
   id: number;
   nombre: string;
   role: UserRole;
+  token: string;
 }
 
 interface LoginFormProps {
@@ -124,40 +125,6 @@ export const PrimaryButton = styled.button<{ color?: string }>`
   }
 `;
 
-const SocialLoginContainer = styled.div`
-  text-align: center;
-  margin-top: 1.5rem;
-`;
-
-const SocialText = styled.p`
-  font-size: 0.85rem;
-  color: #757575;
-  margin-bottom: 1rem;
-`;
-
-const SocialIconsRow = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-`;
-
-const SocialIconCircle = styled.button`
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-
-  &:hover {
-    background-color: #f5f5f5;
-  }
-`;
-
 const ErrorText = styled.p`
   color: #d32f2f;
   font-size: 0.85rem;
@@ -168,22 +135,11 @@ const ErrorText = styled.p`
 
 // --- Componente Principal ---
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLogin, onFacebookLogin }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  // Login social: todavía no hay integración real, solo se avisa si el padre no maneja el evento
-  const handleGoogleLogin = () => {
-    if (onGoogleLogin) onGoogleLogin();
-    else alert('El inicio de sesión con Google todavía no está disponible.');
-  };
-
-  const handleFacebookLogin = () => {
-    if (onFacebookLogin) onFacebookLogin();
-    else alert('El inicio de sesión con Facebook todavía no está disponible.');
-  };
 
   // Autenticación real contra la API (tabla `usuarios`)
   const handleSubmit = async (e: React.FormEvent) => {
@@ -191,7 +147,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLo
     setErrorMessage('');
 
     try {
-      const { user } = await loginRequest(email.trim(), password);
+      const { user, token } = await loginRequest(email.trim(), password);
       const rol = mapRolToUserRole(user.rol);
 
       if (!rol) {
@@ -203,6 +159,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLo
         id: user.id,
         nombre: user.nombre,
         role: rol,
+        token,
       });
     } catch (error) {
       setErrorMessage(

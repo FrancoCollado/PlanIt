@@ -21,7 +21,7 @@ let Categoria = class Categoria {
 };
 exports.Categoria = Categoria;
 __decorate([
-    (0, legacy_1.PrimaryKey)(),
+    (0, legacy_1.PrimaryKey)({ type: 'number' }),
     __metadata("design:type", Number)
 ], Categoria.prototype, "id", void 0);
 __decorate([
@@ -32,15 +32,18 @@ __decorate([
     __metadata("design:type", evento_1.Evento)
 ], Categoria.prototype, "evento", void 0);
 __decorate([
-    (0, legacy_1.Property)({ length: 100 }),
+    (0, legacy_1.Property)({ type: 'string', length: 100 }),
     __metadata("design:type", String)
 ], Categoria.prototype, "nombre", void 0);
 __decorate([
-    (0, legacy_1.Property)({ columnType: 'text', nullable: true }),
+    (0, legacy_1.Property)({ type: 'string', columnType: 'text', nullable: true }),
     __metadata("design:type", String)
 ], Categoria.prototype, "descripcion", void 0);
 __decorate([
-    (0, legacy_1.Property)({ fieldName: 'creado_en' }),
+    (0, legacy_1.Property)({
+        type: 'Date',
+        fieldName: 'creado_en'
+    }),
     __metadata("design:type", Date)
 ], Categoria.prototype, "creadoEn", void 0);
 exports.Categoria = Categoria = __decorate([

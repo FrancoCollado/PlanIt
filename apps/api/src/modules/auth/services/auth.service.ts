@@ -37,6 +37,7 @@ export const createUser = async (
     email: email,
     password: password,
     rol: role,
+    activo: true,
     ...(businessData ?? {})
   });
 

@@ -2,6 +2,7 @@ import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { randomBytes } from 'crypto';
 
 import { MikroORM } from '@mikro-orm/mysql';
 import mikroOrmConfig from './config/mikro-orm.config';
@@ -12,10 +13,17 @@ import usuarioRoutes from './modules/users/routes/usuario.routes';
 import statsRoutes from './modules/stats/routes/stats.routes';
 import categoriaRoutes from './modules/categories/routes/categoria.routes';
 import servicioRoutes from './modules/services/routes/servicio.routes';
+import tableroRoutes from './modules/boards/tablero.routes';
 
 import { setOrm } from './config/orm';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET es obligatorio en producción');
+  process.env.JWT_SECRET = randomBytes(32).toString('hex');
+  console.warn('JWT_SECRET temporal: las sesiones expirarán al reiniciar la API');
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -29,6 +37,7 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/servicios', servicioRoutes);
+app.use('/api/tableros', tableroRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {

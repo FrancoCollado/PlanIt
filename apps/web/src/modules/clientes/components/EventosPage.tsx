@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CalendarDays, Search, Tags } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Tags } from 'lucide-react';
 
 import {
   listEventosRequest
@@ -24,15 +24,17 @@ import {
 import type {
   Servicio
 } from '../services/servicioService';
+import ServicioCard from './ServicioCard';
 
 
 interface EventosPageProps {
   onVolver: () => void;
+  token: string;
 }
 
 
 export default function EventosPage({
-  onVolver
+  onVolver, token
 }: EventosPageProps) {
 
   const [eventos, setEventos] = useState<Evento[]>([]);
@@ -356,48 +358,7 @@ export default function EventosPage({
 
                 {servicios.map((servicio) => (
 
-                  <article
-                    key={servicio.id}
-                    className="cliente-servicio-card"
-                  >
-
-                    <div className="cliente-servicio-imagen">
-
-                      {servicio.imagen ? (
-
-                        <img
-                          src={servicio.imagen}
-                          alt={servicio.nombre}
-                        />
-
-                      ) : (
-
-                        <Search size={36} />
-
-                      )}
-
-                    </div>
-
-
-                    <div className="cliente-servicio-contenido">
-
-                      <span className="cliente-servicio-categoria">
-                        {servicio.categoria.nombre}
-                      </span>
-
-                      <h3>
-                        {servicio.nombre}
-                      </h3>
-
-                      {servicio.descripcion && (
-                        <p>
-                          {servicio.descripcion}
-                        </p>
-                      )}
-
-                    </div>
-
-                  </article>
+                  <ServicioCard key={servicio.id} servicio={servicio} token={token} />
 
                 ))}
 

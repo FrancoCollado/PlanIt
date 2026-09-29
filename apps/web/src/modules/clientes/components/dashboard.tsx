@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, CalendarDays, Tags } from 'lucide-react';
+import { Search, CalendarDays, Tags, Pencil } from 'lucide-react';
 import './dashboard.css';
 
 import {
@@ -12,27 +12,33 @@ import type {
 
 import CategoriasPage from './CategoriasPage';
 import EventosPage from './EventosPage';
+import TablerosPage from './TablerosPage';
+import ServicioCard from './ServicioCard';
 
 
 interface ClienteDashboardProps {
   nombreUsuario: string;
+  token: string;
   onLogout?: () => void;
 }
 
 
 export default function ClienteDashboard({
   nombreUsuario,
+  token,
   onLogout
 }: ClienteDashboardProps) {
 
   const [textoBusqueda, setTextoBusqueda] = useState('');
+  const [zonaBusqueda, setZonaBusqueda] = useState('');
+  const [empresaBusqueda, setEmpresaBusqueda] = useState('');
   const [servicios, setServicios] = useState<Servicio[]>([]);
   const [buscando, setBuscando] = useState(false);
   const [busquedaRealizada, setBusquedaRealizada] = useState(false);
   const [errorBusqueda, setErrorBusqueda] = useState('');
 
   const [pantalla, setPantalla] =
-    useState<'inicio' | 'categorias' | 'eventos'>('inicio');
+    useState<'inicio' | 'categorias' | 'eventos' | 'tableros'>('inicio');
 
 
   function volverAIniciarSesion() {
@@ -49,7 +55,7 @@ export default function ClienteDashboard({
 
     const texto = textoBusqueda.trim();
 
-    if (!texto) {
+    if (!texto && !zonaBusqueda.trim() && !empresaBusqueda.trim()) {
       return;
     }
 
@@ -60,7 +66,7 @@ export default function ClienteDashboard({
     try {
 
       const resultados =
-        await buscarServiciosRequest(texto);
+        await buscarServiciosRequest(texto, zonaBusqueda, empresaBusqueda);
 
       setServicios(resultados);
 
@@ -123,6 +129,7 @@ export default function ClienteDashboard({
         {pantalla === 'categorias' && (
 
           <CategoriasPage
+            token={token}
             onVolver={() => setPantalla('inicio')}
           />
 
@@ -136,10 +143,13 @@ export default function ClienteDashboard({
         {pantalla === 'eventos' && (
 
           <EventosPage
+            token={token}
             onVolver={() => setPantalla('inicio')}
           />
 
         )}
+
+        {pantalla === 'tableros' && <TablerosPage token={token} onVolver={() => setPantalla('inicio')} />}
 
 
         {/* ==========================================
@@ -148,6 +158,11 @@ export default function ClienteDashboard({
 
         {pantalla === 'inicio' && (
           <>
+            <div className="cliente-tableros-entrada">
+              <button className="cliente-accion" onClick={() => setPantalla('tableros')}>
+                <Pencil size={18} /> Crear tablero / Mis tableros
+              </button>
+            </div>
 
             {/* ==========================================
                 BUSCADOR DIRECTO
@@ -164,28 +179,29 @@ export default function ClienteDashboard({
               </p>
 
 
-              <form
-                className="cliente-buscador"
-                onSubmit={buscarServicios}
-              >
-
-                <input
-                  type="text"
-                  placeholder="Buscar servicios por nombre..."
-                  value={textoBusqueda}
-                  onChange={(e) =>
-                    setTextoBusqueda(e.target.value)
-                  }
-                />
-
-                <button
-                  type="submit"
-                  className="cliente-buscador-boton"
-                  aria-label="Buscar servicios"
-                >
-                  <Search size={22} />
-                </button>
-
+              <form onSubmit={buscarServicios}>
+                <div className="cliente-buscador">
+                  <input
+                    type="search"
+                    aria-label="Nombre del servicio"
+                    placeholder="Buscar servicios por nombre..."
+                    value={textoBusqueda}
+                    onChange={(e) => setTextoBusqueda(e.target.value)}
+                  />
+                  <button type="submit" className="cliente-buscador-boton" aria-label="Buscar servicios">
+                    <Search size={22} />
+                  </button>
+                </div>
+                <div className="cliente-filtros">
+                  <label>
+                    Zona de la empresa
+                    <input type="search" value={zonaBusqueda} onChange={(e) => setZonaBusqueda(e.target.value)} placeholder="Cualquier zona" />
+                  </label>
+                  <label>
+                    Nombre de la empresa
+                    <input type="search" value={empresaBusqueda} onChange={(e) => setEmpresaBusqueda(e.target.value)} placeholder="Cualquier empresa" />
+                  </label>
+                </div>
               </form>
 
             </section>
@@ -239,50 +255,7 @@ export default function ClienteDashboard({
 
                     {servicios.map((servicio) => (
 
-                      <article
-                        key={servicio.id}
-                        className="cliente-servicio-card"
-                      >
-
-                        <div className="cliente-servicio-imagen">
-
-                          {servicio.imagen ? (
-
-                            <img
-                              src={servicio.imagen}
-                              alt={servicio.nombre}
-                            />
-
-                          ) : (
-
-                            <Search size={36} />
-
-                          )}
-
-                        </div>
-
-
-                        <div className="cliente-servicio-contenido">
-
-                          <span className="cliente-servicio-categoria">
-                            {servicio.categoria.nombre}
-                          </span>
-
-                          <h3>
-                            {servicio.nombre}
-                          </h3>
-
-                          {servicio.descripcion && (
-
-                            <p>
-                              {servicio.descripcion}
-                            </p>
-
-                          )}
-
-                        </div>
-
-                      </article>
+                      <ServicioCard key={servicio.id} servicio={servicio} token={token} />
 
                     ))}
 

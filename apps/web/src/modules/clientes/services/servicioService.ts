@@ -19,11 +19,18 @@ export interface Servicio {
 // ======================================================
 
 export const buscarServiciosRequest = async (
-  nombre: string
+  nombre: string,
+  zona = '',
+  empresa = ''
 ): Promise<Servicio[]> => {
 
+  const params = new URLSearchParams();
+  if (nombre.trim()) params.set('nombre', nombre.trim());
+  if (zona.trim()) params.set('zona', zona.trim());
+  if (empresa.trim()) params.set('empresa', empresa.trim());
+
   const response = await fetch(
-    `${API_URL}/api/servicios/buscar?nombre=${encodeURIComponent(nombre)}`
+    `${API_URL}/api/servicios/buscar?${params.toString()}`
   );
 
   const data = await response.json();

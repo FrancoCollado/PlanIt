@@ -6,6 +6,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 
 import { User } from './usuario';
+import { Evento } from './evento';
 
 @Entity({ tableName: 'tableros' })
 export class Tablero {
@@ -18,6 +19,13 @@ export class Tablero {
     deleteRule: 'cascade'
   })
   cliente!: User;
+
+  @ManyToOne(() => Evento, {
+    fieldName: 'evento_id',
+    nullable: true,
+    deleteRule: 'set null'
+  })
+  evento?: Evento;
 
   @Property({ type: 'string', length: 100 })
   nombre!: string;
