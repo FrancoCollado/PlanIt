@@ -29,10 +29,18 @@ export class Servicio {
   @Property({ type: 'string', length: 100 })
   nombre!: string;
 
-  @Property({ type: 'string', columnType: 'text', nullable: true })
+  @Property({
+    type: 'string',
+    columnType: 'text',
+    nullable: true
+  })
   descripcion?: string;
 
-  @Property({ type: 'string', length: 255, nullable: true })
+  @Property({
+    type: 'string',
+    length: 255,
+    nullable: true
+  })
   imagen?: string;
 
   @Property({
@@ -41,7 +49,11 @@ export class Servicio {
   })
   creadoEn!: Date;
 
-  // Indica si el servicio ya está publicado (activo) o todavía es un borrador
-  @Property({ type: 'boolean', default: true })
+  // Indica si el servicio ya está publicado (activo)
+  // o todavía es un borrador
+  @Property({
+    type: 'boolean',
+    default: true
+  })
   draft: boolean = true;
 }

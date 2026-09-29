@@ -1,119 +1,381 @@
-import Card from './card';
+import { useState } from 'react';
+import { Search, CalendarDays, Tags } from 'lucide-react';
 import './dashboard.css';
 
-interface Servicio {
-  id: number;
-  nombre: string;
-  precio: string;
-  descripcion: string;
-  imagen: string;
-}
+import {
+  buscarServiciosRequest
+} from '../services/servicioService';
+
+import type {
+  Servicio
+} from '../services/servicioService';
+
+import CategoriasPage from './CategoriasPage';
+import EventosPage from './EventosPage';
+
 
 interface ClienteDashboardProps {
-  onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
-  servicios?: Servicio[];
-  onContratar?: (servicio: Servicio) => void;
+  nombreUsuario: string;
+  onLogout?: () => void;
 }
 
-// Lista falsa de servicios que un cliente podría contratar.
-// Son datos "hardcodeados" (fijos en el código), no vienen de ninguna base de datos todavía.
-// La imagen viene de picsum.photos, un sitio que da fotos random gratis para pruebas.
-// Usamos "seed" (semilla) para que cada servicio muestre siempre la misma foto.
-const serviciosDisponibles: Servicio[] = [
-  {
-    id: 1,
-    nombre: 'Corte de pelo',
-    precio: '$ 5.000',
-    descripcion: 'Corte clásico para caballero, incluye lavado.',
-    imagen: 'https://picsum.photos/seed/corte-de-pelo/300/200',
-  },
-  {
-    id: 2,
-    nombre: 'Manicura',
-    precio: '$ 8.000',
-    descripcion: 'Manicura completa con esmalte a elección.',
-    imagen: 'https://picsum.photos/seed/manicura/300/200',
-  },
-  {
-    id: 3,
-    nombre: 'Masaje relajante',
-    precio: '$ 15.000',
-    descripcion: 'Masaje de 30 minutos para aliviar el estrés.',
-    imagen: 'https://picsum.photos/seed/masaje-relajante/300/200',
-  },
-  {
-    id: 4,
-    nombre: 'Limpieza facial',
-    precio: '$ 12.000',
-    descripcion: 'Limpieza profunda de cutis con productos naturales.',
-    imagen: 'https://picsum.photos/seed/limpieza-facial/300/200',
-  },
-];
 
-export default function ClienteDashboard({ onLogout, servicios = serviciosDisponibles, onContratar }: ClienteDashboardProps) {
-  // Botón "Volver a iniciar sesión": llama a onLogout (viene de App.tsx)
-  // y eso hace que la app vuelva a mostrar la pantalla de login.
+export default function ClienteDashboard({
+  nombreUsuario,
+  onLogout
+}: ClienteDashboardProps) {
+
+  const [textoBusqueda, setTextoBusqueda] = useState('');
+  const [servicios, setServicios] = useState<Servicio[]>([]);
+  const [buscando, setBuscando] = useState(false);
+  const [busquedaRealizada, setBusquedaRealizada] = useState(false);
+  const [errorBusqueda, setErrorBusqueda] = useState('');
+
+  const [pantalla, setPantalla] =
+    useState<'inicio' | 'categorias' | 'eventos'>('inicio');
+
+
   function volverAIniciarSesion() {
     onLogout?.();
   }
 
-  // Si el padre pasa un callback lo usamos, si no avisamos que está en construcción.
-  function contratarServicio(servicio: Servicio) {
-    if (onContratar) onContratar(servicio);
-    else alert(`Todavía no se puede contratar "${servicio.nombre}". ¡Función en construcción!`);
+
+  // ======================================================
+  // BUSCAR SERVICIOS POR NOMBRE
+  // ======================================================
+
+  async function buscarServicios(e: React.FormEvent) {
+    e.preventDefault();
+
+    const texto = textoBusqueda.trim();
+
+    if (!texto) {
+      return;
+    }
+
+    setBuscando(true);
+    setErrorBusqueda('');
+    setBusquedaRealizada(true);
+
+    try {
+
+      const resultados =
+        await buscarServiciosRequest(texto);
+
+      setServicios(resultados);
+
+    } catch (error) {
+
+      setServicios([]);
+
+      setErrorBusqueda(
+        error instanceof Error
+          ? error.message
+          : 'Error al buscar los servicios'
+      );
+
+    } finally {
+
+      setBuscando(false);
+
+    }
   }
+
 
   return (
     <div className="cliente-container">
+
       <main className="cliente-main">
-        {/* Fila de arriba: título a la izquierda y botón de logout a la derecha */}
-        {/* Copiado igual que en el dashboard de businesses */}
-        <div className="cliente-dashboard-header">
-          <h1 className="cliente-dashboard-title">Dashboard</h1>
-          <button className="cliente-boton-logout" onClick={volverAIniciarSesion}>
-            Volver a iniciar sesión
+
+        {/* ==========================================
+            ENCABEZADO
+            ========================================== */}
+
+        <div className="cliente-header">
+
+          <div>
+
+            <h1 className="cliente-titulo">
+              PlanIt
+            </h1>
+
+            <p className="cliente-bienvenida">
+              Bienvenido {nombreUsuario}
+            </p>
+
+          </div>
+
+
+          <button
+            className="cliente-boton-logout"
+            onClick={volverAIniciarSesion}
+          >
+            Cerrar sesión
           </button>
+
         </div>
 
-        {/* Banner */}
-        <div id="cliente-subtitulo"> Observa tus estadísticas </div>
 
-        {/* TARJETAS SUPERIORES: iguales a las del dashboard de businesses */}
-        <div className="cliente-cards-grid">
-          <Card id="cliente-verde" amount="$ 153.000" label="Ingresos" icon="money.svg" />
-          <Card id="cliente-amarillo" amount="20" label="Ventas" icon="cart.svg" />
-          <Card id="cliente-azul" amount="20" label="Clientes" icon="badge.svg" />
-          <Card id="cliente-gris" amount="20" label="Empleados" icon="gift.svg" />
-        </div>
+        {/* ==========================================
+            PANTALLA DE CATEGORÍAS
+            ========================================== */}
 
-        {/* Título de la sección de servicios */}
-        <h2 className="cliente-servicios-title">Servicios disponibles</h2>
+        {pantalla === 'categorias' && (
 
-        {/* Lista de servicios: usa el mismo estilo visual (fondo blanco, barra de color, sombra) */}
-        <div className="cliente-servicios-lista">
-          {servicios.map((servicio) => (
-            <div key={servicio.id} className="cliente-servicio-card">
-              <div className="cliente-servicio-accent" />
-              <img className="cliente-servicio-imagen" src={servicio.imagen} alt={servicio.nombre} />
-              <div className="cliente-servicio-content">
-                <div className="cliente-servicio-header">
-                  <span className="cliente-servicio-nombre">{servicio.nombre}</span>
-                  <span className="cliente-servicio-precio">{servicio.precio}</span>
-                </div>
-                <p className="cliente-servicio-descripcion">{servicio.descripcion}</p>
+          <CategoriasPage
+            onVolver={() => setPantalla('inicio')}
+          />
 
-                {/* Botón conectado al callback onContratar (o al aviso de "en construcción" si no se pasa) */}
+        )}
+
+
+        {/* ==========================================
+            PANTALLA DE EVENTOS
+            ========================================== */}
+
+        {pantalla === 'eventos' && (
+
+          <EventosPage
+            onVolver={() => setPantalla('inicio')}
+          />
+
+        )}
+
+
+        {/* ==========================================
+            PANTALLA PRINCIPAL
+            ========================================== */}
+
+        {pantalla === 'inicio' && (
+          <>
+
+            {/* ==========================================
+                BUSCADOR DIRECTO
+                ========================================== */}
+
+            <section className="cliente-buscador-seccion">
+
+              <h2>
+                ¿Buscás algo específico?
+              </h2>
+
+              <p>
+                Buscá directamente el servicio que necesitás
+              </p>
+
+
+              <form
+                className="cliente-buscador"
+                onSubmit={buscarServicios}
+              >
+
+                <input
+                  type="text"
+                  placeholder="Buscar servicios por nombre..."
+                  value={textoBusqueda}
+                  onChange={(e) =>
+                    setTextoBusqueda(e.target.value)
+                  }
+                />
+
                 <button
-                  className="cliente-boton-contratar"
-                  onClick={() => contratarServicio(servicio)}
+                  type="submit"
+                  className="cliente-buscador-boton"
+                  aria-label="Buscar servicios"
                 >
-                  Contratar
+                  <Search size={22} />
                 </button>
-              </div>
-            </div>
-          ))}
-        </div>
+
+              </form>
+
+            </section>
+
+
+            {/* ==========================================
+                RESULTADOS DE BÚSQUEDA
+                ========================================== */}
+
+            {buscando && (
+
+              <p className="cliente-mensaje-busqueda">
+                Buscando servicios...
+              </p>
+
+            )}
+
+
+            {errorBusqueda && (
+
+              <p className="cliente-error-busqueda">
+                {errorBusqueda}
+              </p>
+
+            )}
+
+
+            {!buscando &&
+              busquedaRealizada &&
+              !errorBusqueda &&
+              servicios.length === 0 && (
+
+                <p className="cliente-mensaje-busqueda">
+                  No encontramos servicios con ese nombre.
+                </p>
+
+              )}
+
+
+            {!buscando &&
+              servicios.length > 0 && (
+
+                <section className="cliente-resultados">
+
+                  <h2 className="cliente-resultados-titulo">
+                    Servicios encontrados
+                  </h2>
+
+
+                  <div className="cliente-resultados-grid">
+
+                    {servicios.map((servicio) => (
+
+                      <article
+                        key={servicio.id}
+                        className="cliente-servicio-card"
+                      >
+
+                        <div className="cliente-servicio-imagen">
+
+                          {servicio.imagen ? (
+
+                            <img
+                              src={servicio.imagen}
+                              alt={servicio.nombre}
+                            />
+
+                          ) : (
+
+                            <Search size={36} />
+
+                          )}
+
+                        </div>
+
+
+                        <div className="cliente-servicio-contenido">
+
+                          <span className="cliente-servicio-categoria">
+                            {servicio.categoria.nombre}
+                          </span>
+
+                          <h3>
+                            {servicio.nombre}
+                          </h3>
+
+                          {servicio.descripcion && (
+
+                            <p>
+                              {servicio.descripcion}
+                            </p>
+
+                          )}
+
+                        </div>
+
+                      </article>
+
+                    ))}
+
+                  </div>
+
+                </section>
+
+              )}
+
+
+            {/* ==========================================
+                FORMAS DE BÚSQUEDA
+                ========================================== */}
+
+            <section className="cliente-opciones">
+
+
+              {/* EVENTOS */}
+
+              <button
+                className="cliente-opcion-card"
+                onClick={() => setPantalla('eventos')}
+              >
+
+                <div className="cliente-opcion-icono">
+                  <CalendarDays size={42} />
+                </div>
+
+                <div className="cliente-opcion-numero">
+                  1
+                </div>
+
+                <span className="cliente-opcion-texto">
+                  Buscar servicio por
+                </span>
+
+                <h2>
+                  EVENTO
+                </h2>
+
+                <p>
+                  Elegí el tipo de evento y descubrí las categorías
+                  de servicios disponibles.
+                </p>
+
+                <span className="cliente-opcion-boton">
+                  Ver eventos
+                </span>
+
+              </button>
+
+
+              {/* CATEGORÍAS */}
+
+              <button
+                className="cliente-opcion-card"
+                onClick={() => setPantalla('categorias')}
+              >
+
+                <div className="cliente-opcion-icono">
+                  <Tags size={42} />
+                </div>
+
+                <div className="cliente-opcion-numero">
+                  2
+                </div>
+
+                <span className="cliente-opcion-texto">
+                  Buscar servicio por
+                </span>
+
+                <h2>
+                  CATEGORÍA
+                </h2>
+
+                <p>
+                  Explorá las categorías y encontrá los servicios
+                  disponibles en cada una.
+                </p>
+
+                <span className="cliente-opcion-boton">
+                  Ver categorías
+                </span>
+
+              </button>
+
+            </section>
+
+          </>
+        )}
+
       </main>
+
     </div>
   );
 }

@@ -1,157 +1,512 @@
-/* Todas las clases de este archivo llevan el prefijo "cliente-" para no
-   chocar con las clases (con los mismos nombres) del módulo "businesses",
-   ya que el CSS acá es global y no está aislado por módulo. */
+/* ==========================================
+   CONTENEDOR GENERAL
+   ========================================== */
 
 .cliente-container {
   width: 100%;
   min-height: 100vh;
   flex: 1;
   box-sizing: border-box;
+  background-color: #f8fafc;
 }
 
 .cliente-main {
-  background-color: rgb(255, 255, 255);
+  width: 100%;
+  box-sizing: border-box;
   padding: 20px;
 }
 
-.cliente-dashboard-title,
-.cliente-servicios-title {
-  color: black;
-}
-
-#cliente-subtitulo {
-  border: 1px solid black;
-  margin: 10px;
-  padding: 1px;
-  color: black;
-}
 
 /* ==========================================
-   TITULO "Dashboard" + botón de logout
-   (mismo estilo que en el dashboard de businesses)
+   ENCABEZADO
    ========================================== */
-.cliente-dashboard-header {
+
+.cliente-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+
+  background: linear-gradient(135deg, #1e293b 0%, #1d4ed8 100%);
+
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+
+  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.20);
 }
 
-.cliente-dashboard-title {
+.cliente-titulo {
+  margin: 0;
+  color: #ffffff;
   font-size: 2rem;
   font-weight: 800;
-  color: #1f2937;
-  margin: 0 0 0.25rem 0;
   padding-left: 0.75rem;
-  border-left: 6px solid #2563eb;
+  border-left: 6px solid #60a5fa;
+}
+
+.cliente-bienvenida {
+  margin: 0.5rem 0 0 0.75rem;
+  color: rgba(255, 255, 255, 0.80);
+  font-size: 0.95rem;
 }
 
 .cliente-boton-logout {
-  border: 1px solid #e5e7eb;
-  background-color: #ffffff;
-  color: #374151;
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  background-color: rgba(255, 255, 255, 0.10);
+  color: #ffffff;
   border-radius: 6px;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .cliente-boton-logout:hover {
-  background-color: #f3f4f6;
+  background-color: rgba(255, 255, 255, 0.20);
 }
+
 
 /* ==========================================
-   SECCIÓN "Servicios disponibles"
+   BUSCADOR
    ========================================== */
-.cliente-servicios-title {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
+
+.cliente-buscador-seccion {
+  max-width: 850px;
+  margin: 0 auto 2.5rem auto;
+  text-align: center;
 }
 
-.cliente-servicios-lista {
+.cliente-buscador-seccion h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.6rem;
+}
+
+.cliente-buscador-seccion p {
+  margin: 0.4rem 0 1.2rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.cliente-buscador {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem 0.5rem 0.4rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cliente-buscador:focus-within {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12),
+    0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.cliente-buscador input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.cliente-buscador input::placeholder {
+  color: #9ca3af;
+}
+
+.cliente-buscador-boton {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background-color: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cliente-buscador-boton:hover {
+  background-color: #1d4ed8;
+}
+
+
+/* ==========================================
+   RESULTADOS DE BÚSQUEDA
+   ========================================== */
+
+.cliente-resultados {
+  max-width: 850px;
+  margin: 0 auto 2.5rem auto;
+}
+
+.cliente-resultados-titulo {
+  margin: 0 0 1rem;
+  color: #1f2937;
+  font-size: 1.2rem;
+}
+
+.cliente-resultados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1rem;
 }
 
-/* Tarjeta de servicio: mismo look que las tarjetas horizontales (barra de color + fondo blanco) */
 .cliente-servicio-card {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 800px;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e7eb;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.cliente-servicio-accent {
-  width: 6px;
-  background-color: #2563eb;
-  flex-shrink: 0;
+.cliente-servicio-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
 }
 
 .cliente-servicio-imagen {
-  width: 140px;
-  height: auto;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-@media (max-width: 600px) {
-  .cliente-servicio-imagen {
-    width: 90px;
-  }
-}
-
-.cliente-servicio-content {
+  height: 140px;
   display: flex;
-  flex-direction: column;
-  padding: 1rem 1.25rem;
-  flex: 1;
-  min-width: 0;
-}
-
-.cliente-servicio-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.35rem;
-}
-
-.cliente-servicio-nombre {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.cliente-servicio-precio {
-  font-size: 0.9rem;
-  font-weight: 600;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%);
   color: #2563eb;
 }
 
-.cliente-servicio-descripcion {
-  margin: 0 0 0.75rem 0;
-  font-size: 0.875rem;
-  color: #4b5563;
+.cliente-servicio-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cliente-servicio-contenido {
+  padding: 1rem;
+}
+
+.cliente-servicio-categoria {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.15rem 0.55rem;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.cliente-servicio-contenido h3 {
+  margin: 0 0 0.4rem;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+.cliente-servicio-contenido p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
   line-height: 1.4;
 }
 
-.cliente-boton-contratar {
-  align-self: flex-start;
-  border: none;
-  background-color: #2563eb;
-  color: white;
-  border-radius: 6px;
+.cliente-mensaje-busqueda {
+  max-width: 850px;
+  margin: -1rem auto 2rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.cliente-error-busqueda {
+  max-width: 850px;
+  margin: 1rem auto 2rem;
+  color: #b91c1c;
+  text-align: center;
+}
+
+
+/* ==========================================
+   OPCIONES DE BÚSQUEDA
+   ========================================== */
+
+.cliente-opciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+
+/* ==========================================
+   CARD EVENTO / CATEGORÍA
+   ========================================== */
+
+.cliente-opcion-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 280px;
+  padding: 2rem 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-top: 4px solid #2563eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cliente-opcion-card:hover {
+  transform: translateY(-4px);
+  border-color: #2563eb;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+}
+
+.cliente-opcion-card:focus {
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.15),
+    0 10px 24px rgba(15, 23, 42, 0.14);
+}
+
+.cliente-opcion-numero {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  color: #1e3a5f;
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+.cliente-opcion-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 1rem;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border-radius: 50%;
+}
+
+.cliente-opcion-texto {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.cliente-opcion-card h2 {
+  margin: 0.15rem 0 0.75rem;
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.cliente-opcion-card p {
+  max-width: 300px;
+  margin: 0 0 1.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cliente-opcion-boton {
+  margin-top: auto;
   padding: 0.5rem 1rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.cliente-opcion-card:hover .cliente-opcion-boton {
+  background-color: #1d4ed8;
+}
+
+
+/* ==========================================
+   PANTALLA DE CATEGORÍAS
+   ========================================== */
+
+.cliente-subpagina {
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.cliente-subpagina-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.cliente-subpagina-header h2 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.6rem;
+}
+
+.cliente-subpagina-header p {
+  margin: 0.35rem 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.cliente-volver {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 7px;
+  padding: 0.5rem 0.8rem;
+  font-family: inherit;
   font-size: 0.85rem;
   cursor: pointer;
 }
 
-.cliente-boton-contratar:hover {
-  background-color: #1d4ed8;
+.cliente-volver:hover {
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  background-color: #eff6ff;
+}
+
+
+/* ==========================================
+   CATEGORÍAS
+   ========================================== */
+
+.cliente-categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.cliente-categoria-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 64px;
+  padding: 0.8rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  color: #374151;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cliente-categoria-card svg {
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+.cliente-categoria-card:hover {
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  background-color: #f8fbff;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.09);
+}
+
+.cliente-categoria-card:focus {
+  outline: none;
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12),
+    0 6px 14px rgba(15, 23, 42, 0.09);
+}
+
+.cliente-categoria-card-activa {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cliente-categoria-servicios {
+  margin-top: 2.5rem;
+}
+
+.cliente-mensaje {
+  margin: 1.5rem 0;
+  color: #6b7280;
+  text-align: center;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 700px) {
+
+  .cliente-header {
+    align-items: flex-start;
+    padding: 1.25rem;
+  }
+
+  .cliente-titulo {
+    font-size: 1.6rem;
+  }
+
+  .cliente-opciones {
+    grid-template-columns: 1fr;
+  }
+
+  .cliente-opcion-card {
+    min-height: 250px;
+  }
+
+  .cliente-resultados-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cliente-categorias-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cliente-subpagina-header {
+    flex-direction: column;
+  }
 }

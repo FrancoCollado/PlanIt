@@ -5,6 +5,7 @@ export type UserRole = 'admin' | 'business' | 'client';
 
 export interface AuthUser {
   id: number;
+  nombre: string;
   role: UserRole;
 }
 
@@ -198,11 +199,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLo
         return;
       }
 
-      onLoginSuccess?.({ id: user.id, role: rol });
+      onLoginSuccess?.({
+        id: user.id,
+        nombre: user.nombre,
+        role: rol,
+      });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Credenciales inválidas');
+      setErrorMessage(
+        error instanceof Error ? error.message : 'No se pudo iniciar sesión',
+      );
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -250,3 +258,5 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess, onGoogleLo
     </form>
   );
 };
+
+

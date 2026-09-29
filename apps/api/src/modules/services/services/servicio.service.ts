@@ -4,29 +4,121 @@ import { Categoria } from '../../../entities/categoria';
 import { User } from '../../../entities/usuario';
 import type { CreateServicioDto, UpdateServicioDto } from '../dtos/servicio.dto';
 
-export const listServiciosByUsuario = async (usuarioId: number): Promise<Servicio[]> => {
+
+// ======================================================
+// LISTAR SERVICIOS DE UNA EMPRESA
+// ======================================================
+
+export const listServiciosByUsuario = async (
+  usuarioId: number
+): Promise<Servicio[]> => {
   const orm = getOrm();
   const em = orm.em.fork();
 
-  return em.find(Servicio, { usuario: usuarioId }, { populate: ['categoria'], orderBy: { creadoEn: 'DESC' } });
+  return em.find(
+    Servicio,
+    { usuario: usuarioId },
+    {
+      populate: ['categoria'],
+      orderBy: { creadoEn: 'DESC' }
+    }
+  );
 };
 
-export const getServicioById = async (id: number): Promise<Servicio | null> => {
+
+// ======================================================
+// BUSCAR SERVICIOS PUBLICADOS POR NOMBRE
+// Se utiliza desde la pantalla del cliente.
+// ======================================================
+
+export const buscarServiciosPorNombre = async (
+  nombre: string
+): Promise<Servicio[]> => {
   const orm = getOrm();
   const em = orm.em.fork();
 
-  return em.findOne(Servicio, { id }, { populate: ['categoria'] });
+  return em.find(
+    Servicio,
+    {
+      nombre: { $like: `%${nombre}%` },
+      draft: false
+    },
+    {
+      populate: ['categoria'],
+      orderBy: { nombre: 'ASC' }
+    }
+  );
 };
 
-export const createServicio = async (data: CreateServicioDto): Promise<Servicio> => {
+
+// ======================================================
+// BUSCAR SERVICIOS PUBLICADOS POR CATEGORÍA
+// Se utiliza desde la pantalla del cliente.
+// ======================================================
+
+export const buscarServiciosPorCategoria = async (
+  categoriaId: number
+): Promise<Servicio[]> => {
   const orm = getOrm();
   const em = orm.em.fork();
 
-  const categoria = await em.findOne(Categoria, { id: data.categoriaId });
-  if (!categoria) throw new Error('La categoría indicada no existe');
+  return em.find(
+    Servicio,
+    {
+      categoria: categoriaId,
+      draft: false
+    },
+    {
+      populate: ['categoria'],
+      orderBy: { nombre: 'ASC' }
+    }
+  );
+};
 
-  const usuario = await em.findOne(User, { id: data.usuarioId });
-  if (!usuario) throw new Error('El usuario indicado no existe');
+
+// ======================================================
+// OBTENER SERVICIO POR ID
+// ======================================================
+
+export const getServicioById = async (
+  id: number
+): Promise<Servicio | null> => {
+  const orm = getOrm();
+  const em = orm.em.fork();
+
+  return em.findOne(
+    Servicio,
+    { id },
+    { populate: ['categoria'] }
+  );
+};
+
+
+// ======================================================
+// CREAR SERVICIO
+// ======================================================
+
+export const createServicio = async (
+  data: CreateServicioDto
+): Promise<Servicio> => {
+  const orm = getOrm();
+  const em = orm.em.fork();
+
+  const categoria = await em.findOne(Categoria, {
+    id: data.categoriaId
+  });
+
+  if (!categoria) {
+    throw new Error('La categoría indicada no existe');
+  }
+
+  const usuario = await em.findOne(User, {
+    id: data.usuarioId
+  });
+
+  if (!usuario) {
+    throw new Error('El usuario indicado no existe');
+  }
 
   const servicio = em.create(Servicio, {
     nombre: data.nombre,
@@ -43,6 +135,11 @@ export const createServicio = async (data: CreateServicioDto): Promise<Servicio>
   return servicio;
 };
 
+
+// ======================================================
+// ACTUALIZAR SERVICIO
+// ======================================================
+
 export const updateServicio = async (
   id: number,
   usuarioId: number,
@@ -51,18 +148,40 @@ export const updateServicio = async (
   const orm = getOrm();
   const em = orm.em.fork();
 
-  const servicio = await em.findOne(Servicio, { id, usuario: usuarioId });
+  const servicio = await em.findOne(Servicio, {
+    id,
+    usuario: usuarioId
+  });
 
-  if (!servicio) return null;
+  if (!servicio) {
+    return null;
+  }
 
-  if (data.nombre !== undefined) servicio.nombre = data.nombre;
-  if (data.descripcion !== undefined) servicio.descripcion = data.descripcion;
-  if (data.imagen !== undefined) servicio.imagen = data.imagen;
-  if (data.draft !== undefined) servicio.draft = data.draft;
+  if (data.nombre !== undefined) {
+    servicio.nombre = data.nombre;
+  }
+
+  if (data.descripcion !== undefined) {
+    servicio.descripcion = data.descripcion;
+  }
+
+  if (data.imagen !== undefined) {
+    servicio.imagen = data.imagen;
+  }
+
+  if (data.draft !== undefined) {
+    servicio.draft = data.draft;
+  }
 
   if (data.categoriaId !== undefined) {
-    const categoria = await em.findOne(Categoria, { id: data.categoriaId });
-    if (!categoria) throw new Error('La categoría indicada no existe');
+    const categoria = await em.findOne(Categoria, {
+      id: data.categoriaId
+    });
+
+    if (!categoria) {
+      throw new Error('La categoría indicada no existe');
+    }
+
     servicio.categoria = categoria;
   }
 
@@ -71,13 +190,26 @@ export const updateServicio = async (
   return servicio;
 };
 
-export const deleteServicio = async (id: number, usuarioId: number): Promise<boolean> => {
+
+// ======================================================
+// BORRAR SERVICIO
+// ======================================================
+
+export const deleteServicio = async (
+  id: number,
+  usuarioId: number
+): Promise<boolean> => {
   const orm = getOrm();
   const em = orm.em.fork();
 
-  const servicio = await em.findOne(Servicio, { id, usuario: usuarioId });
+  const servicio = await em.findOne(Servicio, {
+    id,
+    usuario: usuarioId
+  });
 
-  if (!servicio) return false;
+  if (!servicio) {
+    return false;
+  }
 
   await em.remove(servicio).flush();
 
