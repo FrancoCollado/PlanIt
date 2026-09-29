@@ -97,6 +97,7 @@ export default function ClienteDashboard({
             ENCABEZADO
             ========================================== */}
 
+
         <div className="cliente-header">
 
           <div>
@@ -149,7 +150,19 @@ export default function ClienteDashboard({
 
         )}
 
-        {pantalla === 'tableros' && <TablerosPage token={token} onVolver={() => setPantalla('inicio')} />}
+
+        {/* ==========================================
+            PANTALLA DE TABLEROS
+            ========================================== */}
+
+        {pantalla === 'tableros' && (
+
+          <TablerosPage
+            token={token}
+            onVolver={() => setPantalla('inicio')}
+          />
+
+        )}
 
 
         {/* ==========================================
@@ -158,11 +171,6 @@ export default function ClienteDashboard({
 
         {pantalla === 'inicio' && (
           <>
-            <div className="cliente-tableros-entrada">
-              <button className="cliente-accion" onClick={() => setPantalla('tableros')}>
-                <Pencil size={18} /> Crear tablero / Mis tableros
-              </button>
-            </div>
 
             {/* ==========================================
                 BUSCADOR DIRECTO
@@ -180,7 +188,9 @@ export default function ClienteDashboard({
 
 
               <form onSubmit={buscarServicios}>
+
                 <div className="cliente-buscador">
+
                   <input
                     type="search"
                     aria-label="Nombre del servicio"
@@ -188,20 +198,45 @@ export default function ClienteDashboard({
                     value={textoBusqueda}
                     onChange={(e) => setTextoBusqueda(e.target.value)}
                   />
-                  <button type="submit" className="cliente-buscador-boton" aria-label="Buscar servicios">
+
+                  <button
+                    type="submit"
+                    className="cliente-buscador-boton"
+                    aria-label="Buscar servicios"
+                  >
                     <Search size={22} />
                   </button>
+
                 </div>
+
+
                 <div className="cliente-filtros">
+
                   <label>
                     Zona de la empresa
-                    <input type="search" value={zonaBusqueda} onChange={(e) => setZonaBusqueda(e.target.value)} placeholder="Cualquier zona" />
+
+                    <input
+                      type="search"
+                      value={zonaBusqueda}
+                      onChange={(e) => setZonaBusqueda(e.target.value)}
+                      placeholder="Cualquier zona"
+                    />
                   </label>
+
+
                   <label>
                     Nombre de la empresa
-                    <input type="search" value={empresaBusqueda} onChange={(e) => setEmpresaBusqueda(e.target.value)} placeholder="Cualquier empresa" />
+
+                    <input
+                      type="search"
+                      value={empresaBusqueda}
+                      onChange={(e) => setEmpresaBusqueda(e.target.value)}
+                      placeholder="Cualquier empresa"
+                    />
                   </label>
+
                 </div>
+
               </form>
 
             </section>
@@ -255,7 +290,11 @@ export default function ClienteDashboard({
 
                     {servicios.map((servicio) => (
 
-                      <ServicioCard key={servicio.id} servicio={servicio} token={token} />
+                      <ServicioCard
+                        key={servicio.id}
+                        servicio={servicio}
+                        token={token}
+                      />
 
                     ))}
 
@@ -338,6 +377,41 @@ export default function ClienteDashboard({
 
                 <span className="cliente-opcion-boton">
                   Ver categorías
+                </span>
+
+              </button>
+
+
+              {/* MIS TABLEROS */}
+
+              <button
+                className="cliente-opcion-card cliente-opcion-tableros"
+                onClick={() => setPantalla('tableros')}
+              >
+
+                <div className="cliente-opcion-icono">
+                  <Pencil size={42} />
+                </div>
+
+                <div className="cliente-opcion-numero">
+                  3
+                </div>
+
+                <span className="cliente-opcion-texto">
+                  Organizá tus servicios en
+                </span>
+
+                <h2>
+                  MIS TABLEROS
+                </h2>
+
+                <p>
+                  Creá y administrá tus tableros con los servicios
+                  que quieras guardar.
+                </p>
+
+                <span className="cliente-opcion-boton">
+                  Ver tableros
                 </span>
 
               </button>
