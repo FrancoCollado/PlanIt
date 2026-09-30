@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestJson } from '../../../shared/api';
 
 export interface LoginResponse {
   message: string;
@@ -13,18 +13,11 @@ export interface LoginResponse {
 }
 
 export const loginRequest = async (email: string, password: string): Promise<LoginResponse> => {
-  const response = await fetch(`${API_URL}/api/auth/login`, {
+  const data = await requestJson<LoginResponse>(`/api/auth/login`, 'Error al iniciar sesión', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al iniciar sesión');
-  }
-
   return data;
 };
 
@@ -53,17 +46,10 @@ export interface RegisterResponse {
 }
 
 export const registerRequest = async (payload: RegisterPayload): Promise<RegisterResponse> => {
-  const response = await fetch(`${API_URL}/api/auth/register`, {
+  const data = await requestJson<RegisterResponse>(`/api/auth/register`, 'Error al registrar usuario', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al registrar usuario');
-  }
-
   return data;
 };

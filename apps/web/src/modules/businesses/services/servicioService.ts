@@ -1,17 +1,7 @@
-const API_URL = 'http://localhost:4000';
+import { requestDelete, requestJson } from '../../../shared/api';
 
-export interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion?: string;
-  imagen?: string;
-  draft: boolean;
-  creadoEn?: string;
-  categoria: {
-    id: number;
-    nombre: string;
-  };
-}
+import type { Servicio } from '../../clientes/services/servicioService';
+export type { Servicio } from '../../clientes/services/servicioService';
 
 export interface ServicioPayload {
   nombre: string;
@@ -22,29 +12,16 @@ export interface ServicioPayload {
 }
 
 export const listServiciosRequest = async (usuarioId: number): Promise<Servicio[]> => {
-  const response = await fetch(`${API_URL}/api/servicios?usuarioId=${usuarioId}`);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener los servicios');
-  }
-
+  const data = await requestJson<{ servicios: Servicio[] }>(`/api/servicios?usuarioId=${usuarioId}`, 'Error al obtener los servicios');
   return data.servicios;
 };
 
 export const createServicioRequest = async (usuarioId: number, payload: ServicioPayload): Promise<Servicio> => {
-  const response = await fetch(`${API_URL}/api/servicios`, {
+  const data = await requestJson<{ servicio: Servicio }>(`/api/servicios`, 'Error al crear el servicio', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...payload, usuarioId }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al crear el servicio');
-  }
-
   return data.servicio;
 };
 
@@ -53,28 +30,16 @@ export const updateServicioRequest = async (
   usuarioId: number,
   payload: Partial<ServicioPayload>
 ): Promise<Servicio> => {
-  const response = await fetch(`${API_URL}/api/servicios/${id}`, {
+  const data = await requestJson<{ servicio: Servicio }>(`/api/servicios/${id}`, 'Error al actualizar el servicio', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...payload, usuarioId }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al actualizar el servicio');
-  }
-
   return data.servicio;
 };
 
 export const deleteServicioRequest = async (id: number, usuarioId: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/servicios/${id}?usuarioId=${usuarioId}`, {
+  await requestDelete(`/api/servicios/${id}?usuarioId=${usuarioId}`, 'Error al eliminar el servicio', {
     method: 'DELETE',
   });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Error al eliminar el servicio');
-  }
 };

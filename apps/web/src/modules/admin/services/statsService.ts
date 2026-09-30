@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestJson } from '../../../shared/api';
 
 export interface AdminStats {
   empresasActivas: number;
@@ -8,12 +8,6 @@ export interface AdminStats {
 }
 
 export const getAdminStatsRequest = async (): Promise<AdminStats> => {
-  const response = await fetch(`${API_URL}/api/stats/admin`);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener las estadísticas');
-  }
-
+  const data = await requestJson<AdminStats>(`/api/stats/admin`, 'Error al obtener las estadísticas');
   return data;
 };

@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestJson } from '../../../shared/api';
 
 export interface Usuario {
   id: number;
@@ -14,28 +14,15 @@ export interface Usuario {
 
 export const listUsuariosRequest = async (rol?: string): Promise<Usuario[]> => {
   const query = rol ? `?rol=${encodeURIComponent(rol)}` : '';
-  const response = await fetch(`${API_URL}/api/usuarios${query}`);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener los usuarios');
-  }
-
+  const data = await requestJson<{ usuarios: Usuario[] }>(`/api/usuarios${query}`, 'Error al obtener los usuarios');
   return data.usuarios;
 };
 
 export const setUsuarioActivoRequest = async (id: number, activo: boolean): Promise<Usuario> => {
-  const response = await fetch(`${API_URL}/api/usuarios/${id}/activo`, {
+  const data = await requestJson<{ usuario: Usuario }>(`/api/usuarios/${id}/activo`, 'Error al actualizar el usuario', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ activo }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al actualizar el usuario');
-  }
-
   return data.usuario;
 };

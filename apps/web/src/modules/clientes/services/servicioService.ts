@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestJson } from '../../../shared/api';
 
 export interface Servicio {
   id: number;
@@ -13,57 +13,22 @@ export interface Servicio {
   };
 }
 
-
-// ======================================================
-// BUSCAR SERVICIOS POR NOMBRE
-// ======================================================
-
 export const buscarServiciosRequest = async (
   nombre: string,
   zona = '',
   empresa = ''
 ): Promise<Servicio[]> => {
-
   const params = new URLSearchParams();
   if (nombre.trim()) params.set('nombre', nombre.trim());
   if (zona.trim()) params.set('zona', zona.trim());
   if (empresa.trim()) params.set('empresa', empresa.trim());
-
-  const response = await fetch(
-    `${API_URL}/api/servicios/buscar?${params.toString()}`
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || 'Error al buscar los servicios'
-    );
-  }
-
+  const data = await requestJson<{ servicios: Servicio[] }>(`/api/servicios/buscar?${params.toString()}`, 'Error al buscar los servicios');
   return data.servicios;
 };
-
-
-// ======================================================
-// BUSCAR SERVICIOS POR CATEGORÍA
-// ======================================================
 
 export const buscarServiciosPorCategoriaRequest = async (
   categoriaId: number
 ): Promise<Servicio[]> => {
-
-  const response = await fetch(
-    `${API_URL}/api/servicios/categoria/${categoriaId}`
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || 'Error al buscar los servicios por categoría'
-    );
-  }
-
+  const data = await requestJson<{ servicios: Servicio[] }>(`/api/servicios/categoria/${categoriaId}`, 'Error al buscar los servicios por categoría');
   return data.servicios;
 };

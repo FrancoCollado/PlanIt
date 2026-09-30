@@ -4,22 +4,19 @@ import { Evento } from '../../../entities/evento';
 import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto';
 
 export const listCategorias = async (): Promise<Categoria[]> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   return em.find(Categoria, {}, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
 };
 
 export const getCategoriaById = async (id: number): Promise<Categoria | null> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   return em.findOne(Categoria, { id }, { populate: ['evento'] });
 };
 
 export const createCategoria = async (data: CreateCategoriaDto): Promise<Categoria> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const evento = await em.findOne(Evento, { id: data.eventoId });
 
@@ -40,8 +37,7 @@ export const createCategoria = async (data: CreateCategoriaDto): Promise<Categor
 };
 
 export const updateCategoria = async (id: number, data: UpdateCategoriaDto): Promise<Categoria | null> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const categoria = await em.findOne(Categoria, { id });
 
@@ -66,8 +62,7 @@ export const updateCategoria = async (id: number, data: UpdateCategoriaDto): Pro
 };
 
 export const deleteCategoria = async (id: number): Promise<boolean> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const categoria = await em.findOne(Categoria, { id });
 

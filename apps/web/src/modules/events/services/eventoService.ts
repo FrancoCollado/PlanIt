@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestDelete, requestJson } from '../../../shared/api';
 
 export interface Evento {
   id: number;
@@ -17,55 +17,31 @@ export interface EventoPayload {
 }
 
 export const listEventosRequest = async (): Promise<Evento[]> => {
-  const response = await fetch(`${API_URL}/api/eventos`);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener los eventos');
-  }
-
+  const data = await requestJson<{ eventos: Evento[] }>(`/api/eventos`, 'Error al obtener los eventos');
   return data.eventos;
 };
 
 export const createEventoRequest = async (payload: EventoPayload): Promise<Evento> => {
-  const response = await fetch(`${API_URL}/api/eventos`, {
+  const data = await requestJson<{ evento: Evento }>(`/api/eventos`, 'Error al crear el evento', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al crear el evento');
-  }
-
   return data.evento;
 };
 
 export const updateEventoRequest = async (id: number, payload: Partial<EventoPayload>): Promise<Evento> => {
-  const response = await fetch(`${API_URL}/api/eventos/${id}`, {
+  const data = await requestJson<{ evento: Evento }>(`/api/eventos/${id}`, 'Error al actualizar el evento', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al actualizar el evento');
-  }
-
   return data.evento;
 };
 
 export const deleteEventoRequest = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/eventos/${id}`, {
+  await requestDelete(`/api/eventos/${id}`, 'Error al eliminar el evento', {
     method: 'DELETE',
   });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Error al eliminar el evento');
-  }
 };
+

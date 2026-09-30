@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestDelete, requestJson } from '../../../shared/api';
 
 export interface Categoria {
   id: number;
@@ -18,55 +18,30 @@ export interface CategoriaPayload {
 }
 
 export const listCategoriasRequest = async (): Promise<Categoria[]> => {
-  const response = await fetch(`${API_URL}/api/categorias`);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener las categorías');
-  }
-
+  const data = await requestJson<{ categorias: Categoria[] }>(`/api/categorias`, 'Error al obtener las categorías');
   return data.categorias;
 };
 
 export const createCategoriaRequest = async (payload: CategoriaPayload): Promise<Categoria> => {
-  const response = await fetch(`${API_URL}/api/categorias`, {
+  const data = await requestJson<{ categoria: Categoria }>(`/api/categorias`, 'Error al crear la categoría', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al crear la categoría');
-  }
-
   return data.categoria;
 };
 
 export const updateCategoriaRequest = async (id: number, payload: Partial<CategoriaPayload>): Promise<Categoria> => {
-  const response = await fetch(`${API_URL}/api/categorias/${id}`, {
+  const data = await requestJson<{ categoria: Categoria }>(`/api/categorias/${id}`, 'Error al actualizar la categoría', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al actualizar la categoría');
-  }
-
   return data.categoria;
 };
 
 export const deleteCategoriaRequest = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/categorias/${id}`, {
+  await requestDelete(`/api/categorias/${id}`, 'Error al eliminar la categoría', {
     method: 'DELETE',
   });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Error al eliminar la categoría');
-  }
 };

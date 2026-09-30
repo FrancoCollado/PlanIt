@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { requestJson } from '../../../shared/api';
 
 export interface BusinessStats {
   serviciosActivos: number;
@@ -8,12 +8,6 @@ export interface BusinessStats {
 }
 
 export const getBusinessStatsRequest = async (usuarioId: number): Promise<BusinessStats> => {
-  const response = await fetch(`${API_URL}/api/stats/business?usuarioId=${usuarioId}`);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener las estadísticas');
-  }
-
+  const data = await requestJson<BusinessStats>(`/api/stats/business?usuarioId=${usuarioId}`, 'Error al obtener las estadísticas');
   return data;
 };

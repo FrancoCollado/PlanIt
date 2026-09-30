@@ -19,8 +19,7 @@ export interface BusinessStats {
 }
 
 export const getAdminStats = async (): Promise<AdminStats> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const [empresasActivas, eventosPublicados, eventosBorrador, clientesRegistrados] = await Promise.all([
     em.count(User, { rol: 'empresa', activo: true }),
@@ -33,8 +32,7 @@ export const getAdminStats = async (): Promise<AdminStats> => {
 };
 
 export const getBusinessStats = async (usuarioId: number): Promise<BusinessStats> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const [serviciosActivos, serviciosBorrador, vecesGuardadoEnTableros, serviciosDelUsuario] = await Promise.all([
     em.count(Servicio, { usuario: usuarioId, draft: false }),
