@@ -4,9 +4,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { randomBytes } from 'crypto';
 
-import { MikroORM } from '@mikro-orm/postgresql';
-import mikroOrmConfig from './config/mikro-orm.config';
-
 import authRoutes from './modules/auth/routes/auth.routes';
 import eventoRoutes from './modules/events/routes/evento.routes';
 import usuarioRoutes from './modules/users/routes/usuario.routes';
@@ -15,7 +12,7 @@ import categoriaRoutes from './modules/categories/routes/categoria.routes';
 import servicioRoutes from './modules/services/routes/servicio.routes';
 import tableroRoutes from './modules/boards/tablero.routes';
 
-import { setOrm } from './config/orm';
+import { initOrm } from './config/orm';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
@@ -37,6 +34,25 @@ if (corsOrigins?.length) {
 
 app.use(express.json());
 
+// Diagnóstico: no toca la base de datos, así que responde aunque la conexión falle.
+app.get('/api/health', (_req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'API de planIt funcionando'
+  });
+});
+
+// La conexión se establece antes de cualquier ruta para que un fallo de base de
+// datos devuelva JSON y no un crash de la función.
+app.use('/api', async (_req, _res, next) => {
+  try {
+    await initOrm();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/eventos', eventoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
@@ -45,34 +61,20 @@ app.use('/api/categorias', categoriaRoutes);
 app.use('/api/servicios', servicioRoutes);
 app.use('/api/tableros', tableroRoutes);
 
-// Ruta de prueba
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    message: 'API de planIt funcionando'
-  });
+app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('Error no controlado:', error);
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-async function iniciarServidor() {
-  try {
+// En Vercel la plataforma invoca la app; el listen es sólo para desarrollo local.
+if (!process.env.VERCEL) {
+  initOrm()
+    .then(() => console.log('Base de datos conectada con MikroORM'))
+    .catch((error) => console.error('Error al conectar la base de datos:', error));
 
-    const orm = await MikroORM.init(mikroOrmConfig);
-
-    await orm.connect();
-    setOrm(orm);
-
-    console.log('Base de datos conectada con MikroORM');
-
-    app.listen(PORT, () => {
-      console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
-    });
-
-  } catch (error) {
-
-    console.error('Error al iniciar el servidor:');
-    console.error(error);
-
-  }
+  app.listen(PORT, () => {
+    console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
+  });
 }
 
-iniciarServidor();
+export default app;

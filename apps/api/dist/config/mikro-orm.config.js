@@ -18,12 +18,19 @@ const evento_categoria_1 = require("../entities/evento-categoria");
 const tablero_1 = require("../entities/tablero");
 const tablero_servicio_1 = require("../entities/tablero-servicio");
 // config  MikroORM para la conectar la bd uso var del .env
+// DATABASE_URL (connection string de Supabase) tiene prioridad; si no está, se
+// arma la conexión con las variables sueltas.
+const clientUrl = process.env.DATABASE_URL;
 exports.default = (0, postgresql_1.defineConfig)({
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: Number(process.env.DB_PORT) || 5432,
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '',
-    dbName: process.env.DB_NAME || 'postgres',
+    ...(clientUrl
+        ? { clientUrl }
+        : {
+            host: process.env.DB_HOST || '127.0.0.1',
+            port: Number(process.env.DB_PORT) || 5432,
+            user: process.env.DB_USER || 'postgres',
+            password: process.env.DB_PASSWORD || '',
+            dbName: process.env.DB_NAME || 'postgres'
+        }),
     // Supabase exige TLS; en local se desactiva con DB_SSL=false.
     driverOptions: {
         connection: {
@@ -40,5 +47,6 @@ exports.default = (0, postgresql_1.defineConfig)({
         tablero_servicio_1.TableroServicio
     ],
     metadataProvider: legacy_1.ReflectMetadataProvider,
-    debug: true,
+    // El modo debug imprime cada query con sus parámetros: nunca en producción.
+    debug: process.env.NODE_ENV !== 'production',
 });
