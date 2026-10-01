@@ -49,8 +49,7 @@ export class Servicio {
   })
   creadoEn!: Date;
 
-  // Indica si el servicio ya está publicado (activo)
-  // o todavía es un borrador
+  // Indica si el servicio ya está publicado (activo) o si es un borrador
   @Property({
     type: 'boolean',
     default: true

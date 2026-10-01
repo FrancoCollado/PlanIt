@@ -9,12 +9,12 @@ import {
 export class User {
 
   @PrimaryKey({ type: 'number' })
-  id!: number;
+  id!: number; //va asi por que id es non-nullable y no tiene valor por defecto, uso ! para indicar que siempre tendrá un valor.
 
   @Property({ type: 'string', length: 100 })
   nombre!: string;
 
-  @Property({ type: 'string', length: 100, unique: true })
+  @Property({ type: 'string', length: 100, unique: true }) //aca por ser email hago que sea unique
   email!: string;
 
   @Property({
@@ -24,7 +24,7 @@ export class User {
   })
   password!: string;
 
-  @Enum({
+  @Enum({//
     items: ['cliente', 'administrador', 'empresa']
   })
   rol: 'cliente' | 'administrador' | 'empresa' = 'cliente';
@@ -38,7 +38,7 @@ export class User {
   @Property({ type: 'number', nullable: true })
   telefono?: number;
 
-  // Permite suspender (desactivar) una cuenta sin borrarla, usado para empresas
+  // Permite suspender una cuenta sin borrarla, lo usamos para empresas
   @Property({ type: 'boolean', default: true })
   activo: boolean = true;
 
