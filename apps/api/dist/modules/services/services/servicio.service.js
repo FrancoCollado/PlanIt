@@ -9,8 +9,7 @@ const usuario_1 = require("../../../entities/usuario");
 // LISTAR SERVICIOS DE UNA EMPRESA
 // ======================================================
 const listServiciosByUsuario = async (usuarioId) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.find(servicio_1.Servicio, { usuario: usuarioId }, {
         populate: ['categoria'],
         orderBy: { creadoEn: 'DESC' }
@@ -22,8 +21,7 @@ exports.listServiciosByUsuario = listServiciosByUsuario;
 // Se utiliza desde la pantalla del cliente.
 // ======================================================
 const buscarServiciosPorNombre = async (nombre, zona = '', empresa = '') => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.find(servicio_1.Servicio, {
         ...(nombre && { nombre: { $like: `%${nombre}%` } }),
         draft: false,
@@ -44,8 +42,7 @@ exports.buscarServiciosPorNombre = buscarServiciosPorNombre;
 // Se utiliza desde la pantalla del cliente.
 // ======================================================
 const buscarServiciosPorCategoria = async (categoriaId) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.find(servicio_1.Servicio, {
         categoria: categoriaId,
         draft: false
@@ -59,8 +56,7 @@ exports.buscarServiciosPorCategoria = buscarServiciosPorCategoria;
 // OBTENER SERVICIO POR ID
 // ======================================================
 const getServicioById = async (id) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.findOne(servicio_1.Servicio, { id }, { populate: ['categoria'] });
 };
 exports.getServicioById = getServicioById;
@@ -68,8 +64,7 @@ exports.getServicioById = getServicioById;
 // CREAR SERVICIO
 // ======================================================
 const createServicio = async (data) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const categoria = await em.findOne(categoria_1.Categoria, {
         id: data.categoriaId
     });
@@ -99,8 +94,7 @@ exports.createServicio = createServicio;
 // ACTUALIZAR SERVICIO
 // ======================================================
 const updateServicio = async (id, usuarioId, data) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const servicio = await em.findOne(servicio_1.Servicio, {
         id,
         usuario: usuarioId
@@ -137,8 +131,7 @@ exports.updateServicio = updateServicio;
 // BORRAR SERVICIO
 // ======================================================
 const deleteServicio = async (id, usuarioId) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const servicio = await em.findOne(servicio_1.Servicio, {
         id,
         usuario: usuarioId

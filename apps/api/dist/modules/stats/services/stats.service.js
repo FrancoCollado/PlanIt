@@ -7,8 +7,7 @@ const evento_1 = require("../../../entities/evento");
 const servicio_1 = require("../../../entities/servicio");
 const tablero_servicio_1 = require("../../../entities/tablero-servicio");
 const getAdminStats = async () => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const [empresasActivas, eventosPublicados, eventosBorrador, clientesRegistrados] = await Promise.all([
         em.count(usuario_1.User, { rol: 'empresa', activo: true }),
         em.count(evento_1.Evento, { draft: false }),
@@ -19,8 +18,7 @@ const getAdminStats = async () => {
 };
 exports.getAdminStats = getAdminStats;
 const getBusinessStats = async (usuarioId) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const [serviciosActivos, serviciosBorrador, vecesGuardadoEnTableros, serviciosDelUsuario] = await Promise.all([
         em.count(servicio_1.Servicio, { usuario: usuarioId, draft: false }),
         em.count(servicio_1.Servicio, { usuario: usuarioId, draft: true }),

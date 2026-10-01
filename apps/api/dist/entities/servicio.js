@@ -21,8 +21,7 @@ let Servicio = class Servicio {
     descripcion;
     imagen;
     creadoEn;
-    // Indica si el servicio ya está publicado (activo)
-    // o todavía es un borrador
+    // Indica si el servicio ya está publicado (activo) o si es un borrador
     draft = true;
 };
 exports.Servicio = Servicio;

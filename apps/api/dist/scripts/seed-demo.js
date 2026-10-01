@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mysql_1 = require("@mikro-orm/mysql");
+const postgresql_1 = require("@mikro-orm/postgresql");
 const mikro_orm_config_1 = __importDefault(require("../config/mikro-orm.config"));
 const usuario_1 = require("../entities/usuario");
 const evento_1 = require("../entities/evento");
@@ -52,7 +52,7 @@ async function main() {
         throw new Error('No se permite cargar datos demo en produccion');
     if (!dryRun && !confirm)
         throw new Error('Usa --dry-run para probar o --confirm para insertar datos demo');
-    const orm = await mysql_1.MikroORM.init({ ...mikro_orm_config_1.default, debug: false });
+    const orm = await postgresql_1.MikroORM.init({ ...mikro_orm_config_1.default, debug: false });
     const created = { usuarios: 0, eventos: 0, categorias: 0, eventoCategoria: 0, servicios: 0, tableros: 0, tableroServicio: 0 };
     try {
         await orm.em.transactional(async (em) => {

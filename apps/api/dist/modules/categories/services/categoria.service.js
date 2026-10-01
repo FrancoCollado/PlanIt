@@ -5,20 +5,17 @@ const orm_1 = require("../../../config/orm");
 const categoria_1 = require("../../../entities/categoria");
 const evento_1 = require("../../../entities/evento");
 const listCategorias = async () => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.find(categoria_1.Categoria, {}, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
 };
 exports.listCategorias = listCategorias;
 const getCategoriaById = async (id) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.findOne(categoria_1.Categoria, { id }, { populate: ['evento'] });
 };
 exports.getCategoriaById = getCategoriaById;
 const createCategoria = async (data) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const evento = await em.findOne(evento_1.Evento, { id: data.eventoId });
     if (!evento) {
         throw new Error('El evento indicado no existe');
@@ -34,8 +31,7 @@ const createCategoria = async (data) => {
 };
 exports.createCategoria = createCategoria;
 const updateCategoria = async (id, data) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const categoria = await em.findOne(categoria_1.Categoria, { id });
     if (!categoria)
         return null;
@@ -55,8 +51,7 @@ const updateCategoria = async (id, data) => {
 };
 exports.updateCategoria = updateCategoria;
 const deleteCategoria = async (id) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const categoria = await em.findOne(categoria_1.Categoria, { id });
     if (!categoria)
         return false;

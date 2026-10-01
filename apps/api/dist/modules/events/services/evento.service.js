@@ -4,20 +4,17 @@ exports.deleteEvento = exports.updateEvento = exports.createEvento = exports.get
 const orm_1 = require("../../../config/orm");
 const evento_1 = require("../../../entities/evento");
 const listEventos = async () => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.find(evento_1.Evento, {}, { orderBy: { creadoEn: 'DESC' } });
 };
 exports.listEventos = listEventos;
 const getEventoById = async (id) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     return em.findOne(evento_1.Evento, { id });
 };
 exports.getEventoById = getEventoById;
 const createEvento = async (data) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const evento = em.create(evento_1.Evento, {
         nombre: data.nombre,
         descripcion: data.descripcion,
@@ -30,8 +27,7 @@ const createEvento = async (data) => {
 };
 exports.createEvento = createEvento;
 const updateEvento = async (id, data) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const evento = await em.findOne(evento_1.Evento, { id });
     if (!evento)
         return null;
@@ -48,8 +44,7 @@ const updateEvento = async (id, data) => {
 };
 exports.updateEvento = updateEvento;
 const deleteEvento = async (id) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const evento = await em.findOne(evento_1.Evento, { id });
     if (!evento)
         return false;

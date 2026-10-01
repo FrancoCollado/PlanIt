@@ -5,23 +5,17 @@ const orm_1 = require("../../../config/orm");
 const usuario_1 = require("../../../entities/usuario");
 // Busca un usuario por email y contraseña
 const findUserByCredentials = async (email, password) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
-    const user = await em.findOne(usuario_1.User, {
-        email,
-        password
-    });
-    return user;
+    const em = (0, orm_1.getOrm)().em.fork();
+    return em.findOne(usuario_1.User, { email, password });
 };
 exports.findUserByCredentials = findUserByCredentials;
 // Crea un nuevo usuario
 const createUser = async (name, email, password, role, businessData) => {
-    const orm = (0, orm_1.getOrm)();
-    const em = orm.em.fork();
+    const em = (0, orm_1.getOrm)().em.fork();
     const user = em.create(usuario_1.User, {
         nombre: name,
-        email: email,
-        password: password,
+        email,
+        password,
         rol: role,
         activo: true,
         ...(businessData ?? {})

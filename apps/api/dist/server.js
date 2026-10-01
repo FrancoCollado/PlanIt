@@ -8,7 +8,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const crypto_1 = require("crypto");
-const mysql_1 = require("@mikro-orm/mysql");
+const postgresql_1 = require("@mikro-orm/postgresql");
 const mikro_orm_config_1 = __importDefault(require("./config/mikro-orm.config"));
 const auth_routes_1 = __importDefault(require("./modules/auth/routes/auth.routes"));
 const evento_routes_1 = __importDefault(require("./modules/events/routes/evento.routes"));
@@ -27,7 +27,12 @@ if (!process.env.JWT_SECRET) {
 }
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 4000;
-app.use((0, cors_1.default)());
+// En Vercel el frontend se sirve bajo el mismo dominio, así que CORS sólo se
+// habilita si se declaran orígenes externos explícitos.
+const corsOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()).filter(Boolean);
+if (corsOrigins?.length) {
+    app.use((0, cors_1.default)({ origin: corsOrigins }));
+}
 app.use(express_1.default.json());
 app.use('/api/auth', auth_routes_1.default);
 app.use('/api/eventos', evento_routes_1.default);
@@ -45,7 +50,7 @@ app.get('/api/health', (req, res) => {
 });
 async function iniciarServidor() {
     try {
-        const orm = await mysql_1.MikroORM.init(mikro_orm_config_1.default);
+        const orm = await postgresql_1.MikroORM.init(mikro_orm_config_1.default);
         await orm.connect();
         (0, orm_1.setOrm)(orm);
         console.log('Base de datos conectada con MikroORM');

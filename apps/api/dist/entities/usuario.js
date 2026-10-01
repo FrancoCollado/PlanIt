@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const legacy_1 = require("@mikro-orm/decorators/legacy");
 let User = class User {
-    id;
+    id; //va asi por que id es non-nullable y no tiene valor por defecto, uso ! para indicar que siempre tendrá un valor.
     nombre;
     email;
     password;
@@ -20,7 +20,7 @@ let User = class User {
     zona;
     cuit;
     telefono;
-    // Permite suspender (desactivar) una cuenta sin borrarla, usado para empresas
+    // Permite suspender una cuenta sin borrarla, lo usamos para empresas
     activo = true;
     creadoEn;
 };
@@ -34,7 +34,8 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "nombre", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'string', length: 100, unique: true }),
+    (0, legacy_1.Property)({ type: 'string', length: 100, unique: true }) //aca por ser email hago que sea unique
+    ,
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
