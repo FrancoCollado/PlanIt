@@ -1,4 +1,4 @@
-import type { MikroORM } from '@mikro-orm/mysql';
+import type { MikroORM } from '@mikro-orm/postgresql';
 
 let orm: MikroORM;
 

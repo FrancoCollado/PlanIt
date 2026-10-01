@@ -1,6 +1,7 @@
 import type { Servicio } from './servicioService';
+import { API_URL } from '../../../config/api';
 
-const API_URL = 'http://localhost:4000/api/tableros';
+const TABLEROS_URL = `${API_URL}/api/tableros`;
 
 export interface Tablero {
   id: number;
@@ -11,7 +12,7 @@ export interface Tablero {
 }
 
 async function request<T>(token: string, path = '', init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(`${TABLEROS_URL}${path}`, {
     ...init,
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...init.headers }
   });

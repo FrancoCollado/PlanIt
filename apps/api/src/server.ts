@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { randomBytes } from 'crypto';
 
-import { MikroORM } from '@mikro-orm/mysql';
+import { MikroORM } from '@mikro-orm/postgresql';
 import mikroOrmConfig from './config/mikro-orm.config';
 
 import authRoutes from './modules/auth/routes/auth.routes';
@@ -28,7 +28,13 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+// En Vercel el frontend se sirve bajo el mismo dominio, así que CORS sólo se
+// habilita si se declaran orígenes externos explícitos.
+const corsOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()).filter(Boolean);
+if (corsOrigins?.length) {
+  app.use(cors({ origin: corsOrigins }));
+}
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

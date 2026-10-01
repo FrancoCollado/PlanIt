@@ -1,4 +1,4 @@
-import { MikroORM } from '@mikro-orm/mysql';
+import { MikroORM } from '@mikro-orm/postgresql';
 import mikroOrmConfig from '../config/mikro-orm.config';
 import { User } from '../entities/usuario';
 import { Evento } from '../entities/evento';

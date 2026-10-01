@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:4000';
+import { API_URL } from '../../../config/api';
 
 export interface Evento {
   id: number;
