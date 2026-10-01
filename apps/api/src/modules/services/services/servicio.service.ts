@@ -12,8 +12,7 @@ import type { CreateServicioDto, UpdateServicioDto } from '../dtos/servicio.dto'
 export const listServiciosByUsuario = async (
   usuarioId: number
 ): Promise<Servicio[]> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   return em.find(
     Servicio,
@@ -36,8 +35,7 @@ export const buscarServiciosPorNombre = async (
   zona = '',
   empresa = ''
 ): Promise<Servicio[]> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   return em.find(
     Servicio,
@@ -67,8 +65,7 @@ export const buscarServiciosPorNombre = async (
 export const buscarServiciosPorCategoria = async (
   categoriaId: number
 ): Promise<Servicio[]> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   return em.find(
     Servicio,
@@ -91,8 +88,7 @@ export const buscarServiciosPorCategoria = async (
 export const getServicioById = async (
   id: number
 ): Promise<Servicio | null> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   return em.findOne(
     Servicio,
@@ -109,8 +105,7 @@ export const getServicioById = async (
 export const createServicio = async (
   data: CreateServicioDto
 ): Promise<Servicio> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const categoria = await em.findOne(Categoria, {
     id: data.categoriaId
@@ -153,8 +148,7 @@ export const updateServicio = async (
   usuarioId: number,
   data: UpdateServicioDto
 ): Promise<Servicio | null> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const servicio = await em.findOne(Servicio, {
     id,
@@ -207,8 +201,7 @@ export const deleteServicio = async (
   id: number,
   usuarioId: number
 ): Promise<boolean> => {
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const servicio = await em.findOne(Servicio, {
     id,

@@ -13,11 +13,11 @@ export class Categoria {
   @PrimaryKey({ type: 'number' })
   id!: number;
 
-  @ManyToOne(() => Evento, {
+  @ManyToOne(() => Evento, { 
     fieldName: 'evento_id',
     deleteRule: 'cascade'
   })
-  evento!: Evento;
+  evento!: Evento; 
 
   @Property({ type: 'string', length: 100 })
   nombre!: string;

@@ -8,15 +8,9 @@ export const findUserByCredentials = async (
   password: string
 ): Promise<User | null> => {
 
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
-  const user = await em.findOne(User, {
-    email,
-    password
-  });
-
-  return user;
+  return em.findOne(User, { email, password });
 };
 
 
@@ -29,13 +23,12 @@ export const createUser = async (
   businessData?: { zona: string; cuit: number; telefono: number }
 ): Promise<User> => {
 
-  const orm = getOrm();
-  const em = orm.em.fork();
+  const em = getOrm().em.fork();
 
   const user = em.create(User, {
     nombre: name,
-    email: email,
-    password: password,
+    email,
+    password,
     rol: role,
     activo: true,
     ...(businessData ?? {})

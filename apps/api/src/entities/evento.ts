@@ -4,7 +4,9 @@ import {
   Property
 } from '@mikro-orm/decorators/legacy';
 
+
 @Entity({ tableName: 'eventos' })
+
 export class Evento {
 
   @PrimaryKey({ type: 'number' })

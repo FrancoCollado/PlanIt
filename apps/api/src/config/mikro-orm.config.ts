@@ -7,6 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 import { defineConfig } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 
+// Importo las entidades para que el orm las mapee a la bd
 import { User } from '../entities/usuario';
 import { Evento } from '../entities/evento';
 import { Categoria } from '../entities/categoria';
@@ -15,6 +16,7 @@ import { EventoCategoria } from '../entities/evento-categoria';
 import { Tablero } from '../entities/tablero';
 import { TableroServicio } from '../entities/tablero-servicio';
 
+// config  MikroORM para la conectar la bd uso var del .env
 export default defineConfig({
 
   host: process.env.DB_HOST || '127.0.0.1',
@@ -34,7 +36,8 @@ export default defineConfig({
     }
   },
 
-  entities: [
+
+  entities: [  
     User,
     Evento,
     Categoria,
