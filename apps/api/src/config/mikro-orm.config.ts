@@ -19,7 +19,7 @@ import { TableroServicio } from '../entities/tablero-servicio';
 // config  MikroORM para la conectar la bd uso var del .env
 // DATABASE_URL (connection string de Supabase) tiene prioridad; si no está, se
 // arma la conexión con las variables sueltas.
-const clientUrl = process.env.DATABASE_URL;
+const clientUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
 export default defineConfig({
 

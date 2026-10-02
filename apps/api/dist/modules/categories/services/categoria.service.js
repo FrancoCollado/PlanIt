@@ -4,9 +4,10 @@ exports.deleteCategoria = exports.updateCategoria = exports.createCategoria = ex
 const orm_1 = require("../../../config/orm");
 const categoria_1 = require("../../../entities/categoria");
 const evento_1 = require("../../../entities/evento");
-const listCategorias = async () => {
+const api_error_1 = require("../../../shared/api-error");
+const listCategorias = async (includeDraftEvents = false) => {
     const em = (0, orm_1.getOrm)().em.fork();
-    return em.find(categoria_1.Categoria, {}, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
+    return em.find(categoria_1.Categoria, includeDraftEvents ? {} : { evento: { draft: false } }, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
 };
 exports.listCategorias = listCategorias;
 const getCategoriaById = async (id) => {
@@ -18,7 +19,7 @@ const createCategoria = async (data) => {
     const em = (0, orm_1.getOrm)().em.fork();
     const evento = await em.findOne(evento_1.Evento, { id: data.eventoId });
     if (!evento) {
-        throw new Error('El evento indicado no existe');
+        throw new api_error_1.ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
     }
     const categoria = em.create(categoria_1.Categoria, {
         nombre: data.nombre,
@@ -42,7 +43,7 @@ const updateCategoria = async (id, data) => {
     if (data.eventoId !== undefined) {
         const evento = await em.findOne(evento_1.Evento, { id: data.eventoId });
         if (!evento) {
-            throw new Error('El evento indicado no existe');
+            throw new api_error_1.ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
         }
         categoria.evento = evento;
     }

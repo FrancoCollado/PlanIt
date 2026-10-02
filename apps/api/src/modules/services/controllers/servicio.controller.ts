@@ -13,6 +13,7 @@ import type {
   CreateServicioDto,
   UpdateServicioDto
 } from '../dtos/servicio.dto';
+import { respondWithError, sendApiError } from '../../../shared/api-error';
 
 
 const serializeServicio = (servicio: {
@@ -50,12 +51,6 @@ export const getServicios = async (
 ) => {
   const usuarioId = Number(req.query.usuarioId);
 
-  if (!usuarioId) {
-    return res.status(400).json({
-      error: 'El parámetro "usuarioId" es requerido'
-    });
-  }
-
   try {
     const servicios = await listServiciosByUsuario(usuarioId);
 
@@ -63,11 +58,7 @@ export const getServicios = async (
       servicios: servicios.map(serializeServicio)
     });
   } catch (error) {
-    console.error('Error al listar servicios:', error);
-
-    res.status(500).json({
-      error: 'Error al obtener los servicios'
-    });
+    sendApiError(res, error, 'Error al obtener los servicios');
   }
 };
 
@@ -84,12 +75,6 @@ export const buscarServicios = async (
   const zona = String(req.query.zona ?? '').trim();
   const empresa = String(req.query.empresa ?? '').trim();
 
-  if (!nombre && !zona && !empresa) {
-    return res.status(400).json({
-      error: 'Ingresá un nombre, una zona o una empresa para buscar'
-    });
-  }
-
   try {
     const servicios = await buscarServiciosPorNombre(nombre, zona, empresa);
 
@@ -97,11 +82,7 @@ export const buscarServicios = async (
       servicios: servicios.map(serializeServicio)
     });
   } catch (error) {
-    console.error('Error al buscar servicios:', error);
-
-    res.status(500).json({
-      error: 'Error al buscar los servicios'
-    });
+    sendApiError(res, error, 'Error al buscar los servicios');
   }
 };
 
@@ -116,12 +97,6 @@ export const buscarServiciosCategoria = async (
 ) => {
   const categoriaId = Number(req.params.categoriaId);
 
-  if (!categoriaId) {
-    return res.status(400).json({
-      error: 'La categoría es requerida'
-    });
-  }
-
   try {
     const servicios = await buscarServiciosPorCategoria(categoriaId);
 
@@ -129,11 +104,7 @@ export const buscarServiciosCategoria = async (
       servicios: servicios.map(serializeServicio)
     });
   } catch (error) {
-    console.error('Error al buscar servicios por categoría:', error);
-
-    res.status(500).json({
-      error: 'Error al buscar los servicios por categoría'
-    });
+    sendApiError(res, error, 'Error al buscar los servicios por categoría');
   }
 };
 
@@ -155,12 +126,6 @@ export const crearServicio = async (
     draft
   } = req.body;
 
-  if (!nombre || !categoriaId || !usuarioId) {
-    return res.status(400).json({
-      error: 'El nombre, la categoría y el usuario son requeridos'
-    });
-  }
-
   try {
     const servicio = await createServicio({
       nombre,
@@ -176,14 +141,7 @@ export const crearServicio = async (
       servicio: serializeServicio(servicio)
     });
   } catch (error) {
-    console.error('Error al crear servicio:', error);
-
-    res.status(400).json({
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Error al crear el servicio'
-    });
+    sendApiError(res, error, 'Error al crear el servicio');
   }
 };
 
@@ -203,12 +161,6 @@ export const actualizarServicio = async (
   const id = Number(req.params.id);
   const { usuarioId, ...data } = req.body;
 
-  if (!usuarioId) {
-    return res.status(400).json({
-      error: 'El parámetro "usuarioId" es requerido'
-    });
-  }
-
   try {
     const servicio = await updateServicio(
       id,
@@ -217,9 +169,7 @@ export const actualizarServicio = async (
     );
 
     if (!servicio) {
-      return res.status(404).json({
-        error: 'Servicio no encontrado'
-      });
+      return respondWithError(res, 404, 'NOT_FOUND', 'Servicio no encontrado');
     }
 
     res.json({
@@ -227,14 +177,7 @@ export const actualizarServicio = async (
       servicio: serializeServicio(servicio)
     });
   } catch (error) {
-    console.error('Error al actualizar servicio:', error);
-
-    res.status(400).json({
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Error al actualizar el servicio'
-    });
+    sendApiError(res, error, 'Error al actualizar el servicio');
   }
 };
 
@@ -250,13 +193,11 @@ export const borrarServicio = async (
   const id = Number(req.params.id);
 
   const usuarioId = Number(
-    req.query.usuarioId ?? req.body.usuarioId
+    req.query.usuarioId ?? req.body?.usuarioId
   );
 
-  if (!usuarioId) {
-    return res.status(400).json({
-      error: 'El parámetro "usuarioId" es requerido'
-    });
+  if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
+    return respondWithError(res, 400, 'VALIDATION_ERROR', 'El parámetro "usuarioId" es requerido y debe ser un entero positivo');
   }
 
   try {
@@ -266,19 +207,13 @@ export const borrarServicio = async (
     );
 
     if (!eliminado) {
-      return res.status(404).json({
-        error: 'Servicio no encontrado'
-      });
+      return respondWithError(res, 404, 'NOT_FOUND', 'Servicio no encontrado');
     }
 
     res.json({
       message: 'Servicio eliminado correctamente'
     });
   } catch (error) {
-    console.error('Error al eliminar servicio:', error);
-
-    res.status(500).json({
-      error: 'Error al eliminar el servicio'
-    });
+    sendApiError(res, error, 'Error al eliminar el servicio');
   }
 };

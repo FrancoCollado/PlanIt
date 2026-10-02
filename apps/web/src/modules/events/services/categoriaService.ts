@@ -17,8 +17,10 @@ export interface CategoriaPayload {
   eventoId: number;
 }
 
-export const listCategoriasRequest = async (): Promise<Categoria[]> => {
-  const response = await fetch(`${API_URL}/api/categorias`);
+export const listCategoriasRequest = async (token: string): Promise<Categoria[]> => {
+  const response = await fetch(`${API_URL}/api/categorias`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json();
 
   if (!response.ok) {
@@ -28,10 +30,10 @@ export const listCategoriasRequest = async (): Promise<Categoria[]> => {
   return data.categorias;
 };
 
-export const createCategoriaRequest = async (payload: CategoriaPayload): Promise<Categoria> => {
+export const createCategoriaRequest = async (payload: CategoriaPayload, token: string): Promise<Categoria> => {
   const response = await fetch(`${API_URL}/api/categorias`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(payload),
   });
 
@@ -44,10 +46,10 @@ export const createCategoriaRequest = async (payload: CategoriaPayload): Promise
   return data.categoria;
 };
 
-export const updateCategoriaRequest = async (id: number, payload: Partial<CategoriaPayload>): Promise<Categoria> => {
+export const updateCategoriaRequest = async (id: number, payload: Partial<CategoriaPayload>, token: string): Promise<Categoria> => {
   const response = await fetch(`${API_URL}/api/categorias/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(payload),
   });
 
@@ -60,9 +62,10 @@ export const updateCategoriaRequest = async (id: number, payload: Partial<Catego
   return data.categoria;
 };
 
-export const deleteCategoriaRequest = async (id: number): Promise<void> => {
+export const deleteCategoriaRequest = async (id: number, token: string): Promise<void> => {
   const response = await fetch(`${API_URL}/api/categorias/${id}`, {
     method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!response.ok) {

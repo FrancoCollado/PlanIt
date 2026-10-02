@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteEvento = exports.updateEvento = exports.createEvento = exports.getEventoById = exports.listEventos = void 0;
 const orm_1 = require("../../../config/orm");
 const evento_1 = require("../../../entities/evento");
-const listEventos = async () => {
+const listEventos = async (includeDraft = false) => {
     const em = (0, orm_1.getOrm)().em.fork();
-    return em.find(evento_1.Evento, {}, { orderBy: { creadoEn: 'DESC' } });
+    return em.find(evento_1.Evento, includeDraft ? {} : { draft: false }, { orderBy: { creadoEn: 'DESC' } });
 };
 exports.listEventos = listEventos;
 const getEventoById = async (id) => {

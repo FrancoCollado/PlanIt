@@ -53,7 +53,7 @@ export default function CategoriasPage({
       setError('');
 
       try {
-        const resultado = await listCategoriasRequest();
+        const resultado = await listCategoriasRequest(token);
 
         setCategorias(resultado);
       } catch (error) {
@@ -71,7 +71,7 @@ export default function CategoriasPage({
 
     cargarCategorias();
 
-  }, []);
+  }, [token]);
 
 
   // ======================================================

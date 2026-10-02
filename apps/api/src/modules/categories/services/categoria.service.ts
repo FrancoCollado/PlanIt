@@ -2,11 +2,16 @@ import { getOrm } from '../../../config/orm';
 import { Categoria } from '../../../entities/categoria';
 import { Evento } from '../../../entities/evento';
 import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto';
+import { ApiError } from '../../../shared/api-error';
 
-export const listCategorias = async (): Promise<Categoria[]> => {
+export const listCategorias = async (includeDraftEvents = false): Promise<Categoria[]> => {
   const em = getOrm().em.fork();
 
-  return em.find(Categoria, {}, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
+  return em.find(
+    Categoria,
+    includeDraftEvents ? {} : { evento: { draft: false } },
+    { populate: ['evento'], orderBy: { creadoEn: 'DESC' } }
+  );
 };
 
 export const getCategoriaById = async (id: number): Promise<Categoria | null> => {
@@ -21,7 +26,7 @@ export const createCategoria = async (data: CreateCategoriaDto): Promise<Categor
   const evento = await em.findOne(Evento, { id: data.eventoId });
 
   if (!evento) {
-    throw new Error('El evento indicado no existe');
+    throw new ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
   }
 
   const categoria = em.create(Categoria, {
@@ -50,7 +55,7 @@ export const updateCategoria = async (id: number, data: UpdateCategoriaDto): Pro
     const evento = await em.findOne(Evento, { id: data.eventoId });
 
     if (!evento) {
-      throw new Error('El evento indicado no existe');
+      throw new ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
     }
 
     categoria.evento = evento;

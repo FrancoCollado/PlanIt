@@ -2,7 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const stats_controller_1 = require("../controllers/stats.controller");
+const request_validation_1 = require("../../../shared/request-validation");
+const request_schemas_1 = require("../../../shared/request-schemas");
+const ensure_orm_1 = require("../../../middlewares/ensure-orm");
+const authorization_1 = require("../../../middlewares/authorization");
 const router = (0, express_1.Router)();
-router.get('/admin', stats_controller_1.getAdminDashboardStats);
-router.get('/business', stats_controller_1.getBusinessDashboardStats);
+router.get('/admin', authorization_1.authenticate, (0, authorization_1.requireRoles)('administrador'), ensure_orm_1.ensureOrm, authorization_1.ensureActiveUser, stats_controller_1.getAdminDashboardStats);
+router.get('/business', authorization_1.authenticate, (0, authorization_1.requireRoles)('empresa'), (0, request_validation_1.validateRequest)(request_schemas_1.requestSchemas.businessStats), authorization_1.requireOwnUserId, ensure_orm_1.ensureOrm, authorization_1.ensureActiveUser, stats_controller_1.getBusinessDashboardStats);
 exports.default = router;

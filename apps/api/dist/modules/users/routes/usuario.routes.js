@@ -2,7 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const usuario_controller_1 = require("../controllers/usuario.controller");
+const request_validation_1 = require("../../../shared/request-validation");
+const request_schemas_1 = require("../../../shared/request-schemas");
+const ensure_orm_1 = require("../../../middlewares/ensure-orm");
+const authorization_1 = require("../../../middlewares/authorization");
 const router = (0, express_1.Router)();
-router.get('/', usuario_controller_1.getUsuarios);
-router.patch('/:id/activo', usuario_controller_1.patchUsuarioActivo);
+router.get('/', authorization_1.authenticate, (0, authorization_1.requireRoles)('administrador'), (0, request_validation_1.validateRequest)(request_schemas_1.requestSchemas.listUsuarios), ensure_orm_1.ensureOrm, authorization_1.ensureActiveUser, usuario_controller_1.getUsuarios);
+router.patch('/:id/activo', authorization_1.authenticate, (0, authorization_1.requireRoles)('administrador'), (0, request_validation_1.validateRequest)(request_schemas_1.requestSchemas.setUsuarioActivo), ensure_orm_1.ensureOrm, authorization_1.ensureActiveUser, usuario_controller_1.patchUsuarioActivo);
 exports.default = router;

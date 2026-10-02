@@ -16,8 +16,10 @@ export interface EventoPayload {
   draft?: boolean;
 }
 
-export const listEventosRequest = async (): Promise<Evento[]> => {
-  const response = await fetch(`${API_URL}/api/eventos`);
+export const listEventosRequest = async (token: string): Promise<Evento[]> => {
+  const response = await fetch(`${API_URL}/api/eventos`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json();
 
   if (!response.ok) {
@@ -27,10 +29,10 @@ export const listEventosRequest = async (): Promise<Evento[]> => {
   return data.eventos;
 };
 
-export const createEventoRequest = async (payload: EventoPayload): Promise<Evento> => {
+export const createEventoRequest = async (payload: EventoPayload, token: string): Promise<Evento> => {
   const response = await fetch(`${API_URL}/api/eventos`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(payload),
   });
 
@@ -43,10 +45,10 @@ export const createEventoRequest = async (payload: EventoPayload): Promise<Event
   return data.evento;
 };
 
-export const updateEventoRequest = async (id: number, payload: Partial<EventoPayload>): Promise<Evento> => {
+export const updateEventoRequest = async (id: number, payload: Partial<EventoPayload>, token: string): Promise<Evento> => {
   const response = await fetch(`${API_URL}/api/eventos/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(payload),
   });
 
@@ -59,9 +61,10 @@ export const updateEventoRequest = async (id: number, payload: Partial<EventoPay
   return data.evento;
 };
 
-export const deleteEventoRequest = async (id: number): Promise<void> => {
+export const deleteEventoRequest = async (id: number, token: string): Promise<void> => {
   const response = await fetch(`${API_URL}/api/eventos/${id}`, {
     method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!response.ok) {

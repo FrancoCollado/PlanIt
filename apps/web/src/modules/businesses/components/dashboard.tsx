@@ -19,6 +19,7 @@ interface DashboardProps {
   role?: string; // O role?: 'admin' | 'business' | 'client';
   onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
   usuarioId?: number;
+  token: string;
 }
 
 const servicioVacio = { nombre: '', descripcion: '', imagen: '', categoriaId: 0, draft: true };
@@ -29,7 +30,7 @@ const statsVacias: BusinessStats = {
   categoriasPresentes: 0
 };
 
-export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
+export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps) {
   function volverAIniciarSesion() {
     onLogout?.();
   }
@@ -39,13 +40,13 @@ export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
 
   function cargarStats() {
     if (!usuarioId) return;
-    getBusinessStatsRequest(usuarioId).then(setStats).catch(() => {});
+    getBusinessStatsRequest(usuarioId, token).then(setStats).catch(() => {});
   }
 
   useEffect(() => {
     cargarStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usuarioId]);
+  }, [usuarioId, token]);
 
   // --- Gestión de servicios propios de la empresa (CRUD real contra la API con MikroORM) ---
   const [desplegado, setDesplegado] = useState(false);
@@ -65,7 +66,7 @@ export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
     setErrorServicios('');
 
     try {
-      const data = await listServiciosRequest(usuarioId);
+      const data = await listServiciosRequest(usuarioId, token);
       setServicios(data);
     } catch (error) {
       setErrorServicios(error instanceof Error ? error.message : 'Error al cargar los servicios');
@@ -76,7 +77,7 @@ export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
 
   async function cargarCategorias() {
     try {
-      const data = await listCategoriasRequest();
+      const data = await listCategoriasRequest(token);
       setCategorias(data);
     } catch {
       setCategorias([]);
@@ -129,9 +130,9 @@ export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
 
     try {
       if (servicioEnEdicion) {
-        await updateServicioRequest(servicioEnEdicion.id, usuarioId, formServicio);
+        await updateServicioRequest(servicioEnEdicion.id, usuarioId, formServicio, token);
       } else {
-        await createServicioRequest(usuarioId, formServicio);
+        await createServicioRequest(usuarioId, formServicio, token);
       }
 
       await cargarServicios();
@@ -149,7 +150,7 @@ export default function Dashboard({ onLogout, usuarioId }: DashboardProps) {
     if (!confirmado) return;
 
     try {
-      await deleteServicioRequest(servicio.id, usuarioId);
+      await deleteServicioRequest(servicio.id, usuarioId, token);
       await cargarServicios();
       cargarStats();
     } catch (error) {

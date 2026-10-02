@@ -3,6 +3,7 @@ import { Servicio } from '../../../entities/servicio';
 import { Categoria } from '../../../entities/categoria';
 import { User } from '../../../entities/usuario';
 import type { CreateServicioDto, UpdateServicioDto } from '../dtos/servicio.dto';
+import { ApiError } from '../../../shared/api-error';
 
 
 // ======================================================
@@ -112,7 +113,7 @@ export const createServicio = async (
   });
 
   if (!categoria) {
-    throw new Error('La categoría indicada no existe');
+    throw new ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
   }
 
   const usuario = await em.findOne(User, {
@@ -120,7 +121,7 @@ export const createServicio = async (
   });
 
   if (!usuario) {
-    throw new Error('El usuario indicado no existe');
+    throw new ApiError(404, 'NOT_FOUND', 'El usuario indicado no existe');
   }
 
   const servicio = em.create(Servicio, {
@@ -181,7 +182,7 @@ export const updateServicio = async (
     });
 
     if (!categoria) {
-      throw new Error('La categoría indicada no existe');
+      throw new ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
     }
 
     servicio.categoria = categoria;

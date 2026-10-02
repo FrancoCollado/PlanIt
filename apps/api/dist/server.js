@@ -16,6 +16,7 @@ const categoria_routes_1 = __importDefault(require("./modules/categories/routes/
 const servicio_routes_1 = __importDefault(require("./modules/services/routes/servicio.routes"));
 const tablero_routes_1 = __importDefault(require("./modules/boards/tablero.routes"));
 const orm_1 = require("./config/orm");
+const api_error_1 = require("./shared/api-error");
 dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../../.env') });
 if (!process.env.JWT_SECRET) {
     if (process.env.NODE_ENV === 'production')
@@ -39,17 +40,6 @@ app.get('/api/health', (_req, res) => {
         message: 'API de planIt funcionando'
     });
 });
-// La conexión se establece antes de cualquier ruta para que un fallo de base de
-// datos devuelva JSON y no un crash de la función.
-app.use('/api', async (_req, _res, next) => {
-    try {
-        await (0, orm_1.initOrm)();
-        next();
-    }
-    catch (error) {
-        next(error);
-    }
-});
 app.use('/api/auth', auth_routes_1.default);
 app.use('/api/eventos', evento_routes_1.default);
 app.use('/api/usuarios', usuario_routes_1.default);
@@ -57,10 +47,10 @@ app.use('/api/stats', stats_routes_1.default);
 app.use('/api/categorias', categoria_routes_1.default);
 app.use('/api/servicios', servicio_routes_1.default);
 app.use('/api/tableros', tablero_routes_1.default);
-app.use((error, _req, res, _next) => {
-    console.error('Error no controlado:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+app.use('/api', (_req, res) => {
+    (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Ruta de API no encontrada');
 });
+app.use(api_error_1.apiErrorHandler);
 // En Vercel la plataforma invoca la app; el listen es sólo para desarrollo local.
 if (!process.env.VERCEL) {
     (0, orm_1.initOrm)()

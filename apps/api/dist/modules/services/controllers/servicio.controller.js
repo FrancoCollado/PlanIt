@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.borrarServicio = exports.actualizarServicio = exports.crearServicio = exports.buscarServiciosCategoria = exports.buscarServicios = exports.getServicios = void 0;
 const servicio_service_1 = require("../services/servicio.service");
+const api_error_1 = require("../../../shared/api-error");
 const serializeServicio = (servicio) => ({
     id: servicio.id,
     nombre: servicio.nombre,
@@ -19,11 +20,6 @@ const serializeServicio = (servicio) => ({
 // ======================================================
 const getServicios = async (req, res) => {
     const usuarioId = Number(req.query.usuarioId);
-    if (!usuarioId) {
-        return res.status(400).json({
-            error: 'El parámetro "usuarioId" es requerido'
-        });
-    }
     try {
         const servicios = await (0, servicio_service_1.listServiciosByUsuario)(usuarioId);
         res.json({
@@ -31,10 +27,7 @@ const getServicios = async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error al listar servicios:', error);
-        res.status(500).json({
-            error: 'Error al obtener los servicios'
-        });
+        (0, api_error_1.sendApiError)(res, error, 'Error al obtener los servicios');
     }
 };
 exports.getServicios = getServicios;
@@ -45,11 +38,6 @@ const buscarServicios = async (req, res) => {
     const nombre = String(req.query.nombre ?? '').trim();
     const zona = String(req.query.zona ?? '').trim();
     const empresa = String(req.query.empresa ?? '').trim();
-    if (!nombre && !zona && !empresa) {
-        return res.status(400).json({
-            error: 'Ingresá un nombre, una zona o una empresa para buscar'
-        });
-    }
     try {
         const servicios = await (0, servicio_service_1.buscarServiciosPorNombre)(nombre, zona, empresa);
         res.json({
@@ -57,10 +45,7 @@ const buscarServicios = async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error al buscar servicios:', error);
-        res.status(500).json({
-            error: 'Error al buscar los servicios'
-        });
+        (0, api_error_1.sendApiError)(res, error, 'Error al buscar los servicios');
     }
 };
 exports.buscarServicios = buscarServicios;
@@ -69,11 +54,6 @@ exports.buscarServicios = buscarServicios;
 // ======================================================
 const buscarServiciosCategoria = async (req, res) => {
     const categoriaId = Number(req.params.categoriaId);
-    if (!categoriaId) {
-        return res.status(400).json({
-            error: 'La categoría es requerida'
-        });
-    }
     try {
         const servicios = await (0, servicio_service_1.buscarServiciosPorCategoria)(categoriaId);
         res.json({
@@ -81,10 +61,7 @@ const buscarServiciosCategoria = async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error al buscar servicios por categoría:', error);
-        res.status(500).json({
-            error: 'Error al buscar los servicios por categoría'
-        });
+        (0, api_error_1.sendApiError)(res, error, 'Error al buscar los servicios por categoría');
     }
 };
 exports.buscarServiciosCategoria = buscarServiciosCategoria;
@@ -93,11 +70,6 @@ exports.buscarServiciosCategoria = buscarServiciosCategoria;
 // ======================================================
 const crearServicio = async (req, res) => {
     const { nombre, descripcion, imagen, categoriaId, usuarioId, draft } = req.body;
-    if (!nombre || !categoriaId || !usuarioId) {
-        return res.status(400).json({
-            error: 'El nombre, la categoría y el usuario son requeridos'
-        });
-    }
     try {
         const servicio = await (0, servicio_service_1.createServicio)({
             nombre,
@@ -113,12 +85,7 @@ const crearServicio = async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error al crear servicio:', error);
-        res.status(400).json({
-            error: error instanceof Error
-                ? error.message
-                : 'Error al crear el servicio'
-        });
+        (0, api_error_1.sendApiError)(res, error, 'Error al crear el servicio');
     }
 };
 exports.crearServicio = crearServicio;
@@ -128,17 +95,10 @@ exports.crearServicio = crearServicio;
 const actualizarServicio = async (req, res) => {
     const id = Number(req.params.id);
     const { usuarioId, ...data } = req.body;
-    if (!usuarioId) {
-        return res.status(400).json({
-            error: 'El parámetro "usuarioId" es requerido'
-        });
-    }
     try {
         const servicio = await (0, servicio_service_1.updateServicio)(id, Number(usuarioId), data);
         if (!servicio) {
-            return res.status(404).json({
-                error: 'Servicio no encontrado'
-            });
+            return (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Servicio no encontrado');
         }
         res.json({
             message: 'Servicio actualizado correctamente',
@@ -146,12 +106,7 @@ const actualizarServicio = async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error al actualizar servicio:', error);
-        res.status(400).json({
-            error: error instanceof Error
-                ? error.message
-                : 'Error al actualizar el servicio'
-        });
+        (0, api_error_1.sendApiError)(res, error, 'Error al actualizar el servicio');
     }
 };
 exports.actualizarServicio = actualizarServicio;
@@ -160,28 +115,21 @@ exports.actualizarServicio = actualizarServicio;
 // ======================================================
 const borrarServicio = async (req, res) => {
     const id = Number(req.params.id);
-    const usuarioId = Number(req.query.usuarioId ?? req.body.usuarioId);
-    if (!usuarioId) {
-        return res.status(400).json({
-            error: 'El parámetro "usuarioId" es requerido'
-        });
+    const usuarioId = Number(req.query.usuarioId ?? req.body?.usuarioId);
+    if (!Number.isSafeInteger(usuarioId) || usuarioId <= 0) {
+        return (0, api_error_1.respondWithError)(res, 400, 'VALIDATION_ERROR', 'El parámetro "usuarioId" es requerido y debe ser un entero positivo');
     }
     try {
         const eliminado = await (0, servicio_service_1.deleteServicio)(id, usuarioId);
         if (!eliminado) {
-            return res.status(404).json({
-                error: 'Servicio no encontrado'
-            });
+            return (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Servicio no encontrado');
         }
         res.json({
             message: 'Servicio eliminado correctamente'
         });
     }
     catch (error) {
-        console.error('Error al eliminar servicio:', error);
-        res.status(500).json({
-            error: 'Error al eliminar el servicio'
-        });
+        (0, api_error_1.sendApiError)(res, error, 'Error al eliminar el servicio');
     }
 };
 exports.borrarServicio = borrarServicio;

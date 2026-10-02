@@ -9,15 +9,15 @@ import {
 } from '../services/evento.service';
 
 import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto';
+import { respondWithError, sendApiError } from '../../../shared/api-error';
 
 
-export const getEventos = async (_req: Request, res: Response) => {
+export const getEventos = async (req: Request, res: Response) => {
   try {
-    const eventos = await listEventos();
+    const eventos = await listEventos(req.auth?.role === 'administrador');
     res.json({ eventos });
   } catch (error) {
-    console.error('Error al listar eventos:', error);
-    res.status(500).json({ error: 'Error al obtener los eventos' });
+    sendApiError(res, error, 'Error al obtener los eventos');
   }
 };
 
@@ -27,14 +27,13 @@ export const getEvento = async (req: Request, res: Response) => {
   try {
     const evento = await getEventoById(id);
 
-    if (!evento) {
-      return res.status(404).json({ error: 'Evento no encontrado' });
+    if (!evento || (evento.draft && req.auth?.role !== 'administrador')) {
+      return respondWithError(res, 404, 'NOT_FOUND', 'Evento no encontrado');
     }
 
     res.json({ evento });
   } catch (error) {
-    console.error('Error al obtener evento:', error);
-    res.status(500).json({ error: 'Error al obtener el evento' });
+    sendApiError(res, error, 'Error al obtener el evento');
   }
 };
 
@@ -44,16 +43,11 @@ export const crearEvento = async (
 ) => {
   const { nombre, descripcion, imagen, draft } = req.body;
 
-  if (!nombre) {
-    return res.status(400).json({ error: 'El nombre del evento es requerido' });
-  }
-
   try {
     const evento = await createEvento({ nombre, descripcion, imagen, draft });
     res.status(201).json({ message: 'Evento creado correctamente', evento });
   } catch (error) {
-    console.error('Error al crear evento:', error);
-    res.status(500).json({ error: 'Error al crear el evento' });
+    sendApiError(res, error, 'Error al crear el evento');
   }
 };
 
@@ -67,13 +61,12 @@ export const actualizarEvento = async (
     const evento = await updateEvento(id, req.body);
 
     if (!evento) {
-      return res.status(404).json({ error: 'Evento no encontrado' });
+      return respondWithError(res, 404, 'NOT_FOUND', 'Evento no encontrado');
     }
 
     res.json({ message: 'Evento actualizado correctamente', evento });
   } catch (error) {
-    console.error('Error al actualizar evento:', error);
-    res.status(500).json({ error: 'Error al actualizar el evento' });
+    sendApiError(res, error, 'Error al actualizar el evento');
   }
 };
 
@@ -84,12 +77,11 @@ export const borrarEvento = async (req: Request, res: Response) => {
     const eliminado = await deleteEvento(id);
 
     if (!eliminado) {
-      return res.status(404).json({ error: 'Evento no encontrado' });
+      return respondWithError(res, 404, 'NOT_FOUND', 'Evento no encontrado');
     }
 
     res.json({ message: 'Evento eliminado correctamente' });
   } catch (error) {
-    console.error('Error al eliminar evento:', error);
-    res.status(500).json({ error: 'Error al eliminar el evento' });
+    sendApiError(res, error, 'Error al eliminar el evento');
   }
 };

@@ -21,8 +21,10 @@ export interface ServicioPayload {
   draft?: boolean;
 }
 
-export const listServiciosRequest = async (usuarioId: number): Promise<Servicio[]> => {
-  const response = await fetch(`${API_URL}/api/servicios?usuarioId=${usuarioId}`);
+export const listServiciosRequest = async (usuarioId: number, token: string): Promise<Servicio[]> => {
+  const response = await fetch(`${API_URL}/api/servicios?usuarioId=${usuarioId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json();
 
   if (!response.ok) {
@@ -32,10 +34,10 @@ export const listServiciosRequest = async (usuarioId: number): Promise<Servicio[
   return data.servicios;
 };
 
-export const createServicioRequest = async (usuarioId: number, payload: ServicioPayload): Promise<Servicio> => {
+export const createServicioRequest = async (usuarioId: number, payload: ServicioPayload, token: string): Promise<Servicio> => {
   const response = await fetch(`${API_URL}/api/servicios`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ ...payload, usuarioId }),
   });
 
@@ -51,11 +53,12 @@ export const createServicioRequest = async (usuarioId: number, payload: Servicio
 export const updateServicioRequest = async (
   id: number,
   usuarioId: number,
-  payload: Partial<ServicioPayload>
+  payload: Partial<ServicioPayload>,
+  token: string
 ): Promise<Servicio> => {
   const response = await fetch(`${API_URL}/api/servicios/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ ...payload, usuarioId }),
   });
 
@@ -68,9 +71,10 @@ export const updateServicioRequest = async (
   return data.servicio;
 };
 
-export const deleteServicioRequest = async (id: number, usuarioId: number): Promise<void> => {
+export const deleteServicioRequest = async (id: number, usuarioId: number, token: string): Promise<void> => {
   const response = await fetch(`${API_URL}/api/servicios/${id}?usuarioId=${usuarioId}`, {
     method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!response.ok) {

@@ -5,6 +5,7 @@ const orm_1 = require("../../../config/orm");
 const servicio_1 = require("../../../entities/servicio");
 const categoria_1 = require("../../../entities/categoria");
 const usuario_1 = require("../../../entities/usuario");
+const api_error_1 = require("../../../shared/api-error");
 // ======================================================
 // LISTAR SERVICIOS DE UNA EMPRESA
 // ======================================================
@@ -69,13 +70,13 @@ const createServicio = async (data) => {
         id: data.categoriaId
     });
     if (!categoria) {
-        throw new Error('La categoría indicada no existe');
+        throw new api_error_1.ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
     }
     const usuario = await em.findOne(usuario_1.User, {
         id: data.usuarioId
     });
     if (!usuario) {
-        throw new Error('El usuario indicado no existe');
+        throw new api_error_1.ApiError(404, 'NOT_FOUND', 'El usuario indicado no existe');
     }
     const servicio = em.create(servicio_1.Servicio, {
         nombre: data.nombre,
@@ -119,7 +120,7 @@ const updateServicio = async (id, usuarioId, data) => {
             id: data.categoriaId
         });
         if (!categoria) {
-            throw new Error('La categoría indicada no existe');
+            throw new api_error_1.ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
         }
         servicio.categoria = categoria;
     }

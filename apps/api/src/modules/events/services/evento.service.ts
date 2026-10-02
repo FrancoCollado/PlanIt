@@ -2,10 +2,10 @@ import { getOrm } from '../../../config/orm';
 import { Evento } from '../../../entities/evento';
 import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto';
 
-export const listEventos = async (): Promise<Evento[]> => {
+export const listEventos = async (includeDraft = false): Promise<Evento[]> => {
   const em = getOrm().em.fork();
 
-  return em.find(Evento, {}, { orderBy: { creadoEn: 'DESC' } });
+  return em.find(Evento, includeDraft ? {} : { draft: false }, { orderBy: { creadoEn: 'DESC' } });
 };
 
 export const getEventoById = async (id: number): Promise<Evento | null> => {

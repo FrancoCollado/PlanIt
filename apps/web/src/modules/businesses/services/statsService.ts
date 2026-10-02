@@ -7,8 +7,10 @@ export interface BusinessStats {
   categoriasPresentes: number;
 }
 
-export const getBusinessStatsRequest = async (usuarioId: number): Promise<BusinessStats> => {
-  const response = await fetch(`${API_URL}/api/stats/business?usuarioId=${usuarioId}`);
+export const getBusinessStatsRequest = async (usuarioId: number, token: string): Promise<BusinessStats> => {
+  const response = await fetch(`${API_URL}/api/stats/business?usuarioId=${usuarioId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json();
 
   if (!response.ok) {

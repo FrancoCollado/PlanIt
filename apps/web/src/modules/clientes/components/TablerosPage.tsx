@@ -18,7 +18,7 @@ export default function TablerosPage({ token, onVolver }: { token: string; onVol
 
   useEffect(() => {
     let active = true;
-    Promise.all([listTableros(token), listEventosRequest()]).then(([boards, events]) => {
+    Promise.all([listTableros(token), listEventosRequest(token)]).then(([boards, events]) => {
       if (active) { setTableros(boards); setEventos(events.filter(event => !event.draft)); }
     }).catch(err => { if (active) setError(err instanceof Error ? err.message : 'Error al cargar tableros'); })
       .finally(() => { if (active) setLoading(false); });

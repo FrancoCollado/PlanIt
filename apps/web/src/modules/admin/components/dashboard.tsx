@@ -22,6 +22,7 @@ import { getAdminStatsRequest } from '../services/statsService';
 import type { AdminStats } from '../services/statsService';
 
 interface AdminDashboardProps {
+  token: string;
   onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
 }
 
@@ -29,7 +30,7 @@ const eventoVacio = { nombre: '', descripcion: '', imagen: '', draft: true };
 const categoriaVacia = { nombre: '', descripcion: '', eventoId: 0 };
 const statsVacias: AdminStats = { empresasActivas: 0, eventosPublicados: 0, eventosBorrador: 0, clientesRegistrados: 0 };
 
-export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
+export default function AdminDashboard({ token, onLogout }: AdminDashboardProps) {
   function volverAIniciarSesion() {
     onLogout?.();
   }
@@ -38,10 +39,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [stats, setStats] = useState<AdminStats>(statsVacias);
 
   useEffect(() => {
-    getAdminStatsRequest()
+    getAdminStatsRequest(token)
       .then(setStats)
       .catch(() => setStats(statsVacias));
-  }, []);
+  }, [token]);
 
   // Controla qué panel se muestra debajo de las tarjetas: 'eventos', 'categorias', 'perfiles' o ninguno (null)
   const [panelAbierto, setPanelAbierto] = useState<'eventos' | 'categorias' | 'perfiles' | null>(null);
@@ -64,7 +65,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setErrorEventos('');
 
     try {
-      const data = await listEventosRequest();
+      const data = await listEventosRequest(token);
       setEventos(data);
     } catch (error) {
       setErrorEventos(error instanceof Error ? error.message : 'Error al cargar los eventos');
@@ -108,14 +109,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
     try {
       if (eventoEnEdicion) {
-        await updateEventoRequest(eventoEnEdicion.id, formEvento);
+        await updateEventoRequest(eventoEnEdicion.id, formEvento, token);
       } else {
-        await createEventoRequest(formEvento);
+        await createEventoRequest(formEvento, token);
       }
 
       await cargarEventos();
       cerrarFormEvento();
-      getAdminStatsRequest().then(setStats).catch(() => {});
+      getAdminStatsRequest(token).then(setStats).catch(() => {});
     } catch (error) {
       setErrorEventos(error instanceof Error ? error.message : 'Error al guardar el evento');
     }
@@ -126,9 +127,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     if (!confirmado) return;
 
     try {
-      await deleteEventoRequest(evento.id);
+      await deleteEventoRequest(evento.id, token);
       await cargarEventos();
-      getAdminStatsRequest().then(setStats).catch(() => {});
+      getAdminStatsRequest(token).then(setStats).catch(() => {});
     } catch (error) {
       setErrorEventos(error instanceof Error ? error.message : 'Error al eliminar el evento');
     }
@@ -148,7 +149,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setErrorCategorias('');
 
     try {
-      const data = await listCategoriasRequest();
+      const data = await listCategoriasRequest(token);
       setCategorias(data);
     } catch (error) {
       setErrorCategorias(error instanceof Error ? error.message : 'Error al cargar las categorías');
@@ -197,9 +198,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
     try {
       if (categoriaEnEdicion) {
-        await updateCategoriaRequest(categoriaEnEdicion.id, formCategoria);
+        await updateCategoriaRequest(categoriaEnEdicion.id, formCategoria, token);
       } else {
-        await createCategoriaRequest(formCategoria);
+        await createCategoriaRequest(formCategoria, token);
       }
 
       await cargarCategorias();
@@ -214,7 +215,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     if (!confirmado) return;
 
     try {
-      await deleteCategoriaRequest(categoria.id);
+      await deleteCategoriaRequest(categoria.id, token);
       await cargarCategorias();
     } catch (error) {
       setErrorCategorias(error instanceof Error ? error.message : 'Error al eliminar la categoría');
@@ -231,7 +232,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     setErrorEmpresas('');
 
     try {
-      const data = await listUsuariosRequest('empresa');
+      const data = await listUsuariosRequest('empresa', token);
       setEmpresas(data);
     } catch (error) {
       setErrorEmpresas(error instanceof Error ? error.message : 'Error al cargar los perfiles de empresa');
@@ -251,9 +252,9 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     if (!confirmado) return;
 
     try {
-      await setUsuarioActivoRequest(empresa.id, !empresa.activo);
+      await setUsuarioActivoRequest(empresa.id, !empresa.activo, token);
       await cargarEmpresas();
-      getAdminStatsRequest().then(setStats).catch(() => {});
+      getAdminStatsRequest(token).then(setStats).catch(() => {});
     } catch (error) {
       setErrorEmpresas(error instanceof Error ? error.message : 'Error al actualizar el perfil');
     }

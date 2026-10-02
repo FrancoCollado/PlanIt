@@ -68,8 +68,8 @@ export default function EventosPage({
 
         const [resultadoEventos, resultadoCategorias] =
           await Promise.all([
-            listEventosRequest(),
-            listCategoriasRequest()
+            listEventosRequest(token),
+            listCategoriasRequest(token)
           ]);
 
         // Solo mostramos eventos publicados
@@ -99,7 +99,7 @@ export default function EventosPage({
 
     cargarDatos();
 
-  }, []);
+  }, [token]);
 
 
   // ======================================================

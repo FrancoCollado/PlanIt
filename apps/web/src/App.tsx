@@ -35,7 +35,7 @@ export default function App() {
   if (userRole === 'admin') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
-        <AdminDashboard onLogout={() => setAuthUser(null)} />
+        <AdminDashboard token={authUser.token} onLogout={() => setAuthUser(null)} />
       </main>
     );
   }
@@ -46,6 +46,7 @@ export default function App() {
       <Dashboard
         role={userRole}
         usuarioId={authUser.id}
+        token={authUser.token}
         onLogout={() => setAuthUser(null)}
       />
     </main>

@@ -2,7 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_controller_1 = require("../controllers/auth.controller");
+const request_validation_1 = require("../../../shared/request-validation");
+const request_schemas_1 = require("../../../shared/request-schemas");
+const ensure_orm_1 = require("../../../middlewares/ensure-orm");
 const router = (0, express_1.Router)();
-router.post('/login', auth_controller_1.login);
-router.post('/register', auth_controller_1.register);
+router.post('/login', (0, request_validation_1.validateRequest)(request_schemas_1.requestSchemas.login), ensure_orm_1.ensureOrm, auth_controller_1.login);
+router.post('/register', (0, request_validation_1.validateRequest)(request_schemas_1.requestSchemas.register), ensure_orm_1.ensureOrm, auth_controller_1.register);
 exports.default = router;

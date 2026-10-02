@@ -12,9 +12,11 @@ export interface Usuario {
   creadoEn?: string;
 }
 
-export const listUsuariosRequest = async (rol?: string): Promise<Usuario[]> => {
+export const listUsuariosRequest = async (rol: string | undefined, token: string): Promise<Usuario[]> => {
   const query = rol ? `?rol=${encodeURIComponent(rol)}` : '';
-  const response = await fetch(`${API_URL}/api/usuarios${query}`);
+  const response = await fetch(`${API_URL}/api/usuarios${query}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json();
 
   if (!response.ok) {
@@ -24,10 +26,10 @@ export const listUsuariosRequest = async (rol?: string): Promise<Usuario[]> => {
   return data.usuarios;
 };
 
-export const setUsuarioActivoRequest = async (id: number, activo: boolean): Promise<Usuario> => {
+export const setUsuarioActivoRequest = async (id: number, activo: boolean, token: string): Promise<Usuario> => {
   const response = await fetch(`${API_URL}/api/usuarios/${id}/activo`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ activo }),
   });
 

@@ -7,13 +7,17 @@ import {
   actualizarEvento,
   borrarEvento
 } from '../controllers/evento.controller';
+import { validateRequest } from '../../../shared/request-validation';
+import { requestSchemas } from '../../../shared/request-schemas';
+import { ensureOrm } from '../../../middlewares/ensure-orm';
+import { authenticate, ensureActiveUser, requireRoles } from '../../../middlewares/authorization';
 
 const router = Router();
 
-router.get('/', getEventos);
-router.get('/:id', getEvento);
-router.post('/', crearEvento);
-router.put('/:id', actualizarEvento);
-router.delete('/:id', borrarEvento);
+router.get('/', authenticate, requireRoles('cliente', 'empresa', 'administrador'), ensureOrm, ensureActiveUser, getEventos);
+router.get('/:id', authenticate, requireRoles('cliente', 'empresa', 'administrador'), validateRequest(requestSchemas.idParams), ensureOrm, ensureActiveUser, getEvento);
+router.post('/', authenticate, requireRoles('administrador'), validateRequest(requestSchemas.createEvento), ensureOrm, ensureActiveUser, crearEvento);
+router.put('/:id', authenticate, requireRoles('administrador'), validateRequest(requestSchemas.updateEvento), ensureOrm, ensureActiveUser, actualizarEvento);
+router.delete('/:id', authenticate, requireRoles('administrador'), validateRequest(requestSchemas.idParams), ensureOrm, ensureActiveUser, borrarEvento);
 
 export default router;

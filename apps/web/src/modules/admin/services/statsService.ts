@@ -7,8 +7,10 @@ export interface AdminStats {
   clientesRegistrados: number;
 }
 
-export const getAdminStatsRequest = async (): Promise<AdminStats> => {
-  const response = await fetch(`${API_URL}/api/stats/admin`);
+export const getAdminStatsRequest = async (token: string): Promise<AdminStats> => {
+  const response = await fetch(`${API_URL}/api/stats/admin`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const data = await response.json();
 
   if (!response.ok) {

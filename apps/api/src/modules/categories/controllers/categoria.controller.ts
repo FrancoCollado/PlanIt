@@ -9,6 +9,7 @@ import {
 } from '../services/categoria.service';
 
 import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto';
+import { respondWithError, sendApiError } from '../../../shared/api-error';
 
 const serializeCategoria = (categoria: Awaited<ReturnType<typeof getCategoriaById>>) => {
   if (!categoria) return null;
@@ -25,13 +26,12 @@ const serializeCategoria = (categoria: Awaited<ReturnType<typeof getCategoriaByI
   };
 };
 
-export const getCategorias = async (_req: Request, res: Response) => {
+export const getCategorias = async (req: Request, res: Response) => {
   try {
-    const categorias = await listCategorias();
+    const categorias = await listCategorias(req.auth?.role === 'administrador');
     res.json({ categorias: categorias.map(serializeCategoria) });
   } catch (error) {
-    console.error('Error al listar categorías:', error);
-    res.status(500).json({ error: 'Error al obtener las categorías' });
+    sendApiError(res, error, 'Error al obtener las categorías');
   }
 };
 
@@ -41,14 +41,13 @@ export const getCategoria = async (req: Request, res: Response) => {
   try {
     const categoria = await getCategoriaById(id);
 
-    if (!categoria) {
-      return res.status(404).json({ error: 'Categoría no encontrada' });
+    if (!categoria || (categoria.evento.draft && req.auth?.role !== 'administrador')) {
+      return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
     }
 
     res.json({ categoria: serializeCategoria(categoria) });
   } catch (error) {
-    console.error('Error al obtener categoría:', error);
-    res.status(500).json({ error: 'Error al obtener la categoría' });
+    sendApiError(res, error, 'Error al obtener la categoría');
   }
 };
 
@@ -58,16 +57,11 @@ export const crearCategoria = async (
 ) => {
   const { nombre, descripcion, eventoId } = req.body;
 
-  if (!nombre || !eventoId) {
-    return res.status(400).json({ error: 'El nombre y el evento son requeridos' });
-  }
-
   try {
     const categoria = await createCategoria({ nombre, descripcion, eventoId: Number(eventoId) });
     res.status(201).json({ message: 'Categoría creada correctamente', categoria: serializeCategoria(categoria) });
   } catch (error) {
-    console.error('Error al crear categoría:', error);
-    res.status(400).json({ error: error instanceof Error ? error.message : 'Error al crear la categoría' });
+    sendApiError(res, error, 'Error al crear la categoría');
   }
 };
 
@@ -81,13 +75,12 @@ export const actualizarCategoria = async (
     const categoria = await updateCategoria(id, req.body);
 
     if (!categoria) {
-      return res.status(404).json({ error: 'Categoría no encontrada' });
+      return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
     }
 
     res.json({ message: 'Categoría actualizada correctamente', categoria: serializeCategoria(categoria) });
   } catch (error) {
-    console.error('Error al actualizar categoría:', error);
-    res.status(400).json({ error: error instanceof Error ? error.message : 'Error al actualizar la categoría' });
+    sendApiError(res, error, 'Error al actualizar la categoría');
   }
 };
 
@@ -98,12 +91,11 @@ export const borrarCategoria = async (req: Request, res: Response) => {
     const eliminada = await deleteCategoria(id);
 
     if (!eliminada) {
-      return res.status(404).json({ error: 'Categoría no encontrada' });
+      return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
     }
 
     res.json({ message: 'Categoría eliminada correctamente' });
   } catch (error) {
-    console.error('Error al eliminar categoría:', error);
-    res.status(500).json({ error: 'Error al eliminar la categoría' });
+    sendApiError(res, error, 'Error al eliminar la categoría');
   }
 };
