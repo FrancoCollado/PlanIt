@@ -1,6 +1,6 @@
-import { getOrm } from '../../../config/orm';
-import { Evento } from '../../../entities/evento';
-import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto';
+import { getOrm } from '../../../config/orm.js';
+import { Evento } from '../../../entities/evento.js';
+import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto.js';
 
 export const listEventos = async (includeDraft = false): Promise<Evento[]> => {
   const em = getOrm().em.fork();

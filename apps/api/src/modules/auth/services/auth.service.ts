@@ -1,5 +1,5 @@
-import { getOrm } from '../../../config/orm';
-import { User } from '../../../entities/usuario';
+import { getOrm } from '../../../config/orm.js';
+import { User } from '../../../entities/usuario.js';
 
 
 // Busca un usuario por email y contraseña

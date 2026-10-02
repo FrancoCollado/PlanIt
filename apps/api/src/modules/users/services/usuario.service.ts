@@ -1,5 +1,5 @@
-import { getOrm } from '../../../config/orm';
-import { User } from '../../../entities/usuario';
+import { getOrm } from '../../../config/orm.js';
+import { User } from '../../../entities/usuario.js';
 
 export const listUsuariosByRol = async (rol?: string): Promise<User[]> => {
   const em = getOrm().em.fork();

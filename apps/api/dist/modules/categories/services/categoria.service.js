@@ -1,27 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCategoria = exports.updateCategoria = exports.createCategoria = exports.getCategoriaById = exports.listCategorias = void 0;
-const orm_1 = require("../../../config/orm");
-const categoria_1 = require("../../../entities/categoria");
-const evento_1 = require("../../../entities/evento");
-const api_error_1 = require("../../../shared/api-error");
-const listCategorias = async (includeDraftEvents = false) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    return em.find(categoria_1.Categoria, includeDraftEvents ? {} : { evento: { draft: false } }, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
+import { getOrm } from '../../../config/orm.js';
+import { Categoria } from '../../../entities/categoria.js';
+import { Evento } from '../../../entities/evento.js';
+import { ApiError } from '../../../shared/api-error.js';
+export const listCategorias = async (includeDraftEvents = false) => {
+    const em = getOrm().em.fork();
+    return em.find(Categoria, includeDraftEvents ? {} : { evento: { draft: false } }, { populate: ['evento'], orderBy: { creadoEn: 'DESC' } });
 };
-exports.listCategorias = listCategorias;
-const getCategoriaById = async (id) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    return em.findOne(categoria_1.Categoria, { id }, { populate: ['evento'] });
+export const getCategoriaById = async (id) => {
+    const em = getOrm().em.fork();
+    return em.findOne(Categoria, { id }, { populate: ['evento'] });
 };
-exports.getCategoriaById = getCategoriaById;
-const createCategoria = async (data) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    const evento = await em.findOne(evento_1.Evento, { id: data.eventoId });
+export const createCategoria = async (data) => {
+    const em = getOrm().em.fork();
+    const evento = await em.findOne(Evento, { id: data.eventoId });
     if (!evento) {
-        throw new api_error_1.ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
+        throw new ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
     }
-    const categoria = em.create(categoria_1.Categoria, {
+    const categoria = em.create(Categoria, {
         nombre: data.nombre,
         descripcion: data.descripcion,
         evento,
@@ -30,10 +25,9 @@ const createCategoria = async (data) => {
     await em.persist(categoria).flush();
     return categoria;
 };
-exports.createCategoria = createCategoria;
-const updateCategoria = async (id, data) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    const categoria = await em.findOne(categoria_1.Categoria, { id });
+export const updateCategoria = async (id, data) => {
+    const em = getOrm().em.fork();
+    const categoria = await em.findOne(Categoria, { id });
     if (!categoria)
         return null;
     if (data.nombre !== undefined)
@@ -41,22 +35,20 @@ const updateCategoria = async (id, data) => {
     if (data.descripcion !== undefined)
         categoria.descripcion = data.descripcion;
     if (data.eventoId !== undefined) {
-        const evento = await em.findOne(evento_1.Evento, { id: data.eventoId });
+        const evento = await em.findOne(Evento, { id: data.eventoId });
         if (!evento) {
-            throw new api_error_1.ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
+            throw new ApiError(404, 'NOT_FOUND', 'El evento indicado no existe');
         }
         categoria.evento = evento;
     }
     await em.flush();
     return categoria;
 };
-exports.updateCategoria = updateCategoria;
-const deleteCategoria = async (id) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    const categoria = await em.findOne(categoria_1.Categoria, { id });
+export const deleteCategoria = async (id) => {
+    const em = getOrm().em.fork();
+    const categoria = await em.findOne(Categoria, { id });
     if (!categoria)
         return false;
     await em.remove(categoria).flush();
     return true;
 };
-exports.deleteCategoria = deleteCategoria;

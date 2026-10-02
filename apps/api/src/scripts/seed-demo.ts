@@ -1,12 +1,12 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import mikroOrmConfig from '../config/mikro-orm.config';
-import { User } from '../entities/usuario';
-import { Evento } from '../entities/evento';
-import { Categoria } from '../entities/categoria';
-import { EventoCategoria } from '../entities/evento-categoria';
-import { Servicio } from '../entities/servicio';
-import { Tablero } from '../entities/tablero';
-import { TableroServicio } from '../entities/tablero-servicio';
+import mikroOrmConfig from '../config/mikro-orm.config.js';
+import { User } from '../entities/usuario.js';
+import { Evento } from '../entities/evento.js';
+import { Categoria } from '../entities/categoria.js';
+import { EventoCategoria } from '../entities/evento-categoria.js';
+import { Servicio } from '../entities/servicio.js';
+import { Tablero } from '../entities/tablero.js';
+import { TableroServicio } from '../entities/tablero-servicio.js';
 
 const dryRun = process.argv.includes('--dry-run');
 const confirm = process.argv.includes('--confirm');

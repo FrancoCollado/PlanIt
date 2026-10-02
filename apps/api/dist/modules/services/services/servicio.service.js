@@ -1,29 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteServicio = exports.updateServicio = exports.createServicio = exports.getServicioById = exports.buscarServiciosPorCategoria = exports.buscarServiciosPorNombre = exports.listServiciosByUsuario = void 0;
-const orm_1 = require("../../../config/orm");
-const servicio_1 = require("../../../entities/servicio");
-const categoria_1 = require("../../../entities/categoria");
-const usuario_1 = require("../../../entities/usuario");
-const api_error_1 = require("../../../shared/api-error");
+import { getOrm } from '../../../config/orm.js';
+import { Servicio } from '../../../entities/servicio.js';
+import { Categoria } from '../../../entities/categoria.js';
+import { User } from '../../../entities/usuario.js';
+import { ApiError } from '../../../shared/api-error.js';
 // ======================================================
 // LISTAR SERVICIOS DE UNA EMPRESA
 // ======================================================
-const listServiciosByUsuario = async (usuarioId) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    return em.find(servicio_1.Servicio, { usuario: usuarioId }, {
+export const listServiciosByUsuario = async (usuarioId) => {
+    const em = getOrm().em.fork();
+    return em.find(Servicio, { usuario: usuarioId }, {
         populate: ['categoria'],
         orderBy: { creadoEn: 'DESC' }
     });
 };
-exports.listServiciosByUsuario = listServiciosByUsuario;
 // ======================================================
 // BUSCAR SERVICIOS PUBLICADOS POR NOMBRE
 // Se utiliza desde la pantalla del cliente.
 // ======================================================
-const buscarServiciosPorNombre = async (nombre, zona = '', empresa = '') => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    return em.find(servicio_1.Servicio, {
+export const buscarServiciosPorNombre = async (nombre, zona = '', empresa = '') => {
+    const em = getOrm().em.fork();
+    return em.find(Servicio, {
         ...(nombre && { nombre: { $like: `%${nombre}%` } }),
         draft: false,
         usuario: {
@@ -37,14 +33,13 @@ const buscarServiciosPorNombre = async (nombre, zona = '', empresa = '') => {
         orderBy: { nombre: 'ASC' }
     });
 };
-exports.buscarServiciosPorNombre = buscarServiciosPorNombre;
 // ======================================================
 // BUSCAR SERVICIOS PUBLICADOS POR CATEGORÍA
 // Se utiliza desde la pantalla del cliente.
 // ======================================================
-const buscarServiciosPorCategoria = async (categoriaId) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    return em.find(servicio_1.Servicio, {
+export const buscarServiciosPorCategoria = async (categoriaId) => {
+    const em = getOrm().em.fork();
+    return em.find(Servicio, {
         categoria: categoriaId,
         draft: false
     }, {
@@ -52,33 +47,31 @@ const buscarServiciosPorCategoria = async (categoriaId) => {
         orderBy: { nombre: 'ASC' }
     });
 };
-exports.buscarServiciosPorCategoria = buscarServiciosPorCategoria;
 // ======================================================
 // OBTENER SERVICIO POR ID
 // ======================================================
-const getServicioById = async (id) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    return em.findOne(servicio_1.Servicio, { id }, { populate: ['categoria'] });
+export const getServicioById = async (id) => {
+    const em = getOrm().em.fork();
+    return em.findOne(Servicio, { id }, { populate: ['categoria'] });
 };
-exports.getServicioById = getServicioById;
 // ======================================================
 // CREAR SERVICIO
 // ======================================================
-const createServicio = async (data) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    const categoria = await em.findOne(categoria_1.Categoria, {
+export const createServicio = async (data) => {
+    const em = getOrm().em.fork();
+    const categoria = await em.findOne(Categoria, {
         id: data.categoriaId
     });
     if (!categoria) {
-        throw new api_error_1.ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
+        throw new ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
     }
-    const usuario = await em.findOne(usuario_1.User, {
+    const usuario = await em.findOne(User, {
         id: data.usuarioId
     });
     if (!usuario) {
-        throw new api_error_1.ApiError(404, 'NOT_FOUND', 'El usuario indicado no existe');
+        throw new ApiError(404, 'NOT_FOUND', 'El usuario indicado no existe');
     }
-    const servicio = em.create(servicio_1.Servicio, {
+    const servicio = em.create(Servicio, {
         nombre: data.nombre,
         descripcion: data.descripcion,
         imagen: data.imagen,
@@ -90,13 +83,12 @@ const createServicio = async (data) => {
     await em.persist(servicio).flush();
     return servicio;
 };
-exports.createServicio = createServicio;
 // ======================================================
 // ACTUALIZAR SERVICIO
 // ======================================================
-const updateServicio = async (id, usuarioId, data) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    const servicio = await em.findOne(servicio_1.Servicio, {
+export const updateServicio = async (id, usuarioId, data) => {
+    const em = getOrm().em.fork();
+    const servicio = await em.findOne(Servicio, {
         id,
         usuario: usuarioId
     });
@@ -116,24 +108,23 @@ const updateServicio = async (id, usuarioId, data) => {
         servicio.draft = data.draft;
     }
     if (data.categoriaId !== undefined) {
-        const categoria = await em.findOne(categoria_1.Categoria, {
+        const categoria = await em.findOne(Categoria, {
             id: data.categoriaId
         });
         if (!categoria) {
-            throw new api_error_1.ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
+            throw new ApiError(404, 'NOT_FOUND', 'La categoría indicada no existe');
         }
         servicio.categoria = categoria;
     }
     await em.flush();
     return servicio;
 };
-exports.updateServicio = updateServicio;
 // ======================================================
 // BORRAR SERVICIO
 // ======================================================
-const deleteServicio = async (id, usuarioId) => {
-    const em = (0, orm_1.getOrm)().em.fork();
-    const servicio = await em.findOne(servicio_1.Servicio, {
+export const deleteServicio = async (id, usuarioId) => {
+    const em = getOrm().em.fork();
+    const servicio = await em.findOne(Servicio, {
         id,
         usuario: usuarioId
     });
@@ -143,4 +134,3 @@ const deleteServicio = async (id, usuarioId) => {
     await em.remove(servicio).flush();
     return true;
 };
-exports.deleteServicio = deleteServicio;

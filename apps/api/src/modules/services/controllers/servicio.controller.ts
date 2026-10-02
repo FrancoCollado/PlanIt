@@ -7,13 +7,13 @@ import {
   createServicio,
   updateServicio,
   deleteServicio
-} from '../services/servicio.service';
+} from '../services/servicio.service.js';
 
 import type {
   CreateServicioDto,
   UpdateServicioDto
-} from '../dtos/servicio.dto';
-import { respondWithError, sendApiError } from '../../../shared/api-error';
+} from '../dtos/servicio.dto.js';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 
 
 const serializeServicio = (servicio: {

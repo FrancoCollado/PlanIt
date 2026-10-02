@@ -1,8 +1,8 @@
-import { getOrm } from '../../../config/orm';
-import { User } from '../../../entities/usuario';
-import { Evento } from '../../../entities/evento';
-import { Servicio } from '../../../entities/servicio';
-import { TableroServicio } from '../../../entities/tablero-servicio';
+import { getOrm } from '../../../config/orm.js';
+import { User } from '../../../entities/usuario.js';
+import { Evento } from '../../../entities/evento.js';
+import { Servicio } from '../../../entities/servicio.js';
+import { TableroServicio } from '../../../entities/tablero-servicio.js';
 
 export interface AdminStats {
   empresasActivas: number;

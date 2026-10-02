@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,10 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Categoria = void 0;
-const legacy_1 = require("@mikro-orm/decorators/legacy");
-const evento_1 = require("./evento");
+import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/decorators/legacy';
+import { Evento } from './evento.js';
 let Categoria = class Categoria {
     id;
     evento;
@@ -19,33 +16,33 @@ let Categoria = class Categoria {
     descripcion;
     creadoEn;
 };
-exports.Categoria = Categoria;
 __decorate([
-    (0, legacy_1.PrimaryKey)({ type: 'number' }),
+    PrimaryKey({ type: 'number' }),
     __metadata("design:type", Number)
 ], Categoria.prototype, "id", void 0);
 __decorate([
-    (0, legacy_1.ManyToOne)(() => evento_1.Evento, {
+    ManyToOne(() => Evento, {
         fieldName: 'evento_id',
         deleteRule: 'cascade'
     }),
-    __metadata("design:type", evento_1.Evento)
+    __metadata("design:type", Evento)
 ], Categoria.prototype, "evento", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'string', length: 100 }),
+    Property({ type: 'string', length: 100 }),
     __metadata("design:type", String)
 ], Categoria.prototype, "nombre", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'string', columnType: 'text', nullable: true }),
+    Property({ type: 'string', columnType: 'text', nullable: true }),
     __metadata("design:type", String)
 ], Categoria.prototype, "descripcion", void 0);
 __decorate([
-    (0, legacy_1.Property)({
+    Property({
         type: 'Date',
         fieldName: 'creado_en'
     }),
     __metadata("design:type", Date)
 ], Categoria.prototype, "creadoEn", void 0);
-exports.Categoria = Categoria = __decorate([
-    (0, legacy_1.Entity)({ tableName: 'categorias' })
+Categoria = __decorate([
+    Entity({ tableName: 'categorias' })
 ], Categoria);
+export { Categoria };

@@ -1,15 +1,15 @@
 import { Router, Request, Response } from 'express';
-import { getOrm } from '../../config/orm';
-import { Tablero } from '../../entities/tablero';
-import { TableroServicio } from '../../entities/tablero-servicio';
-import { Evento } from '../../entities/evento';
-import { Servicio } from '../../entities/servicio';
-import { User } from '../../entities/usuario';
-import { respondWithError, sendApiError } from '../../shared/api-error';
-import { validateRequest } from '../../shared/request-validation';
-import { requestSchemas } from '../../shared/request-schemas';
-import { ensureOrm } from '../../middlewares/ensure-orm';
-import { authenticate, ensureActiveUser, requireRoles } from '../../middlewares/authorization';
+import { getOrm } from '../../config/orm.js';
+import { Tablero } from '../../entities/tablero.js';
+import { TableroServicio } from '../../entities/tablero-servicio.js';
+import { Evento } from '../../entities/evento.js';
+import { Servicio } from '../../entities/servicio.js';
+import { User } from '../../entities/usuario.js';
+import { respondWithError, sendApiError } from '../../shared/api-error.js';
+import { validateRequest } from '../../shared/request-validation.js';
+import { requestSchemas } from '../../shared/request-schemas.js';
+import { ensureOrm } from '../../middlewares/ensure-orm.js';
+import { authenticate, ensureActiveUser, requireRoles } from '../../middlewares/authorization.js';
 
 const router = Router();
 router.use(authenticate, requireRoles('cliente'));

@@ -3,8 +3,8 @@ import {
   ManyToOne
 } from '@mikro-orm/decorators/legacy';
 
-import { Evento } from './evento';
-import { Categoria } from './categoria';
+import { Evento } from './evento.js';
+import { Categoria } from './categoria.js';
 
 @Entity({ tableName: 'evento_categoria' })
 export class EventoCategoria {

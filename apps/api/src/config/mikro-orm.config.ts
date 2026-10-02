@@ -2,19 +2,19 @@ import path from 'path';
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+dotenv.config({ path: path.resolve(import.meta.dirname, '../../../../.env') });
 
 import { defineConfig } from '@mikro-orm/postgresql';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 
 // Importo las entidades para que el orm las mapee a la bd
-import { User } from '../entities/usuario';
-import { Evento } from '../entities/evento';
-import { Categoria } from '../entities/categoria';
-import { Servicio } from '../entities/servicio';
-import { EventoCategoria } from '../entities/evento-categoria';
-import { Tablero } from '../entities/tablero';
-import { TableroServicio } from '../entities/tablero-servicio';
+import { User } from '../entities/usuario.js';
+import { Evento } from '../entities/evento.js';
+import { Categoria } from '../entities/categoria.js';
+import { Servicio } from '../entities/servicio.js';
+import { EventoCategoria } from '../entities/evento-categoria.js';
+import { Tablero } from '../entities/tablero.js';
+import { TableroServicio } from '../entities/tablero-servicio.js';
 
 // config  MikroORM para la conectar la bd uso var del .env
 // DATABASE_URL (connection string de Supabase) tiene prioridad; si no está, se

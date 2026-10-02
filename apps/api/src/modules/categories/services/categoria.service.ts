@@ -1,8 +1,8 @@
-import { getOrm } from '../../../config/orm';
-import { Categoria } from '../../../entities/categoria';
-import { Evento } from '../../../entities/evento';
-import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto';
-import { ApiError } from '../../../shared/api-error';
+import { getOrm } from '../../../config/orm.js';
+import { Categoria } from '../../../entities/categoria.js';
+import { Evento } from '../../../entities/evento.js';
+import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto.js';
+import { ApiError } from '../../../shared/api-error.js';
 
 export const listCategorias = async (includeDraftEvents = false): Promise<Categoria[]> => {
   const em = getOrm().em.fork();

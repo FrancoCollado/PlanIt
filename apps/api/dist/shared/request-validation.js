@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateRequest = void 0;
-const api_error_1 = require("./api-error");
-const validateRequest = (schemas) => (req, _res, next) => {
+import { ApiError } from './api-error.js';
+export const validateRequest = (schemas) => (req, _res, next) => {
     const issues = [];
     for (const part of ['params', 'query', 'body']) {
         const schema = schemas[part];
@@ -20,9 +17,8 @@ const validateRequest = (schemas) => (req, _res, next) => {
             req.body = result.data;
     }
     if (issues.length) {
-        next(new api_error_1.ApiError(400, 'VALIDATION_ERROR', 'Los datos enviados no son válidos', { fields: issues }));
+        next(new ApiError(400, 'VALIDATION_ERROR', 'Los datos enviados no son válidos', { fields: issues }));
         return;
     }
     next();
 };
-exports.validateRequest = validateRequest;

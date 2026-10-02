@@ -3,10 +3,10 @@ import { Router } from 'express';
 import {
   login,
   register
-} from '../controllers/auth.controller';
-import { validateRequest } from '../../../shared/request-validation';
-import { requestSchemas } from '../../../shared/request-schemas';
-import { ensureOrm } from '../../../middlewares/ensure-orm';
+} from '../controllers/auth.controller.js';
+import { validateRequest } from '../../../shared/request-validation.js';
+import { requestSchemas } from '../../../shared/request-schemas.js';
+import { ensureOrm } from '../../../middlewares/ensure-orm.js';
 
 const router = Router();
 

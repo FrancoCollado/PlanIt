@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,33 +7,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EventoCategoria = void 0;
-const legacy_1 = require("@mikro-orm/decorators/legacy");
-const evento_1 = require("./evento");
-const categoria_1 = require("./categoria");
+import { Entity, ManyToOne } from '@mikro-orm/decorators/legacy';
+import { Evento } from './evento.js';
+import { Categoria } from './categoria.js';
 let EventoCategoria = class EventoCategoria {
     // Clave primaria compuesta: evento_id + categoria_id, ambas también son FK
     evento;
     categoria;
 };
-exports.EventoCategoria = EventoCategoria;
 __decorate([
-    (0, legacy_1.ManyToOne)(() => evento_1.Evento, {
+    ManyToOne(() => Evento, {
         primary: true,
         fieldName: 'evento_id',
         deleteRule: 'cascade'
     }),
-    __metadata("design:type", evento_1.Evento)
+    __metadata("design:type", Evento)
 ], EventoCategoria.prototype, "evento", void 0);
 __decorate([
-    (0, legacy_1.ManyToOne)(() => categoria_1.Categoria, {
+    ManyToOne(() => Categoria, {
         primary: true,
         fieldName: 'categoria_id',
         deleteRule: 'cascade'
     }),
-    __metadata("design:type", categoria_1.Categoria)
+    __metadata("design:type", Categoria)
 ], EventoCategoria.prototype, "categoria", void 0);
-exports.EventoCategoria = EventoCategoria = __decorate([
-    (0, legacy_1.Entity)({ tableName: 'evento_categoria' })
+EventoCategoria = __decorate([
+    Entity({ tableName: 'evento_categoria' })
 ], EventoCategoria);
+export { EventoCategoria };

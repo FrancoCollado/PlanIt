@@ -1,17 +1,12 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const postgresql_1 = require("@mikro-orm/postgresql");
-const mikro_orm_config_1 = __importDefault(require("../config/mikro-orm.config"));
-const usuario_1 = require("../entities/usuario");
-const evento_1 = require("../entities/evento");
-const categoria_1 = require("../entities/categoria");
-const evento_categoria_1 = require("../entities/evento-categoria");
-const servicio_1 = require("../entities/servicio");
-const tablero_1 = require("../entities/tablero");
-const tablero_servicio_1 = require("../entities/tablero-servicio");
+import { MikroORM } from '@mikro-orm/postgresql';
+import mikroOrmConfig from '../config/mikro-orm.config.js';
+import { User } from '../entities/usuario.js';
+import { Evento } from '../entities/evento.js';
+import { Categoria } from '../entities/categoria.js';
+import { EventoCategoria } from '../entities/evento-categoria.js';
+import { Servicio } from '../entities/servicio.js';
+import { Tablero } from '../entities/tablero.js';
+import { TableroServicio } from '../entities/tablero-servicio.js';
 const dryRun = process.argv.includes('--dry-run');
 const confirm = process.argv.includes('--confirm');
 const password = 'PlanItDemo2026!';
@@ -52,7 +47,7 @@ async function main() {
         throw new Error('No se permite cargar datos demo en produccion');
     if (!dryRun && !confirm)
         throw new Error('Usa --dry-run para probar o --confirm para insertar datos demo');
-    const orm = await postgresql_1.MikroORM.init({ ...mikro_orm_config_1.default, debug: false });
+    const orm = await MikroORM.init({ ...mikroOrmConfig, debug: false });
     const created = { usuarios: 0, eventos: 0, categorias: 0, eventoCategoria: 0, servicios: 0, tableros: 0, tableroServicio: 0 };
     try {
         await orm.em.transactional(async (em) => {
@@ -62,11 +57,11 @@ async function main() {
             const demoServices = {};
             const demoBoards = {};
             for (const data of users) {
-                let user = await em.findOne(usuario_1.User, { email: data.email });
+                let user = await em.findOne(User, { email: data.email });
                 if (user && user.rol !== data.rol)
                     throw new Error(`Rol inesperado para ${data.email}`);
                 if (!user) {
-                    user = em.create(usuario_1.User, {
+                    user = em.create(User, {
                         nombre: data.nombre, email: data.email, password, rol: data.rol,
                         activo: data.activo, zona: data.zona, cuit: data.cuit, telefono: data.telefono
                     });
@@ -77,9 +72,9 @@ async function main() {
             }
             await em.flush();
             for (const data of events) {
-                let event = await em.findOne(evento_1.Evento, { nombre: data.nombre });
+                let event = await em.findOne(Evento, { nombre: data.nombre });
                 if (!event) {
-                    event = em.create(evento_1.Evento, { nombre: data.nombre, descripcion: data.descripcion, draft: data.draft, creadoEn: new Date() });
+                    event = em.create(Evento, { nombre: data.nombre, descripcion: data.descripcion, draft: data.draft, creadoEn: new Date() });
                     em.persist(event);
                     created.eventos++;
                 }
@@ -88,9 +83,9 @@ async function main() {
             await em.flush();
             for (const data of categories) {
                 const event = demoEvents[data.evento];
-                let category = await em.findOne(categoria_1.Categoria, { evento: event, nombre: data.nombre });
+                let category = await em.findOne(Categoria, { evento: event, nombre: data.nombre });
                 if (!category) {
-                    category = em.create(categoria_1.Categoria, { evento: event, nombre: data.nombre, creadoEn: new Date() });
+                    category = em.create(Categoria, { evento: event, nombre: data.nombre, creadoEn: new Date() });
                     em.persist(category);
                     created.categorias++;
                 }
@@ -100,8 +95,8 @@ async function main() {
             for (const data of categories) {
                 const event = demoEvents[data.evento];
                 const category = demoCategories[data.key];
-                if (!await em.findOne(evento_categoria_1.EventoCategoria, { evento: event, categoria: category })) {
-                    em.persist(em.create(evento_categoria_1.EventoCategoria, { evento: event, categoria: category }));
+                if (!await em.findOne(EventoCategoria, { evento: event, categoria: category })) {
+                    em.persist(em.create(EventoCategoria, { evento: event, categoria: category }));
                     created.eventoCategoria++;
                 }
             }
@@ -109,9 +104,9 @@ async function main() {
             for (const data of services) {
                 const category = demoCategories[data.categoria];
                 const company = demoUsers[data.empresa];
-                let service = await em.findOne(servicio_1.Servicio, { categoria: category, usuario: company, nombre: data.nombre });
+                let service = await em.findOne(Servicio, { categoria: category, usuario: company, nombre: data.nombre });
                 if (!service) {
-                    service = em.create(servicio_1.Servicio, {
+                    service = em.create(Servicio, {
                         categoria: category, usuario: company, nombre: data.nombre,
                         descripcion: `Servicio de prueba de ${company.nombre}`, draft: data.draft, creadoEn: new Date()
                     });
@@ -123,9 +118,9 @@ async function main() {
             await em.flush();
             for (const data of boards) {
                 const client = demoUsers[data.cliente];
-                let board = await em.findOne(tablero_1.Tablero, { cliente: client, nombre: data.nombre });
+                let board = await em.findOne(Tablero, { cliente: client, nombre: data.nombre });
                 if (!board) {
-                    board = em.create(tablero_1.Tablero, { cliente: client, evento: demoEvents[data.evento], nombre: data.nombre, fechaCreacion: new Date() });
+                    board = em.create(Tablero, { cliente: client, evento: demoEvents[data.evento], nombre: data.nombre, fechaCreacion: new Date() });
                     em.persist(board);
                     created.tableros++;
                 }
@@ -141,8 +136,8 @@ async function main() {
             for (const data of savedServices) {
                 const board = demoBoards[data.board];
                 const service = demoServices[data.service];
-                if (!await em.findOne(tablero_servicio_1.TableroServicio, { tablero: board, servicio: service })) {
-                    em.persist(em.create(tablero_servicio_1.TableroServicio, { tablero: board, servicio: service, guardadoEn: new Date() }));
+                if (!await em.findOne(TableroServicio, { tablero: board, servicio: service })) {
+                    em.persist(em.create(TableroServicio, { tablero: board, servicio: service, guardadoEn: new Date() }));
                     created.tableroServicio++;
                 }
             }

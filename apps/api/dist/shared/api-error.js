@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.apiErrorHandler = exports.respondWithError = exports.sendApiError = exports.ApiError = void 0;
-const zod_1 = require("zod");
-class ApiError extends Error {
+import { ZodError } from 'zod';
+export class ApiError extends Error {
     status;
     code;
     details;
@@ -14,7 +11,6 @@ class ApiError extends Error {
         this.name = 'ApiError';
     }
 }
-exports.ApiError = ApiError;
 const getNestedError = (error) => {
     if (!error || typeof error !== 'object')
         return undefined;
@@ -37,7 +33,7 @@ const getPostgresCode = (error) => {
 const getRequestError = (error) => {
     if (error instanceof ApiError)
         return error;
-    if (error instanceof zod_1.ZodError) {
+    if (error instanceof ZodError) {
         return new ApiError(400, 'VALIDATION_ERROR', 'Los datos enviados no son válidos', {
             fields: error.issues.map(({ path, message }) => ({ field: path.join('.'), message }))
         });
@@ -58,7 +54,7 @@ const getRequestError = (error) => {
     }
     return undefined;
 };
-const sendApiError = (res, error, fallbackMessage) => {
+export const sendApiError = (res, error, fallbackMessage) => {
     const apiError = getRequestError(error) ?? new ApiError(500, 'INTERNAL_SERVER_ERROR', fallbackMessage ?? 'Error interno del servidor');
     if (apiError.status >= 500) {
         console.error('Error no controlado en la API:', error);
@@ -69,14 +65,11 @@ const sendApiError = (res, error, fallbackMessage) => {
         ...(apiError.details === undefined ? {} : { details: apiError.details })
     });
 };
-exports.sendApiError = sendApiError;
-const respondWithError = (res, status, code, message, details) => (0, exports.sendApiError)(res, new ApiError(status, code, message, details));
-exports.respondWithError = respondWithError;
-const apiErrorHandler = (error, _req, res, next) => {
+export const respondWithError = (res, status, code, message, details) => sendApiError(res, new ApiError(status, code, message, details));
+export const apiErrorHandler = (error, _req, res, next) => {
     if (res.headersSent) {
         next(error);
         return;
     }
-    (0, exports.sendApiError)(res, error);
+    sendApiError(res, error);
 };
-exports.apiErrorHandler = apiErrorHandler;

@@ -1,32 +1,29 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.requestSchemas = void 0;
-const zod_1 = require("zod");
-const positiveId = zod_1.z.number().int().positive().safe();
-const positiveIdParam = zod_1.z.string()
+import { z } from 'zod';
+const positiveId = z.number().int().positive().safe();
+const positiveIdParam = z.string()
     .regex(/^[1-9]\d*$/, 'Debe ser un ID entero positivo')
     .refine((value) => Number.isSafeInteger(Number(value)), 'El ID está fuera del rango permitido');
-const optionalName = zod_1.z.string().trim().min(1).max(100);
-const optionalDescription = zod_1.z.string().max(10_000).optional();
-const optionalImage = zod_1.z.string().trim().max(255).optional();
-const optionalDraft = zod_1.z.boolean().optional();
-const email = zod_1.z.string().trim().email().max(100);
-const password = zod_1.z.string().min(1).max(255);
-const idParams = zod_1.z.object({ id: positiveIdParam }).strict();
+const optionalName = z.string().trim().min(1).max(100);
+const optionalDescription = z.string().max(10_000).optional();
+const optionalImage = z.string().trim().max(255).optional();
+const optionalDraft = z.boolean().optional();
+const email = z.string().trim().email().max(100);
+const password = z.string().min(1).max(255);
+const idParams = z.object({ id: positiveIdParam }).strict();
 const updateHasFields = (data) => Object.keys(data).length > 0;
-exports.requestSchemas = {
+export const requestSchemas = {
     login: {
-        body: zod_1.z.object({ email, password }).strict()
+        body: z.object({ email, password }).strict()
     },
     register: {
-        body: zod_1.z.object({
+        body: z.object({
             name: optionalName,
             email,
             password,
-            confirmPassword: zod_1.z.string().min(1).max(255),
-            acceptTerms: zod_1.z.literal(true),
-            role: zod_1.z.enum(['cliente', 'empresa']),
-            zona: zod_1.z.string().trim().min(1).max(100).optional(),
+            confirmPassword: z.string().min(1).max(255),
+            acceptTerms: z.literal(true),
+            role: z.enum(['cliente', 'empresa']),
+            zona: z.string().trim().min(1).max(100).optional(),
             cuit: positiveId.optional(),
             telefono: positiveId.optional()
         }).strict().superRefine((data, context) => {
@@ -43,7 +40,7 @@ exports.requestSchemas = {
         })
     },
     createEvento: {
-        body: zod_1.z.object({
+        body: z.object({
             nombre: optionalName,
             descripcion: optionalDescription,
             imagen: optionalImage,
@@ -52,7 +49,7 @@ exports.requestSchemas = {
     },
     updateEvento: {
         params: idParams,
-        body: zod_1.z.object({
+        body: z.object({
             nombre: optionalName.optional(),
             descripcion: optionalDescription,
             imagen: optionalImage,
@@ -61,7 +58,7 @@ exports.requestSchemas = {
     },
     idParams: { params: idParams },
     createCategoria: {
-        body: zod_1.z.object({
+        body: z.object({
             nombre: optionalName,
             descripcion: optionalDescription,
             eventoId: positiveId
@@ -69,29 +66,29 @@ exports.requestSchemas = {
     },
     updateCategoria: {
         params: idParams,
-        body: zod_1.z.object({
+        body: z.object({
             nombre: optionalName.optional(),
             descripcion: optionalDescription,
             eventoId: positiveId.optional()
         }).strict().refine(updateHasFields, 'Debe enviar al menos un campo para actualizar')
     },
     listServicios: {
-        query: zod_1.z.object({ usuarioId: positiveIdParam }).strict()
+        query: z.object({ usuarioId: positiveIdParam }).strict()
     },
     searchServicios: {
-        query: zod_1.z.object({
-            nombre: zod_1.z.string().trim().max(100).optional(),
-            zona: zod_1.z.string().trim().max(100).optional(),
-            empresa: zod_1.z.string().trim().max(100).optional()
+        query: z.object({
+            nombre: z.string().trim().max(100).optional(),
+            zona: z.string().trim().max(100).optional(),
+            empresa: z.string().trim().max(100).optional()
         }).strict().refine((query) => Boolean(query.nombre || query.zona || query.empresa), {
             message: 'Ingresá un nombre, una zona o una empresa para buscar'
         })
     },
     categoriaIdParam: {
-        params: zod_1.z.object({ categoriaId: positiveIdParam }).strict()
+        params: z.object({ categoriaId: positiveIdParam }).strict()
     },
     createServicio: {
-        body: zod_1.z.object({
+        body: z.object({
             nombre: optionalName,
             descripcion: optionalDescription,
             imagen: optionalImage,
@@ -102,7 +99,7 @@ exports.requestSchemas = {
     },
     updateServicio: {
         params: idParams,
-        body: zod_1.z.object({
+        body: z.object({
             nombre: optionalName.optional(),
             descripcion: optionalDescription,
             imagen: optionalImage,
@@ -115,32 +112,32 @@ exports.requestSchemas = {
     },
     deleteServicio: {
         params: idParams,
-        query: zod_1.z.object({ usuarioId: positiveIdParam.optional() }).strict(),
-        body: zod_1.z.object({ usuarioId: positiveId.optional() }).strict().optional()
+        query: z.object({ usuarioId: positiveIdParam.optional() }).strict(),
+        body: z.object({ usuarioId: positiveId.optional() }).strict().optional()
     },
     listUsuarios: {
-        query: zod_1.z.object({ rol: zod_1.z.enum(['cliente', 'administrador', 'empresa']).optional() }).strict()
+        query: z.object({ rol: z.enum(['cliente', 'administrador', 'empresa']).optional() }).strict()
     },
     setUsuarioActivo: {
         params: idParams,
-        body: zod_1.z.object({ activo: zod_1.z.boolean() }).strict()
+        body: z.object({ activo: z.boolean() }).strict()
     },
     businessStats: {
-        query: zod_1.z.object({ usuarioId: positiveIdParam }).strict()
+        query: z.object({ usuarioId: positiveIdParam }).strict()
     },
     createTablero: {
-        body: zod_1.z.object({ nombre: optionalName, eventoId: positiveId }).strict()
+        body: z.object({ nombre: optionalName, eventoId: positiveId }).strict()
     },
     updateTablero: {
         params: idParams,
-        body: zod_1.z.object({ nombre: optionalName, eventoId: positiveId }).strict()
+        body: z.object({ nombre: optionalName, eventoId: positiveId }).strict()
     },
     tableroIdParam: { params: idParams },
     addServicioToTablero: {
         params: idParams,
-        body: zod_1.z.object({ servicioId: positiveId }).strict()
+        body: z.object({ servicioId: positiveId }).strict()
     },
     removeServicioFromTablero: {
-        params: zod_1.z.object({ id: positiveIdParam, servicioId: positiveIdParam }).strict()
+        params: z.object({ id: positiveIdParam, servicioId: positiveIdParam }).strict()
     }
 };

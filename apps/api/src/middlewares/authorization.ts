@@ -1,8 +1,8 @@
 import type { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import { getOrm } from '../config/orm';
-import { User } from '../entities/usuario';
-import { respondWithError } from '../shared/api-error';
+import { getOrm } from '../config/orm.js';
+import { User } from '../entities/usuario.js';
+import { respondWithError } from '../shared/api-error.js';
 
 export type AccessRole = User['rol'];
 

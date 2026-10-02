@@ -1,19 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.initOrm = initOrm;
-exports.setOrm = setOrm;
-exports.getOrm = getOrm;
-const postgresql_1 = require("@mikro-orm/postgresql");
-const mikro_orm_config_1 = __importDefault(require("./mikro-orm.config"));
+import { MikroORM } from '@mikro-orm/postgresql';
+import mikroOrmConfig from './mikro-orm.config.js';
 let orm;
 let ormPromise;
 // En serverless cada instancia arranca en frío: la conexión se crea bajo demanda
 // y se reintenta si falló, en vez de depender de un arranque previo.
-function initOrm() {
-    ormPromise ??= postgresql_1.MikroORM.init(mikro_orm_config_1.default)
+export function initOrm() {
+    ormPromise ??= MikroORM.init(mikroOrmConfig)
         .then((instance) => {
         orm = instance;
         return instance;
@@ -24,10 +16,10 @@ function initOrm() {
     });
     return ormPromise;
 }
-function setOrm(instance) {
+export function setOrm(instance) {
     orm = instance; // Asigno la instancia de MikroORM a la variable global
 }
-function getOrm() {
+export function getOrm() {
     if (!orm)
         throw new Error('El ORM todavía no está inicializado');
     return orm;

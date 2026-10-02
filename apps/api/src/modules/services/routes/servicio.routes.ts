@@ -7,11 +7,11 @@ import {
   crearServicio,
   actualizarServicio,
   borrarServicio
-} from '../controllers/servicio.controller';
-import { validateRequest } from '../../../shared/request-validation';
-import { requestSchemas } from '../../../shared/request-schemas';
-import { ensureOrm } from '../../../middlewares/ensure-orm';
-import { authenticate, ensureActiveUser, requireOwnUserId, requireRoles } from '../../../middlewares/authorization';
+} from '../controllers/servicio.controller.js';
+import { validateRequest } from '../../../shared/request-validation.js';
+import { requestSchemas } from '../../../shared/request-schemas.js';
+import { ensureOrm } from '../../../middlewares/ensure-orm.js';
+import { authenticate, ensureActiveUser, requireOwnUserId, requireRoles } from '../../../middlewares/authorization.js';
 
 const router = Router();
 

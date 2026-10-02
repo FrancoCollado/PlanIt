@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.borrarCategoria = exports.actualizarCategoria = exports.crearCategoria = exports.getCategoria = exports.getCategorias = void 0;
-const categoria_service_1 = require("../services/categoria.service");
-const api_error_1 = require("../../../shared/api-error");
+import { listCategorias, getCategoriaById, createCategoria, updateCategoria, deleteCategoria } from '../services/categoria.service.js';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 const serializeCategoria = (categoria) => {
     if (!categoria)
         return null;
@@ -17,66 +14,61 @@ const serializeCategoria = (categoria) => {
         }
     };
 };
-const getCategorias = async (req, res) => {
+export const getCategorias = async (req, res) => {
     try {
-        const categorias = await (0, categoria_service_1.listCategorias)(req.auth?.role === 'administrador');
+        const categorias = await listCategorias(req.auth?.role === 'administrador');
         res.json({ categorias: categorias.map(serializeCategoria) });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al obtener las categorías');
+        sendApiError(res, error, 'Error al obtener las categorías');
     }
 };
-exports.getCategorias = getCategorias;
-const getCategoria = async (req, res) => {
+export const getCategoria = async (req, res) => {
     const id = Number(req.params.id);
     try {
-        const categoria = await (0, categoria_service_1.getCategoriaById)(id);
+        const categoria = await getCategoriaById(id);
         if (!categoria || (categoria.evento.draft && req.auth?.role !== 'administrador')) {
-            return (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
+            return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
         }
         res.json({ categoria: serializeCategoria(categoria) });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al obtener la categoría');
+        sendApiError(res, error, 'Error al obtener la categoría');
     }
 };
-exports.getCategoria = getCategoria;
-const crearCategoria = async (req, res) => {
+export const crearCategoria = async (req, res) => {
     const { nombre, descripcion, eventoId } = req.body;
     try {
-        const categoria = await (0, categoria_service_1.createCategoria)({ nombre, descripcion, eventoId: Number(eventoId) });
+        const categoria = await createCategoria({ nombre, descripcion, eventoId: Number(eventoId) });
         res.status(201).json({ message: 'Categoría creada correctamente', categoria: serializeCategoria(categoria) });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al crear la categoría');
+        sendApiError(res, error, 'Error al crear la categoría');
     }
 };
-exports.crearCategoria = crearCategoria;
-const actualizarCategoria = async (req, res) => {
+export const actualizarCategoria = async (req, res) => {
     const id = Number(req.params.id);
     try {
-        const categoria = await (0, categoria_service_1.updateCategoria)(id, req.body);
+        const categoria = await updateCategoria(id, req.body);
         if (!categoria) {
-            return (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
+            return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
         }
         res.json({ message: 'Categoría actualizada correctamente', categoria: serializeCategoria(categoria) });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al actualizar la categoría');
+        sendApiError(res, error, 'Error al actualizar la categoría');
     }
 };
-exports.actualizarCategoria = actualizarCategoria;
-const borrarCategoria = async (req, res) => {
+export const borrarCategoria = async (req, res) => {
     const id = Number(req.params.id);
     try {
-        const eliminada = await (0, categoria_service_1.deleteCategoria)(id);
+        const eliminada = await deleteCategoria(id);
         if (!eliminada) {
-            return (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
+            return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
         }
         res.json({ message: 'Categoría eliminada correctamente' });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al eliminar la categoría');
+        sendApiError(res, error, 'Error al eliminar la categoría');
     }
 };
-exports.borrarCategoria = borrarCategoria;

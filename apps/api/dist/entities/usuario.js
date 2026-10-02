@@ -1,4 +1,3 @@
-"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -8,9 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
-const legacy_1 = require("@mikro-orm/decorators/legacy");
+import { Entity, PrimaryKey, Property, Enum } from '@mikro-orm/decorators/legacy';
 let User = class User {
     id; //va asi por que id es non-nullable y no tiene valor por defecto, uso ! para indicar que siempre tendrá un valor.
     nombre;
@@ -24,22 +21,21 @@ let User = class User {
     activo = true;
     creadoEn;
 };
-exports.User = User;
 __decorate([
-    (0, legacy_1.PrimaryKey)({ type: 'number' }),
+    PrimaryKey({ type: 'number' }),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'string', length: 100 }),
+    Property({ type: 'string', length: 100 }),
     __metadata("design:type", String)
 ], User.prototype, "nombre", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'string', length: 100, unique: true }) //aca por ser email hago que sea unique
+    Property({ type: 'string', length: 100, unique: true }) //aca por ser email hago que sea unique
     ,
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, legacy_1.Property)({
+    Property({
         type: 'string',
         fieldName: 'contraseña',
         length: 255
@@ -47,35 +43,36 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, legacy_1.Enum)({
+    Enum({
         items: ['cliente', 'administrador', 'empresa']
     }),
     __metadata("design:type", String)
 ], User.prototype, "rol", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'string', length: 100, nullable: true }),
+    Property({ type: 'string', length: 100, nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "zona", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'number', nullable: true }),
+    Property({ type: 'number', nullable: true }),
     __metadata("design:type", Number)
 ], User.prototype, "cuit", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'number', nullable: true }),
+    Property({ type: 'number', nullable: true }),
     __metadata("design:type", Number)
 ], User.prototype, "telefono", void 0);
 __decorate([
-    (0, legacy_1.Property)({ type: 'boolean', default: true }),
+    Property({ type: 'boolean', default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "activo", void 0);
 __decorate([
-    (0, legacy_1.Property)({
+    Property({
         type: 'Date',
         fieldName: 'creado_en',
         nullable: true
     }),
     __metadata("design:type", Date)
 ], User.prototype, "creadoEn", void 0);
-exports.User = User = __decorate([
-    (0, legacy_1.Entity)({ tableName: 'usuarios' })
+User = __decorate([
+    Entity({ tableName: 'usuarios' })
 ], User);
+export { User };

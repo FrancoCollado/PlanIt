@@ -6,10 +6,10 @@ import {
   createCategoria,
   updateCategoria,
   deleteCategoria
-} from '../services/categoria.service';
+} from '../services/categoria.service.js';
 
-import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto';
-import { respondWithError, sendApiError } from '../../../shared/api-error';
+import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto.js';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 
 const serializeCategoria = (categoria: Awaited<ReturnType<typeof getCategoriaById>>) => {
   if (!categoria) return null;

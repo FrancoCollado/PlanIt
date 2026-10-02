@@ -5,8 +5,8 @@ import {
   ManyToOne
 } from '@mikro-orm/decorators/legacy';
 
-import { User } from './usuario';
-import { Evento } from './evento';
+import { User } from './usuario.js';
+import { Evento } from './evento.js';
 
 @Entity({ tableName: 'tableros' })
 export class Tablero {

@@ -1,12 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.patchUsuarioActivo = exports.getUsuarios = void 0;
-const usuario_service_1 = require("../services/usuario.service");
-const api_error_1 = require("../../../shared/api-error");
-const getUsuarios = async (req, res) => {
+import { listUsuariosByRol, setUsuarioActivo } from '../services/usuario.service.js';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
+export const getUsuarios = async (req, res) => {
     const rol = typeof req.query.rol === 'string' ? req.query.rol : undefined;
     try {
-        const usuarios = await (0, usuario_service_1.listUsuariosByRol)(rol);
+        const usuarios = await listUsuariosByRol(rol);
         res.json({
             usuarios: usuarios.map((u) => ({
                 id: u.id,
@@ -22,17 +19,16 @@ const getUsuarios = async (req, res) => {
         });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al obtener los usuarios');
+        sendApiError(res, error, 'Error al obtener los usuarios');
     }
 };
-exports.getUsuarios = getUsuarios;
-const patchUsuarioActivo = async (req, res) => {
+export const patchUsuarioActivo = async (req, res) => {
     const id = Number(req.params.id);
     const { activo } = req.body;
     try {
-        const usuario = await (0, usuario_service_1.setUsuarioActivo)(id, activo);
+        const usuario = await setUsuarioActivo(id, activo);
         if (!usuario) {
-            return (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Usuario no encontrado');
+            return respondWithError(res, 404, 'NOT_FOUND', 'Usuario no encontrado');
         }
         res.json({
             message: activo ? 'Usuario reactivado correctamente' : 'Usuario suspendido correctamente',
@@ -46,7 +42,6 @@ const patchUsuarioActivo = async (req, res) => {
         });
     }
     catch (error) {
-        (0, api_error_1.sendApiError)(res, error, 'Error al actualizar el usuario');
+        sendApiError(res, error, 'Error al actualizar el usuario');
     }
 };
-exports.patchUsuarioActivo = patchUsuarioActivo;

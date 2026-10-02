@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@mikro-orm/core": "^7.2.3",
     "@mikro-orm/decorators": "^7.2.3",

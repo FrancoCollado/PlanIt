@@ -6,10 +6,10 @@ import {
   createEvento,
   updateEvento,
   deleteEvento
-} from '../services/evento.service';
+} from '../services/evento.service.js';
 
-import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto';
-import { respondWithError, sendApiError } from '../../../shared/api-error';
+import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto.js';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 
 
 export const getEventos = async (req: Request, res: Response) => {

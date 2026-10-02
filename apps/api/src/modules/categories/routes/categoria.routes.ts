@@ -6,11 +6,11 @@ import {
   crearCategoria,
   actualizarCategoria,
   borrarCategoria
-} from '../controllers/categoria.controller';
-import { validateRequest } from '../../../shared/request-validation';
-import { requestSchemas } from '../../../shared/request-schemas';
-import { ensureOrm } from '../../../middlewares/ensure-orm';
-import { authenticate, ensureActiveUser, requireRoles } from '../../../middlewares/authorization';
+} from '../controllers/categoria.controller.js';
+import { validateRequest } from '../../../shared/request-validation.js';
+import { requestSchemas } from '../../../shared/request-schemas.js';
+import { ensureOrm } from '../../../middlewares/ensure-orm.js';
+import { authenticate, ensureActiveUser, requireRoles } from '../../../middlewares/authorization.js';
 
 const router = Router();
 

@@ -1,27 +1,22 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = __importDefault(require("path"));
-require("reflect-metadata");
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../../../.env') });
-const postgresql_1 = require("@mikro-orm/postgresql");
-const legacy_1 = require("@mikro-orm/decorators/legacy");
+import path from 'path';
+import 'reflect-metadata';
+import dotenv from 'dotenv';
+dotenv.config({ path: path.resolve(import.meta.dirname, '../../../../.env') });
+import { defineConfig } from '@mikro-orm/postgresql';
+import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 // Importo las entidades para que el orm las mapee a la bd
-const usuario_1 = require("../entities/usuario");
-const evento_1 = require("../entities/evento");
-const categoria_1 = require("../entities/categoria");
-const servicio_1 = require("../entities/servicio");
-const evento_categoria_1 = require("../entities/evento-categoria");
-const tablero_1 = require("../entities/tablero");
-const tablero_servicio_1 = require("../entities/tablero-servicio");
+import { User } from '../entities/usuario.js';
+import { Evento } from '../entities/evento.js';
+import { Categoria } from '../entities/categoria.js';
+import { Servicio } from '../entities/servicio.js';
+import { EventoCategoria } from '../entities/evento-categoria.js';
+import { Tablero } from '../entities/tablero.js';
+import { TableroServicio } from '../entities/tablero-servicio.js';
 // config  MikroORM para la conectar la bd uso var del .env
 // DATABASE_URL (connection string de Supabase) tiene prioridad; si no está, se
 // arma la conexión con las variables sueltas.
 const clientUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-exports.default = (0, postgresql_1.defineConfig)({
+export default defineConfig({
     ...(clientUrl
         ? { clientUrl }
         : {
@@ -38,15 +33,15 @@ exports.default = (0, postgresql_1.defineConfig)({
         }
     },
     entities: [
-        usuario_1.User,
-        evento_1.Evento,
-        categoria_1.Categoria,
-        servicio_1.Servicio,
-        evento_categoria_1.EventoCategoria,
-        tablero_1.Tablero,
-        tablero_servicio_1.TableroServicio
+        User,
+        Evento,
+        Categoria,
+        Servicio,
+        EventoCategoria,
+        Tablero,
+        TableroServicio
     ],
-    metadataProvider: legacy_1.ReflectMetadataProvider,
+    metadataProvider: ReflectMetadataProvider,
     // El modo debug imprime cada query con sus parámetros: nunca en producción.
     debug: process.env.NODE_ENV !== 'production',
 });

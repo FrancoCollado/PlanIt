@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
-import { getAdminDashboardStats, getBusinessDashboardStats } from '../controllers/stats.controller';
-import { validateRequest } from '../../../shared/request-validation';
-import { requestSchemas } from '../../../shared/request-schemas';
-import { ensureOrm } from '../../../middlewares/ensure-orm';
-import { authenticate, ensureActiveUser, requireOwnUserId, requireRoles } from '../../../middlewares/authorization';
+import { getAdminDashboardStats, getBusinessDashboardStats } from '../controllers/stats.controller.js';
+import { validateRequest } from '../../../shared/request-validation.js';
+import { requestSchemas } from '../../../shared/request-schemas.js';
+import { ensureOrm } from '../../../middlewares/ensure-orm.js';
+import { authenticate, ensureActiveUser, requireOwnUserId, requireRoles } from '../../../middlewares/authorization.js';
 
 const router = Router();
 

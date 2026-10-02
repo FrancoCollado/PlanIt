@@ -4,8 +4,8 @@ import {
   Property
 } from '@mikro-orm/decorators/legacy';
 
-import { Tablero } from './tablero';
-import { Servicio } from './servicio';
+import { Tablero } from './tablero.js';
+import { Servicio } from './servicio.js';
 
 @Entity({ tableName: 'tablero_servicio' })
 export class TableroServicio {

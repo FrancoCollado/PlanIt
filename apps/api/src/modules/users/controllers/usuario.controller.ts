@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
-import { listUsuariosByRol, setUsuarioActivo } from '../services/usuario.service';
-import { respondWithError, sendApiError } from '../../../shared/api-error';
+import { listUsuariosByRol, setUsuarioActivo } from '../services/usuario.service.js';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 
 export const getUsuarios = async (req: Request, res: Response) => {
   const rol = typeof req.query.rol === 'string' ? req.query.rol : undefined;

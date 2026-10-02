@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import {
   findUserByCredentials,
   createUser
-} from '../services/auth.service';
+} from '../services/auth.service.js';
 
-import type { LoginDto } from '../dtos/login.dto';
-import type { RegisterDto } from '../dtos/register.dto';
+import type { LoginDto } from '../dtos/login.dto.js';
+import type { RegisterDto } from '../dtos/register.dto.js';
 import jwt from 'jsonwebtoken';
-import { respondWithError, sendApiError } from '../../../shared/api-error';
+import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 
 const issueToken = (id: number, rol: string) => {
   if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET no está configurado');

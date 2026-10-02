@@ -1,5 +1,5 @@
 import { MikroORM } from '@mikro-orm/postgresql';
-import mikroOrmConfig from './mikro-orm.config';
+import mikroOrmConfig from './mikro-orm.config.js';
 
 let orm: MikroORM | undefined;
 let ormPromise: Promise<MikroORM> | undefined;

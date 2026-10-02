@@ -1,9 +1,9 @@
-import { getOrm } from '../../../config/orm';
-import { Servicio } from '../../../entities/servicio';
-import { Categoria } from '../../../entities/categoria';
-import { User } from '../../../entities/usuario';
-import type { CreateServicioDto, UpdateServicioDto } from '../dtos/servicio.dto';
-import { ApiError } from '../../../shared/api-error';
+import { getOrm } from '../../../config/orm.js';
+import { Servicio } from '../../../entities/servicio.js';
+import { Categoria } from '../../../entities/categoria.js';
+import { User } from '../../../entities/usuario.js';
+import type { CreateServicioDto, UpdateServicioDto } from '../dtos/servicio.dto.js';
+import { ApiError } from '../../../shared/api-error.js';
 
 
 // ======================================================

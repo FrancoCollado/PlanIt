@@ -4,17 +4,17 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { randomBytes } from 'crypto';
 
-import authRoutes from './modules/auth/routes/auth.routes';
-import eventoRoutes from './modules/events/routes/evento.routes';
-import usuarioRoutes from './modules/users/routes/usuario.routes';
-import statsRoutes from './modules/stats/routes/stats.routes';
-import categoriaRoutes from './modules/categories/routes/categoria.routes';
-import servicioRoutes from './modules/services/routes/servicio.routes';
-import tableroRoutes from './modules/boards/tablero.routes';
+import authRoutes from './modules/auth/routes/auth.routes.js';
+import eventoRoutes from './modules/events/routes/evento.routes.js';
+import usuarioRoutes from './modules/users/routes/usuario.routes.js';
+import statsRoutes from './modules/stats/routes/stats.routes.js';
+import categoriaRoutes from './modules/categories/routes/categoria.routes.js';
+import servicioRoutes from './modules/services/routes/servicio.routes.js';
+import tableroRoutes from './modules/boards/tablero.routes.js';
 
-import { apiErrorHandler, respondWithError } from './shared/api-error';
+import { apiErrorHandler, respondWithError } from './shared/api-error.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(import.meta.dirname, '../../../.env') });
 
 if (!process.env.JWT_SECRET) {
   if (process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET es obligatorio en producción');
