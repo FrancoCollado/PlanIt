@@ -21,6 +21,24 @@ import { TableroServicio } from '../entities/tablero-servicio.js';
 // arma la conexión con las variables sueltas.
 const clientUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
+// Supabase firma con su propia CA, así que hay que aportarla en DB_CA_CERT.
+// DB_SSL=no-verify cifra pero no valida el certificado: sólo para depurar,
+// porque habilita ataques de intermediario.
+const resolveSsl = () => {
+  if (process.env.DB_SSL === 'false') return false;
+
+  if (process.env.DB_CA_CERT) {
+    return { ca: process.env.DB_CA_CERT, rejectUnauthorized: true };
+  }
+
+  if (process.env.DB_SSL === 'no-verify') {
+    console.warn('DB_SSL=no-verify: el certificado del servidor no se valida');
+    return { rejectUnauthorized: false };
+  }
+
+  return { rejectUnauthorized: true };
+};
+
 export default defineConfig({
 
   ...(clientUrl
@@ -34,9 +52,9 @@ export default defineConfig({
       }),
 
   // driverOptions se pasa tal cual a pg: una clave "connection" la tomaría como
-  // objeto Connection ya construido. Supabase exige TLS; DB_SSL=false lo apaga.
+  // objeto Connection ya construido.
   driverOptions: {
-    ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: true }
+    ssl: resolveSsl()
   },
 
   // El esquema se aplica con los scripts de migrations, no al conectar.
