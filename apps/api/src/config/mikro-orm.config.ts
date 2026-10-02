@@ -33,11 +33,10 @@ export default defineConfig({
         dbName: process.env.DB_NAME || 'postgres'
       }),
 
-  // Supabase exige TLS; en local se desactiva con DB_SSL=false.
+  // driverOptions se pasa tal cual a pg: una clave "connection" la tomaría como
+  // objeto Connection ya construido. Supabase exige TLS; DB_SSL=false lo apaga.
   driverOptions: {
-    connection: {
-      ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: true }
-    }
+    ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: true }
   },
 
 
