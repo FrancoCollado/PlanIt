@@ -1,7 +1,26 @@
 import { Request, Response } from 'express';
 
-import { listUsuariosByRol, setUsuarioActivo } from '../services/usuario.service.js';
+import { listEmpresasActivas, listUsuariosByRol, setUsuarioActivo } from '../services/usuario.service.js';
 import { respondWithError, sendApiError } from '../../../shared/api-error.js';
+
+// Endpoint público: expone sólo los datos de contacto que el cliente ya ve en las
+// cards de servicios, nunca email, CUIT ni estado de la cuenta.
+export const getEmpresas = async (_req: Request, res: Response) => {
+  try {
+    const empresas = await listEmpresasActivas();
+
+    res.json({
+      empresas: empresas.map((e) => ({
+        id: e.id,
+        nombre: e.nombre,
+        zona: e.zona,
+        telefono: e.telefono
+      }))
+    });
+  } catch (error) {
+    sendApiError(res, error, 'Error al obtener las empresas');
+  }
+};
 
 export const getUsuarios = async (req: Request, res: Response) => {
   const rol = typeof req.query.rol === 'string' ? req.query.rol : undefined;

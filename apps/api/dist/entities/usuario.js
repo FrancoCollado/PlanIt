@@ -8,6 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Entity, PrimaryKey, Property, Enum } from '@mikro-orm/decorators/legacy';
+import { BigIntType } from '@mikro-orm/core';
 let User = class User {
     id; //va asi por que id es non-nullable y no tiene valor por defecto, uso ! para indicar que siempre tendrá un valor.
     nombre;
@@ -16,6 +17,8 @@ let User = class User {
     password;
     rol = 'cliente';
     zona;
+    // Las columnas son BIGINT y pg las devuelve como string: BigIntType('number')
+    // las convierte a número. Un CUIT (11 dígitos) entra holgado en un safe integer.
     cuit;
     telefono;
     // Permite suspender una cuenta sin borrarla, lo usamos para empresas
@@ -55,11 +58,11 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "zona", void 0);
 __decorate([
-    Property({ type: 'number', nullable: true }),
+    Property({ type: new BigIntType('number'), nullable: true }),
     __metadata("design:type", Number)
 ], User.prototype, "cuit", void 0);
 __decorate([
-    Property({ type: 'number', nullable: true }),
+    Property({ type: new BigIntType('number'), nullable: true }),
     __metadata("design:type", Number)
 ], User.prototype, "telefono", void 0);
 __decorate([

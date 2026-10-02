@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, CalendarDays, Tags, Pencil } from 'lucide-react';
 import './dashboard.css';
 
 import {
-  buscarServiciosRequest
+  buscarServiciosRequest,
+  listEmpresasRequest
 } from '../services/servicioService';
 
 import type {
+  Empresa,
   Servicio
 } from '../services/servicioService';
 
@@ -39,6 +41,15 @@ export default function ClienteDashboard({
 
   const [pantalla, setPantalla] =
     useState<'inicio' | 'categorias' | 'eventos' | 'tableros'>('inicio');
+
+  // Alimenta el datalist del filtro: si falla, el input sigue siendo texto libre.
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+
+  useEffect(() => {
+    listEmpresasRequest()
+      .then(setEmpresas)
+      .catch(() => setEmpresas([]));
+  }, []);
 
 
   function volverAIniciarSesion() {
@@ -229,10 +240,19 @@ export default function ClienteDashboard({
 
                     <input
                       type="search"
+                      list="cliente-empresas"
                       value={empresaBusqueda}
                       onChange={(e) => setEmpresaBusqueda(e.target.value)}
-                      placeholder="Cualquier empresa"
+                      placeholder={empresas.length ? 'Elegí o escribí una empresa' : 'Cualquier empresa'}
                     />
+
+                    <datalist id="cliente-empresas">
+                      {empresas.map((empresa) => (
+                        <option key={empresa.id} value={empresa.nombre}>
+                          {empresa.zona ?? ''}
+                        </option>
+                      ))}
+                    </datalist>
                   </label>
 
                 </div>

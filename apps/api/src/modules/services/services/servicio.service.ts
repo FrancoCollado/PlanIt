@@ -19,7 +19,7 @@ export const listServiciosByUsuario = async (
     Servicio,
     { usuario: usuarioId },
     {
-      populate: ['categoria'],
+      populate: ['categoria', 'usuario'],
       orderBy: { creadoEn: 'DESC' }
     }
   );
@@ -51,7 +51,7 @@ export const buscarServiciosPorNombre = async (
       }
     },
     {
-      populate: ['categoria'],
+      populate: ['categoria', 'usuario'],
       orderBy: { nombre: 'ASC' }
     }
   );
@@ -72,10 +72,11 @@ export const buscarServiciosPorCategoria = async (
     Servicio,
     {
       categoria: categoriaId,
-      draft: false
+      draft: false,
+      usuario: { rol: 'empresa', activo: true }
     },
     {
-      populate: ['categoria'],
+      populate: ['categoria', 'usuario'],
       orderBy: { nombre: 'ASC' }
     }
   );

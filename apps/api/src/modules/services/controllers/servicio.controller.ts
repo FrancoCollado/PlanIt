@@ -27,6 +27,12 @@ const serializeServicio = (servicio: {
     id: number;
     nombre: string;
   };
+  usuario: {
+    id: number;
+    nombre: string;
+    telefono?: number;
+    zona?: string;
+  };
 }) => ({
   id: servicio.id,
   nombre: servicio.nombre,
@@ -37,6 +43,13 @@ const serializeServicio = (servicio: {
   categoria: {
     id: servicio.categoria.id,
     nombre: servicio.categoria.nombre
+  },
+  // Datos de contacto públicos de la empresa dueña del servicio.
+  empresa: {
+    id: servicio.usuario.id,
+    nombre: servicio.usuario.nombre,
+    telefono: servicio.usuario.telefono,
+    zona: servicio.usuario.zona
   }
 });
 

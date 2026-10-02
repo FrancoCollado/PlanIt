@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookmarkPlus, Search } from 'lucide-react';
+import { BookmarkPlus, Building2, Phone, Search } from 'lucide-react';
 import type { Servicio } from '../services/servicioService';
 import { addServicio, listTableros } from '../services/tableroService';
 import type { Tablero } from '../services/tableroService';
@@ -43,6 +43,16 @@ export default function ServicioCard({ servicio, token }: { servicio: Servicio; 
       <span className="cliente-servicio-categoria">{servicio.categoria.nombre}</span>
       <h3>{servicio.nombre}</h3>
       {servicio.descripcion && <p>{servicio.descripcion}</p>}
+      <p className="cliente-servicio-empresa">
+        <Building2 size={15} aria-hidden="true" /> {servicio.empresa.nombre}
+        {servicio.empresa.zona && <span className="cliente-servicio-zona"> · {servicio.empresa.zona}</span>}
+      </p>
+      {servicio.empresa.telefono && (
+        <p className="cliente-servicio-telefono">
+          <Phone size={15} aria-hidden="true" />
+          <a href={`tel:${servicio.empresa.telefono}`}>{servicio.empresa.telefono}</a>
+        </p>
+      )}
       <button type="button" className="cliente-accion" onClick={showBoards} disabled={busy}>
         <BookmarkPlus size={17} /> Agregar a tablero
       </button>

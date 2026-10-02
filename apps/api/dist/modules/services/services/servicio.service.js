@@ -9,7 +9,7 @@ import { ApiError } from '../../../shared/api-error.js';
 export const listServiciosByUsuario = async (usuarioId) => {
     const em = getOrm().em.fork();
     return em.find(Servicio, { usuario: usuarioId }, {
-        populate: ['categoria'],
+        populate: ['categoria', 'usuario'],
         orderBy: { creadoEn: 'DESC' }
     });
 };
@@ -29,7 +29,7 @@ export const buscarServiciosPorNombre = async (nombre, zona = '', empresa = '') 
             ...(empresa && { nombre: { $like: `%${empresa}%` } })
         }
     }, {
-        populate: ['categoria'],
+        populate: ['categoria', 'usuario'],
         orderBy: { nombre: 'ASC' }
     });
 };
@@ -41,9 +41,10 @@ export const buscarServiciosPorCategoria = async (categoriaId) => {
     const em = getOrm().em.fork();
     return em.find(Servicio, {
         categoria: categoriaId,
-        draft: false
+        draft: false,
+        usuario: { rol: 'empresa', activo: true }
     }, {
-        populate: ['categoria'],
+        populate: ['categoria', 'usuario'],
         orderBy: { nombre: 'ASC' }
     });
 };

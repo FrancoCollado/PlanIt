@@ -11,7 +11,40 @@ export interface Servicio {
     id: number;
     nombre: string;
   };
+  empresa: {
+    id: number;
+    nombre: string;
+    telefono?: number;
+    zona?: string;
+  };
 }
+
+export interface Empresa {
+  id: number;
+  nombre: string;
+  zona?: string;
+  telefono?: number;
+}
+
+
+// ======================================================
+// LISTAR EMPRESAS ACTIVAS (autocompletado del buscador)
+// ======================================================
+
+export const listEmpresasRequest = async (): Promise<Empresa[]> => {
+
+  const response = await fetch(`${API_URL}/api/usuarios/empresas`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.error || 'Error al obtener las empresas'
+    );
+  }
+
+  return data.empresas;
+};
 
 
 // ======================================================

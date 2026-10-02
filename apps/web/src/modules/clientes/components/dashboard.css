@@ -267,6 +267,34 @@
   line-height: 1.4;
 }
 
+.cliente-servicio-empresa,
+.cliente-servicio-telefono {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem !important;
+  color: #374151 !important;
+  font-size: 0.82rem !important;
+}
+
+.cliente-servicio-empresa {
+  font-weight: 600;
+}
+
+.cliente-servicio-zona {
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.cliente-servicio-telefono a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.cliente-servicio-telefono a:hover {
+  text-decoration: underline;
+}
+
 .cliente-mensaje-busqueda {
   max-width: 850px;
   margin: -1rem auto 2rem;

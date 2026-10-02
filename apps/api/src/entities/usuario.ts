@@ -4,6 +4,7 @@ import {
   Property,
   Enum
 } from '@mikro-orm/decorators/legacy';
+import { BigIntType } from '@mikro-orm/core';
 
 @Entity({ tableName: 'usuarios' })
 export class User {
@@ -34,10 +35,12 @@ export class User {
   @Property({ type: 'string', length: 100, nullable: true })
   zona?: string;
 
-  @Property({ type: 'number', nullable: true })
+  // Las columnas son BIGINT y pg las devuelve como string: BigIntType('number')
+  // las convierte a número. Un CUIT (11 dígitos) entra holgado en un safe integer.
+  @Property({ type: new BigIntType('number'), nullable: true })
   cuit?: number;
 
-  @Property({ type: 'number', nullable: true })
+  @Property({ type: new BigIntType('number'), nullable: true })
   telefono?: number;
 
   // Permite suspender una cuenta sin borrarla, lo usamos para empresas

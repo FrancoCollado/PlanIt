@@ -10,6 +10,13 @@ const serializeServicio = (servicio) => ({
     categoria: {
         id: servicio.categoria.id,
         nombre: servicio.categoria.nombre
+    },
+    // Datos de contacto públicos de la empresa dueña del servicio.
+    empresa: {
+        id: servicio.usuario.id,
+        nombre: servicio.usuario.nombre,
+        telefono: servicio.usuario.telefono,
+        zona: servicio.usuario.zona
     }
 });
 // ======================================================
