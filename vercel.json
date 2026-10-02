@@ -4,6 +4,7 @@
     "api": {
       "root": "apps/api",
       "framework": "express",
+      "installCommand": "cd ../.. && npm ci",
       "buildCommand": "npm run build",
       "entrypoint": "dist/server.js"
     },
