@@ -12,7 +12,6 @@ import categoriaRoutes from './modules/categories/routes/categoria.routes';
 import servicioRoutes from './modules/services/routes/servicio.routes';
 import tableroRoutes from './modules/boards/tablero.routes';
 
-import { initOrm } from './config/orm';
 import { apiErrorHandler, respondWithError } from './shared/api-error';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
@@ -57,15 +56,10 @@ app.use('/api', (_req, res) => {
 
 app.use(apiErrorHandler);
 
-// En Vercel la plataforma invoca la app; el listen es sólo para desarrollo local.
-if (!process.env.VERCEL) {
-  initOrm()
-    .then(() => console.log('Base de datos conectada con MikroORM'))
-    .catch((error) => console.error('Error al conectar la base de datos:', error));
-
-  app.listen(PORT, () => {
-    console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
-  });
-}
+// Vercel ejecuta este proceso y rutea las peticiones al puerto que escucha,
+// igual que en local. La conexión a la base se hace por request con ensureOrm.
+app.listen(PORT, () => {
+  console.log(`Servidor backend escuchando en el puerto ${PORT}`);
+});
 
 export default app;

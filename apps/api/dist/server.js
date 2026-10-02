@@ -15,7 +15,6 @@ const stats_routes_1 = __importDefault(require("./modules/stats/routes/stats.rou
 const categoria_routes_1 = __importDefault(require("./modules/categories/routes/categoria.routes"));
 const servicio_routes_1 = __importDefault(require("./modules/services/routes/servicio.routes"));
 const tablero_routes_1 = __importDefault(require("./modules/boards/tablero.routes"));
-const orm_1 = require("./config/orm");
 const api_error_1 = require("./shared/api-error");
 dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../../.env') });
 if (!process.env.JWT_SECRET) {
@@ -51,13 +50,9 @@ app.use('/api', (_req, res) => {
     (0, api_error_1.respondWithError)(res, 404, 'NOT_FOUND', 'Ruta de API no encontrada');
 });
 app.use(api_error_1.apiErrorHandler);
-// En Vercel la plataforma invoca la app; el listen es sólo para desarrollo local.
-if (!process.env.VERCEL) {
-    (0, orm_1.initOrm)()
-        .then(() => console.log('Base de datos conectada con MikroORM'))
-        .catch((error) => console.error('Error al conectar la base de datos:', error));
-    app.listen(PORT, () => {
-        console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
-    });
-}
+// Vercel ejecuta este proceso y rutea las peticiones al puerto que escucha,
+// igual que en local. La conexión a la base se hace por request con ensureOrm.
+app.listen(PORT, () => {
+    console.log(`Servidor backend escuchando en el puerto ${PORT}`);
+});
 exports.default = app;
