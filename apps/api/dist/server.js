@@ -11,6 +11,8 @@ import categoriaRoutes from './modules/categories/routes/categoria.routes.js';
 import servicioRoutes from './modules/services/routes/servicio.routes.js';
 import tableroRoutes from './modules/boards/tablero.routes.js';
 import { apiErrorHandler, respondWithError } from './shared/api-error.js';
+import { initOrm } from './config/orm.js';
+import { connectionInfo } from './config/mikro-orm.config.js';
 dotenv.config({ path: path.resolve(import.meta.dirname, '../../../.env') });
 if (!process.env.JWT_SECRET) {
     if (process.env.NODE_ENV === 'production')
@@ -33,6 +35,27 @@ app.get('/api/health', (_req, res) => {
         status: 'ok',
         message: 'API de planIt funcionando'
     });
+});
+// Diagnóstico de la base: informa qué variables se usaron y el error exacto de
+// pg. Nunca devuelve la contraseña, sólo su longitud y una huella SHA-256.
+app.get('/api/health/db', async (_req, res) => {
+    try {
+        const orm = await initOrm();
+        const [identidad] = await orm.em.getConnection().execute('select current_user, current_database(), inet_server_port() as port');
+        res.json({ status: 'ok', conexion: connectionInfo, identidad });
+    }
+    catch (error) {
+        const err = error;
+        res.status(500).json({
+            status: 'error',
+            conexion: connectionInfo,
+            error: {
+                message: err.message,
+                code: err.code ?? err.cause?.code,
+                causa: err.cause?.message
+            }
+        });
+    }
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/eventos', eventoRoutes);

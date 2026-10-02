@@ -1,8 +1,11 @@
 // Diagnóstico de conexión: usa la misma configuración que la API.
 // Uso: definir DATABASE_URL y ejecutar `npm run build && npm run db:check`
 import { initOrm } from '../dist/config/orm.js';
+import { connectionInfo } from '../dist/config/mikro-orm.config.js';
 
 const show = (label, value) => console.log(`\n== ${label} ==\n`, value);
+
+show('Configuración detectada', connectionInfo);
 
 try {
   const orm = await initOrm();
