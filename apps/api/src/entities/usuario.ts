@@ -17,10 +17,12 @@ export class User {
   @Property({ type: 'string', length: 100, unique: true }) //aca por ser email hago que sea unique
   email!: string;
 
+  // hidden excluye el hash de toJSON: ninguna respuesta de la API lo expone.
   @Property({
     type: 'string',
     fieldName: 'contraseña',
-    length: 255
+    length: 255,
+    hidden: true
   })
   password!: string;
 

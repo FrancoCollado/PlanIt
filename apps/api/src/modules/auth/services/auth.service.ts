@@ -1,8 +1,15 @@
+import bcrypt from 'bcryptjs';
+
 import { getOrm } from '../../../config/orm.js';
 import { User } from '../../../entities/usuario.js';
 
+// Coste de bcrypt: cada +1 duplica el tiempo de cálculo, encareciendo la fuerza bruta.
+const SALT_ROUNDS = 10;
 
-// Busca un usuario por email y contraseña
+export const hashPassword = (password: string): Promise<string> => bcrypt.hash(password, SALT_ROUNDS);
+
+
+// Busca un usuario por email y verifica la contraseña contra el hash guardado
 export const findUserByCredentials = async (
   email: string,
   password: string
@@ -10,7 +17,13 @@ export const findUserByCredentials = async (
 
   const em = getOrm().em.fork();
 
-  return em.findOne(User, { email, password });
+  const user = await em.findOne(User, { email });
+
+  // Se compara igual aunque el usuario no exista, para que el tiempo de
+  // respuesta no revele qué emails están registrados.
+  const matches = await bcrypt.compare(password, user?.password ?? '');
+
+  return user && matches ? user : null;
 };
 
 
@@ -28,7 +41,7 @@ export const createUser = async (
   const user = em.create(User, {
     nombre: name,
     email,
-    password,
+    password: await hashPassword(password),
     rol: role,
     activo: true,
     ...(businessData ?? {})

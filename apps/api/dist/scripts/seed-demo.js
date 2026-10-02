@@ -7,6 +7,7 @@ import { EventoCategoria } from '../entities/evento-categoria.js';
 import { Servicio } from '../entities/servicio.js';
 import { Tablero } from '../entities/tablero.js';
 import { TableroServicio } from '../entities/tablero-servicio.js';
+import { hashPassword } from '../modules/auth/services/auth.service.js';
 const dryRun = process.argv.includes('--dry-run');
 const confirm = process.argv.includes('--confirm');
 const password = 'PlanItDemo2026!';
@@ -49,6 +50,7 @@ async function main() {
         throw new Error('Usa --dry-run para probar o --confirm para insertar datos demo');
     const orm = await MikroORM.init({ ...mikroOrmConfig, debug: false });
     const created = { usuarios: 0, eventos: 0, categorias: 0, eventoCategoria: 0, servicios: 0, tableros: 0, tableroServicio: 0 };
+    const passwordHash = await hashPassword(password);
     try {
         await orm.em.transactional(async (em) => {
             const demoUsers = {};
@@ -62,7 +64,7 @@ async function main() {
                     throw new Error(`Rol inesperado para ${data.email}`);
                 if (!user) {
                     user = em.create(User, {
-                        nombre: data.nombre, email: data.email, password, rol: data.rol,
+                        nombre: data.nombre, email: data.email, password: passwordHash, rol: data.rol,
                         activo: data.activo, zona: data.zona, cuit: data.cuit, telefono: data.telefono
                     });
                     em.persist(user);

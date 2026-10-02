@@ -12,6 +12,7 @@ let User = class User {
     id; //va asi por que id es non-nullable y no tiene valor por defecto, uso ! para indicar que siempre tendrá un valor.
     nombre;
     email;
+    // hidden excluye el hash de toJSON: ninguna respuesta de la API lo expone.
     password;
     rol = 'cliente';
     zona;
@@ -38,7 +39,8 @@ __decorate([
     Property({
         type: 'string',
         fieldName: 'contraseña',
-        length: 255
+        length: 255,
+        hidden: true
     }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
