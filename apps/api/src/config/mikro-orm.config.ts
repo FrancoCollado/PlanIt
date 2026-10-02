@@ -39,6 +39,8 @@ export default defineConfig({
     ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: true }
   },
 
+  // El esquema se aplica con los scripts de migrations, no al conectar.
+  ensureDatabase: false,
 
   entities: [  
     User,
