@@ -15,28 +15,26 @@ import { Servicio } from '../entities/servicio.js';
 import { EventoCategoria } from '../entities/evento-categoria.js';
 import { Tablero } from '../entities/tablero.js';
 import { TableroServicio } from '../entities/tablero-servicio.js';
+import { SUPABASE_CA } from './supabase-ca.js';
 
 // config  MikroORM para la conectar la bd uso var del .env
 // DATABASE_URL (connection string de Supabase) tiene prioridad; si no está, se
 // arma la conexión con las variables sueltas.
 const clientUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
-// Supabase firma con su propia CA, así que hay que aportarla en DB_CA_CERT.
+// Supabase firma con su propia CA; el certificado viaja en el código para no
+// depender de variables multilínea. DB_CA_CERT permite sobrescribirlo.
 // DB_SSL=no-verify cifra pero no valida el certificado: sólo para depurar,
 // porque habilita ataques de intermediario.
 const resolveSsl = () => {
   if (process.env.DB_SSL === 'false') return false;
-
-  if (process.env.DB_CA_CERT) {
-    return { ca: process.env.DB_CA_CERT, rejectUnauthorized: true };
-  }
 
   if (process.env.DB_SSL === 'no-verify') {
     console.warn('DB_SSL=no-verify: el certificado del servidor no se valida');
     return { rejectUnauthorized: false };
   }
 
-  return { rejectUnauthorized: true };
+  return { ca: process.env.DB_CA_CERT || SUPABASE_CA, rejectUnauthorized: true };
 };
 
 export default defineConfig({
