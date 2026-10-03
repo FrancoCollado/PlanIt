@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CalendarDays, Users, Pencil, Trash2, Plus, Ban, RotateCcw, Building2, CalendarCheck2, FileEdit, Tags } from 'lucide-react';
-import Card from './card';
-import './dashboard.css';
+import Card from '../../../Card/Card';
+import './dashboard.scss';
 import {
   listEventosRequest,
   createEventoRequest,
@@ -38,12 +38,15 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
   // --- Estadísticas reales de la base de datos (MikroORM) para las tarjetas superiores ---
   const [stats, setStats] = useState<AdminStats>(statsVacias);
 
-  useEffect(() => {
-    getAdminStatsRequest(token)
-      .then(setStats)
-      .catch(() => setStats(statsVacias));
-  }, [token]);
+  function cargarStats() {
+  getAdminStatsRequest(token)
+    .then(setStats)
+    .catch(() => setStats(statsVacias));
+}
 
+useEffect(() => {
+  cargarStats();
+}, [token]);
   // Controla qué panel se muestra debajo de las tarjetas: 'eventos', 'categorias', 'perfiles' o ninguno (null)
   const [panelAbierto, setPanelAbierto] = useState<'eventos' | 'categorias' | 'perfiles' | null>(null);
 
@@ -116,7 +119,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
 
       await cargarEventos();
       cerrarFormEvento();
-      getAdminStatsRequest(token).then(setStats).catch(() => {});
+      cargarStats();
     } catch (error) {
       setErrorEventos(error instanceof Error ? error.message : 'Error al guardar el evento');
     }
@@ -129,7 +132,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     try {
       await deleteEventoRequest(evento.id, token);
       await cargarEventos();
-      getAdminStatsRequest(token).then(setStats).catch(() => {});
+      cargarStats();
     } catch (error) {
       setErrorEventos(error instanceof Error ? error.message : 'Error al eliminar el evento');
     }
@@ -254,7 +257,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     try {
       await setUsuarioActivoRequest(empresa.id, !empresa.activo, token);
       await cargarEmpresas();
-      getAdminStatsRequest(token).then(setStats).catch(() => {});
+      cargarStats();
     } catch (error) {
       setErrorEmpresas(error instanceof Error ? error.message : 'Error al actualizar el perfil');
     }
@@ -412,7 +415,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
                     Guardar como borrador
                   </label>
 
-                  <div className="admin-modal-actions">
+                  <div className="admin-form-actions">
                     <button type="button" onClick={cerrarFormEvento}>Cancelar</button>
                     <button type="submit">Guardar</button>
                   </div>
@@ -504,7 +507,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
                     </select>
                   </label>
 
-                  <div className="admin-modal-actions">
+                  <div className="admin-form-actions">
                     <button type="button" onClick={cerrarFormCategoria}>Cancelar</button>
                     <button type="submit">Guardar</button>
                   </div>

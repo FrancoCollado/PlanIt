@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Search, CalendarDays, Tags, Pencil } from 'lucide-react';
-import './dashboard.css';
+import './dashboard.scss';
 
 import {
   buscarServiciosRequest,

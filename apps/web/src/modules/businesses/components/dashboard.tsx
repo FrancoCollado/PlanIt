@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Boxes, Pencil, Trash2, Plus, PackageCheck, FileEdit, BookMarked, Tags, ChevronDown, ChevronUp } from 'lucide-react';
-
-import Card from './card';
-import './dashboard.css';
+import Card from '../../../Card/Card';
+import './dashboard.scss';
 import {
   listServiciosRequest,
   createServicioRequest,
@@ -15,9 +14,9 @@ import type { BusinessStats } from '../services/statsService';
 import { listCategoriasRequest } from '../../events/services/categoriaService';
 import type { Categoria } from '../../events/services/categoriaService';
 
+
 interface DashboardProps {
-  role?: string; // O role?: 'admin' | 'business' | 'client';
-  onLogout?: () => void; // Función que viene de App.tsx para "cerrar sesión"
+  onLogout?: () => void;
   usuarioId?: number;
   token: string;
 }

@@ -1,4 +1,4 @@
-import './HorizontalCard.css';
+import './HorizontalCard.scss';
 
 export interface HorizontalCardProps {
   category: string;

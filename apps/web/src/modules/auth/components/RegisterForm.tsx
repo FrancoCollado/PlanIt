@@ -1,26 +1,9 @@
 // apps/web/src/modules/auth/components/RegisterForm.tsx
 
 import React, { useState } from 'react';
-import styled from 'styled-components';
 
-import {
-  FormTitle,
-  FormSubtitle,
-  InputGroup,
-  Label,
-  ContenedorInput,
-  StyledInput,
-  OptionsRow,
-  CheckboxLabel,
-  PrimaryButton
-} from './LoginForm';
 import type { UserRole, AuthUser } from './LoginForm';
 import { registerRequest } from '../services/authService';
-
-
-const CompactInput = styled(StyledInput)`
-  padding: 0.6rem 1rem;
-`;
 
 interface RegisterFormProps {
   onRegisterSuccess?: (user?: AuthUser) => void;
@@ -40,7 +23,6 @@ const mapRolToUserRole = (rol: string): UserRole | null => {
   }
 };
 
-
 export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
 
   const [name, setName] = useState('');
@@ -55,7 +37,6 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
   const [telefono, setTelefono] = useState('');
 
   const [message, setMessage] = useState('');
-
 
   // Se ejecuta cuando presiono CREAR CUENTA
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -79,7 +60,13 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
         confirmPassword,
         acceptTerms,
         role,
-        ...(role === 'empresa' ? { zona, cuit: Number(cuit), telefono: Number(telefono) } : {})
+        ...(role === 'empresa'
+          ? {
+              zona,
+              cuit: Number(cuit),
+              telefono: Number(telefono)
+            }
+          : {})
       });
 
       // Registro correcto
@@ -97,116 +84,113 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
       setTelefono('');
 
       const rol = mapRolToUserRole(data.user.rol);
-      onRegisterSuccess?.(rol ? { id: data.user.id, nombre: data.user.nombre, role: rol, token: data.token } : undefined);
+
+      onRegisterSuccess?.(
+        rol
+          ? {
+              id: data.user.id,
+              nombre: data.user.nombre,
+              role: rol,
+              token: data.token
+            }
+          : undefined
+      );
 
     } catch (error) {
 
       console.error('Error al registrar usuario:', error);
 
-      setMessage(error instanceof Error ? error.message : 'No se pudo conectar con el servidor');
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo conectar con el servidor'
+      );
     }
   };
 
-
   return (
-
     <form onSubmit={handleSubmit}>
 
-      <FormTitle>
+      <h2 className="form-title">
         REGISTRARSE
-      </FormTitle>
+      </h2>
 
-
-      <FormSubtitle style={{ marginBottom: '1rem' }}>
+      <p
+        className="form-subtitle"
+        style={{ marginBottom: '1rem' }}
+      >
         ¿Sos nuevo? Crea tu cuenta.
-      </FormSubtitle>
+      </p>
 
+      <div className="input-group">
 
-      <InputGroup>
-
-        <Label>
+        <label>
           Nombre Completo
-        </Label>
+        </label>
 
-        <ContenedorInput>
+        <input
+          className="form-input compact-input"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-          <CompactInput
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+      </div>
 
-        </ContenedorInput>
+      <div className="input-group">
 
-      </InputGroup>
-
-
-      <InputGroup>
-
-        <Label>
+        <label>
           Correo Electrónico
-        </Label>
+        </label>
 
-        <ContenedorInput>
+        <input
+          className="form-input compact-input"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-          <CompactInput
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+      </div>
 
-        </ContenedorInput>
+      <div className="input-group">
 
-      </InputGroup>
-
-
-      <InputGroup>
-
-        <Label>
+        <label>
           Contraseña
-        </Label>
+        </label>
 
-        <ContenedorInput>
+        <input
+          className="form-input compact-input"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <CompactInput
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+      </div>
 
-        </ContenedorInput>
+      <div className="input-group">
 
-      </InputGroup>
-
-
-      <InputGroup>
-
-        <Label>
+        <label>
           Confirmar Contraseña
-        </Label>
+        </label>
 
-        <ContenedorInput>
+        <input
+          className="form-input compact-input"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
 
-          <CompactInput
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+      </div>
 
-        </ContenedorInput>
+      <div className="input-group">
 
-      </InputGroup>
-
-
-      <InputGroup>
-
-        <Label>
+        <label>
           Tipo de cuenta
-        </Label>
+        </label>
 
-        <OptionsRow>
+        <div className="options-row">
 
-          <CheckboxLabel>
+          <label className="checkbox-label">
             <input
               type="radio"
               name="role"
@@ -214,9 +198,9 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
               onChange={() => setRole('cliente')}
             />
             Cliente
-          </CheckboxLabel>
+          </label>
 
-          <CheckboxLabel>
+          <label className="checkbox-label">
             <input
               type="radio"
               name="role"
@@ -224,60 +208,67 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
               onChange={() => setRole('empresa')}
             />
             Empresa
-          </CheckboxLabel>
+          </label>
 
-        </OptionsRow>
+        </div>
 
-      </InputGroup>
-
+      </div>
 
       {role === 'empresa' && (
         <>
-          <InputGroup>
-            <Label>
+          <div className="input-group">
+
+            <label>
               Zona
-            </Label>
-            <ContenedorInput>
-              <CompactInput
-                type="text"
-                value={zona}
-                onChange={(e) => setZona(e.target.value)}
-              />
-            </ContenedorInput>
-          </InputGroup>
+            </label>
 
-          <InputGroup>
-            <Label>
+            <input
+              className="form-input compact-input"
+              type="text"
+              value={zona}
+              onChange={(e) => setZona(e.target.value)}
+            />
+
+          </div>
+
+          <div className="input-group">
+
+            <label>
               CUIT
-            </Label>
-            <ContenedorInput>
-              <CompactInput
-                type="number"
-                value={cuit}
-                onChange={(e) => setCuit(e.target.value)}
-              />
-            </ContenedorInput>
-          </InputGroup>
+            </label>
 
-          <InputGroup>
-            <Label>
+            <input
+              className="form-input compact-input"
+              type="number"
+              value={cuit}
+              onChange={(e) => setCuit(e.target.value)}
+            />
+
+          </div>
+
+          <div className="input-group">
+
+            <label>
               Teléfono
-            </Label>
-            <ContenedorInput>
-              <CompactInput
-                type="number"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-              />
-            </ContenedorInput>
-          </InputGroup>
+            </label>
+
+            <input
+              className="form-input compact-input"
+              type="number"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+            />
+
+          </div>
         </>
       )}
 
+      <div
+        className="options-row"
+        style={{ marginBottom: '1rem' }}
+      >
 
-      <OptionsRow style={{ marginBottom: '1rem' }}>
-
-        <CheckboxLabel>
+        <label className="checkbox-label">
 
           <input
             type="checkbox"
@@ -287,18 +278,16 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
 
           Acepto Términos y Condiciones
 
-        </CheckboxLabel>
+        </label>
 
-      </OptionsRow>
+      </div>
 
-
-      <PrimaryButton
+      <button
+        className="primary-button register-button"
         type="submit"
-        color="#f3d736"
       >
         CREAR CUENTA
-      </PrimaryButton>
-
+      </button>
 
       {message && (
         <p>{message}</p>
