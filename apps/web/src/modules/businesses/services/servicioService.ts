@@ -1,4 +1,5 @@
 import { API_URL } from '../../../config/api';
+import { supabase, SERVICIOS_IMAGENES_BUCKET } from '../../../config/supabase';
 
 export interface Servicio {
   id: number;
@@ -20,6 +21,25 @@ export interface ServicioPayload {
   categoriaId: number;
   draft?: boolean;
 }
+
+// Sube el archivo a Supabase Storage y devuelve la URL pública para guardar en `imagen`.
+export const subirImagenServicioRequest = async (usuarioId: number, file: File): Promise<string> => {
+  const extension = file.name.split('.').pop() ?? 'jpg';
+  const path = `${usuarioId}/${crypto.randomUUID()}.${extension}`;
+
+  const { error } = await supabase.storage
+    .from(SERVICIOS_IMAGENES_BUCKET)
+    .upload(path, file, { upsert: false });
+
+  if (error) {
+    throw new Error(error.message || 'Error al subir la imagen');
+  }
+
+  const { data } = supabase.storage.from(SERVICIOS_IMAGENES_BUCKET).getPublicUrl(path);
+
+  return data.publicUrl;
+};
+
 
 export const listServiciosRequest = async (usuarioId: number, token: string): Promise<Servicio[]> => {
   const response = await fetch(`${API_URL}/api/servicios?usuarioId=${usuarioId}`, {

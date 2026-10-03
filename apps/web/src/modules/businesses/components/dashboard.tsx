@@ -6,7 +6,8 @@ import {
   listServiciosRequest,
   createServicioRequest,
   updateServicioRequest,
-  deleteServicioRequest
+  deleteServicioRequest,
+  subirImagenServicioRequest
 } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
 import { getBusinessStatsRequest } from '../services/statsService';
@@ -58,6 +59,25 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
   const [mostrarFormServicio, setMostrarFormServicio] = useState(false);
   const [servicioEnEdicion, setServicioEnEdicion] = useState<Servicio | null>(null);
   const [formServicio, setFormServicio] = useState(servicioVacio);
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
+
+  async function seleccionarImagen(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !usuarioId) return;
+
+    setSubiendoImagen(true);
+    setErrorServicios('');
+
+    try {
+      const url = await subirImagenServicioRequest(usuarioId, file);
+      setFormServicio((prev) => ({ ...prev, imagen: url }));
+    } catch (error) {
+      setErrorServicios(error instanceof Error ? error.message : 'Error al subir la imagen');
+    } finally {
+      setSubiendoImagen(false);
+      e.target.value = '';
+    }
+  }
 
   async function cargarServicios() {
     if (!usuarioId) return;
@@ -288,13 +308,22 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
                     </label>
 
                     <label>
-                      Imagen (URL)
+                      Imagen
                       <input
-                        type="text"
-                        value={formServicio.imagen}
-                        onChange={(e) => setFormServicio({ ...formServicio, imagen: e.target.value })}
+                        type="file"
+                        accept="image/*"
+                        onChange={seleccionarImagen}
+                        disabled={subiendoImagen}
                       />
                     </label>
+                    {subiendoImagen && <p>Subiendo imagen...</p>}
+                    {formServicio.imagen && (
+                      <img
+                        src={formServicio.imagen}
+                        alt="Vista previa"
+                        className="biz-form-imagen-preview"
+                      />
+                    )}
 
                     <label>
                       Categoría
@@ -321,7 +350,7 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
 
                     <div className="biz-form-actions">
                       <button type="button" onClick={cerrarFormServicio}>Cancelar</button>
-                      <button type="submit">Guardar</button>
+                      <button type="submit" disabled={subiendoImagen}>Guardar</button>
                     </div>
                   </form>
                 </>

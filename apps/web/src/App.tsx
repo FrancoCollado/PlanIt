@@ -44,7 +44,6 @@ export default function App() {
   return (
     <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
       <Dashboard
-        role={userRole}
         usuarioId={authUser.id}
         token={authUser.token}
         onLogout={() => setAuthUser(null)}

@@ -41,13 +41,13 @@ export const buscarServiciosPorNombre = async (
   return em.find(
     Servicio,
     {
-      ...(nombre && { nombre: { $like: `%${nombre}%` } }),
+      ...(nombre && { nombre: { $ilike: `%${nombre}%` } }),
       draft: false,
       usuario: {
         rol: 'empresa',
         activo: true,
-        ...(zona && { zona: { $like: `%${zona}%` } }),
-        ...(empresa && { nombre: { $like: `%${empresa}%` } })
+        ...(zona && { zona: { $ilike: `%${zona}%` } }),
+        ...(empresa && { nombre: { $ilike: `%${empresa}%` } })
       }
     },
     {
