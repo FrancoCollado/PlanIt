@@ -20,6 +20,7 @@ import { listUsuariosRequest, setUsuarioActivoRequest } from '../services/usuari
 import type { Usuario } from '../services/usuarioService';
 import { getAdminStatsRequest } from '../services/statsService';
 import type { AdminStats } from '../services/statsService';
+import { formatearTitulo } from '../../../shared/formatters';
 
 interface AdminDashboardProps {
   token: string;
@@ -110,11 +111,13 @@ useEffect(() => {
     e.preventDefault();
     setErrorEventos('');
 
+    const payload = { ...formEvento, nombre: formatearTitulo(formEvento.nombre) };
+
     try {
       if (eventoEnEdicion) {
-        await updateEventoRequest(eventoEnEdicion.id, formEvento, token);
+        await updateEventoRequest(eventoEnEdicion.id, payload, token);
       } else {
-        await createEventoRequest(formEvento, token);
+        await createEventoRequest(payload, token);
       }
 
       await cargarEventos();

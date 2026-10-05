@@ -18,7 +18,7 @@ interface LoginFormProps {
 }
 
 // Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
-const mapRolToUserRole = (rol: string): UserRole | null => {
+export const mapRolToUserRole = (rol: string): UserRole | null => {
   switch (rol.trim().toLowerCase()) {
     case 'administrador':
       return 'admin';

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import type { UserRole, AuthUser } from './LoginForm';
 import { registerRequest } from '../services/authService';
+import { esEmailValido } from '../../../shared/validators';
 
 interface RegisterFormProps {
   onRegisterSuccess?: (user?: AuthUser) => void;
@@ -45,6 +46,11 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
     e.preventDefault();
 
     setMessage('');
+
+    if (!esEmailValido(email)) {
+      setMessage('Ingresá un email válido');
+      return;
+    }
 
     if (role === 'empresa' && (!zona || !cuit || !telefono)) {
       setMessage('Zona, CUIT y teléfono son requeridos para cuentas de empresa');

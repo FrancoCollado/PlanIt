@@ -14,6 +14,7 @@ import { getBusinessStatsRequest } from '../services/statsService';
 import type { BusinessStats } from '../services/statsService';
 import { listCategoriasRequest } from '../../events/services/categoriaService';
 import type { Categoria } from '../../events/services/categoriaService';
+import { formatearTitulo } from '../../../shared/formatters';
 
 
 interface DashboardProps {
@@ -148,10 +149,12 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
     }
 
     try {
+      const payload = { ...formServicio, nombre: formatearTitulo(formServicio.nombre) };
+
       if (servicioEnEdicion) {
-        await updateServicioRequest(servicioEnEdicion.id, usuarioId, formServicio, token);
+        await updateServicioRequest(servicioEnEdicion.id, usuarioId, payload, token);
       } else {
-        await createServicioRequest(usuarioId, formServicio, token);
+        await createServicioRequest(usuarioId, payload, token);
       }
 
       await cargarServicios();
