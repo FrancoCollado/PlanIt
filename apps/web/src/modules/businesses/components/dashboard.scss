@@ -12,11 +12,14 @@ h2{
 }
 
 /* Barra de arriba */
+/* Le pongo wrap para que en el celular el boton baje y no se achique */
 .barra-superior-empresa {
   background-color: #0e0541;
   color: white;
   padding: 15px 20px;
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: space-between;
   align-items: center;
 }
@@ -51,7 +54,11 @@ h2{
 }
 
 /* Botones del menu */
+/* Mobile first: en el celular van uno abajo del otro */
 .menu-empresa {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 25px;
 }
 
@@ -60,13 +67,20 @@ h2{
   color: white;
   border: 1px solid #ffffff;
   padding: 14px 26px;
-  margin: 0 6px;
   font-size: 16px;
   cursor: pointer;
 }
 
 .boton-menu-empresa:hover {
   background-color: #1a237e;
+}
+
+/* De 768px para arriba (tablet y compu) los pongo uno al lado del otro */
+@media (min-width: 768px) {
+  .menu-empresa {
+    flex-direction: row;
+    justify-content: center;
+  }
 }
 
 /* Mensajes */
@@ -178,21 +192,40 @@ h2{
   margin: 0;
 }
 
+/* Cada fila de la lista */
+/* Mobile first: el texto arriba y los botones abajo asi no se aplastan */
 .item-lista-empresa {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   border-bottom: 1px solid #cccccc;
   padding: 10px 0;
   font-size: 15px;
+}
+
+/* Los botones no se achican ni se cortan */
+.botones-item-empresa {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
 }
 
 .botones-item-empresa button {
   background-color: #0e0541;
   color: white;
   border: none;
-  margin-left: 6px;
   padding: 5px 12px;
   font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+/* En compu el texto y los botones van en la misma linea */
+@media (min-width: 768px) {
+  .item-lista-empresa {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
