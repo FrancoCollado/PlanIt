@@ -8,10 +8,10 @@
   min-height: 100vh;
   flex: 1;
   box-sizing: border-box;
+  background-color: rgb(198, 194, 194)
 }
 
 .admin-main {
-  background-color: vars.$color-blanco;
   padding: 20px;
 }
 
@@ -19,11 +19,10 @@
    MARCO SUPERIOR
    ========================================== */
 .admin-hero {
-  background: linear-gradient(135deg, #1e293b 0%, #1d4ed8 100%);
+  background: #222431;
   border-radius: 12px;
   padding: 1.75rem 2rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.25);
 
   #admin-subtitulo {
     margin: 0.5rem 0 0 0.75rem;
@@ -42,20 +41,18 @@
 .admin-dashboard-title {
   margin: 0;
   padding-left: 0.75rem;
-  border-left: 6px solid #60a5fa;
   font-size: 2rem;
   font-weight: 800;
-  color: vars.$color-blanco;
+  color: white
 }
 
 .admin-boton-logout {
-  border: 1px solid rgba(255, 255, 255, 0.3);
+
   background-color: rgba(255, 255, 255, 0.1);
-  color: vars.$color-blanco;
+  color: white;
   border-radius: 6px;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
-  cursor: pointer;
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
@@ -77,33 +74,7 @@
   }
 }
 
-#admin-empresas-activas {
-  .card-accent,
-  .card-icon-lucide {
-    background-color: #0f766e;
-  }
-}
 
-#admin-eventos-publicados {
-  .card-accent,
-  .card-icon-lucide {
-    background-color: #15803d;
-  }
-}
-
-#admin-eventos-borrador {
-  .card-accent,
-  .card-icon-lucide {
-    background-color: #b45309;
-  }
-}
-
-#admin-clientes-registrados {
-  .card-accent,
-  .card-icon-lucide {
-    background-color: #1d4ed8;
-  }
-}
 
 /* ==========================================
    TARJETAS DE ACCIONES
@@ -132,23 +103,20 @@
   gap: 0.5rem;
   padding: 2rem 1rem;
 
-  background-color: vars.$color-blanco;
+  background-color:white;
   border: 1px solid vars.$color-borde;
   border-top: 4px solid #2563eb;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   cursor: pointer;
   font-family: inherit;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   }
 
   &.admin-accion-card-activa {
     border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
   }
 
   .admin-accion-icono {
@@ -267,18 +235,18 @@
   margin-left: 0.5rem;
   padding: 0.1rem 0.5rem;
 
-  border-radius: 999px;
+ 
   font-size: 0.7rem;
   font-weight: 600;
 
   &.es-borrador {
-    background-color: #fef3c7;
-    color: #92400e;
+    background-color: #e5bd20;
+    color: #0c0c0c;
   }
 
   &.publicado {
-    background-color: #d1fae5;
-    color: #065f46;
+    background-color: #3cb448;
+    color: #070707;
   }
 }
 
@@ -324,7 +292,7 @@
 
     cursor: pointer;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
 
     &:hover {
       border-color: #93c5fd;
@@ -332,7 +300,6 @@
 
     &:focus {
       border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
   }
 }
@@ -352,7 +319,6 @@
   background-color: vars.$color-blanco;
   border: 1px solid vars.$color-borde;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .admin-panel-header {

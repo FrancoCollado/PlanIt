@@ -1,14 +1,12 @@
-// apps/web/src/modules/auth/components/AuthCard.tsx
 
 import React from 'react';
 import './AuthCard.scss';
 
 interface AuthCardProps {
-  loginForm: React.ReactNode;
-  registerForm: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const AuthCard: React.FC<AuthCardProps> = ({ loginForm, registerForm }) => {
+export const AuthCard: React.FC<AuthCardProps> = ({ children }) => {
   return (
     <div className="auth-card">
       <div className="auth-logo">
@@ -17,9 +15,9 @@ export const AuthCard: React.FC<AuthCardProps> = ({ loginForm, registerForm }) =
       </div>
 
       <div className="auth-columns">
-        <div className="auth-column">{loginForm}</div>
-        <div className="auth-divider" />
-        <div className="auth-column">{registerForm}</div>
+        <div className="auth-column">
+          {children}
+        </div>
       </div>
     </div>
   );

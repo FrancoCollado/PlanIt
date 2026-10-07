@@ -7,7 +7,7 @@
   min-height: 100vh;
   flex: 1;
   box-sizing: border-box;
-  background-color: #f8fafc;
+  background-color: #747678;
 }
 
 .cliente-main {
@@ -27,13 +27,12 @@
   align-items: center;
   gap: 1rem;
 
-  background: linear-gradient(135deg, #1e293b 0%, #1d4ed8 100%);
+  background: #272a31 ;
 
   border-radius: 12px;
   padding: 1.5rem 2rem;
   margin-bottom: 2rem;
 
-  box-shadow: 0 8px 20px rgba(29, 78, 216, 0.20);
 }
 
 .cliente-titulo {
@@ -58,7 +57,7 @@
   border-radius: 6px;
   padding: 0.5rem 1rem;
   font-size: 0.85rem;
-  cursor: pointer;
+ 
   transition: background-color 0.2s ease;
 }
 
@@ -79,13 +78,13 @@
 
 .cliente-buscador-seccion h2 {
   margin: 0;
-  color: #1f2937;
+  color: #050505;
   font-size: 1.6rem;
 }
 
 .cliente-buscador-seccion p {
   margin: 0.4rem 0 1.2rem;
-  color: #6b7280;
+  color: #070707;
   font-size: 0.9rem;
 }
 
@@ -99,11 +98,7 @@
   background-color: #ffffff;
   border: 1px solid #d1d5db;
   border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
 .cliente-buscador:focus-within {
@@ -119,7 +114,7 @@
   border: none;
   outline: none;
   background-color: transparent;
-  color: #1f2937;
+  color: #0e0e0f;
   font-family: inherit;
   font-size: 1rem;
 }
@@ -138,7 +133,7 @@
   border-radius: 50%;
   background-color: #2563eb;
   color: #ffffff;
-  cursor: pointer;
+  
   flex-shrink: 0;
 }
 
@@ -157,7 +152,7 @@
 .cliente-filtros label {
   display: grid;
   gap: 0.3rem;
-  color: #334155;
+  color: #0a0a0a;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -170,7 +165,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: #fff;
-  color: #1f2937;
+  color: #000000;
   font: inherit;
 }
 
@@ -212,16 +207,11 @@
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
 
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
 }
 
 .cliente-servicio-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
 }
 
 .cliente-servicio-imagen {
@@ -229,7 +219,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 100%);
+  background:  #757882;
   color: #2563eb;
 }
 
@@ -248,7 +238,7 @@
   margin-bottom: 0.5rem;
   padding: 0.15rem 0.55rem;
   background-color: #eff6ff;
-  color: #1d4ed8;
+  color: #1944ba;
   border-radius: 999px;
   font-size: 0.7rem;
   font-weight: 600;
@@ -328,7 +318,7 @@
   font: inherit;
   font-size: 0.85rem;
   font-weight: 600;
-  cursor: pointer;
+
 }
 
 .cliente-accion:hover {
@@ -418,7 +408,7 @@
   border: 0;
   background: transparent;
   color: #34495e;
-  cursor: pointer;
+
   padding: 0.5rem;
 }
 
@@ -488,27 +478,19 @@
   padding: 2rem 1.5rem;
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
-  border-top: 4px solid #2563eb;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   font-family: inherit;
   text-align: center;
-  cursor: pointer;
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+
 }
 
 .cliente-opcion-tableros {
-  background-color: #f6f5b0e6;
+  background-color: #909d74;
 }
 
 .cliente-opcion-card:hover {
   transform: translateY(-4px);
-  border-color: #eb2c25;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
 }
 
 .cliente-opcion-card:focus {
@@ -547,7 +529,7 @@
 
 .cliente-opcion-card h2 {
   margin: 0.15rem 0 0.75rem;
-  color: #1f2937;
+  color: #040404;
   font-size: 1.5rem;
   font-weight: 800;
 }
@@ -571,7 +553,7 @@
 }
 
 .cliente-opcion-card:hover .cliente-opcion-boton {
-  background-color: #1d4ed8;
+  background-color: #080808;
 }
 
 
@@ -615,7 +597,7 @@
   padding: 0.5rem 0.8rem;
   font-family: inherit;
   font-size: 0.85rem;
-  cursor: pointer;
+  
 }
 
 .cliente-volver:hover {
@@ -650,14 +632,8 @@
   font-size: 0.9rem;
   font-weight: 600;
   text-align: left;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
-
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    background-color 0.15s ease,
-    box-shadow 0.15s ease;
+  
+ 
 }
 
 .cliente-categoria-card svg {
@@ -669,7 +645,7 @@
   transform: translateY(-2px);
   border-color: #93c5fd;
   background-color: #f8fbff;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.09);
+
 }
 
 .cliente-categoria-card:focus {

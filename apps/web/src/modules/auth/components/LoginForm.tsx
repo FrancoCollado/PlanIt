@@ -13,11 +13,9 @@ export interface AuthUser {
 
 interface LoginFormProps {
   onLoginSuccess?: (user: AuthUser) => void;
-  onGoogleLogin?: () => void;
-  onFacebookLogin?: () => void;
+  onRegisterClick?: () => void;
 }
 
-// Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
 export const mapRolToUserRole = (rol: string): UserRole | null => {
   switch (rol.trim().toLowerCase()) {
     case 'administrador':
@@ -31,13 +29,15 @@ export const mapRolToUserRole = (rol: string): UserRole | null => {
   }
 };
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({
+  onLoginSuccess,
+  onRegisterClick,
+}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Autenticación real contra la API (tabla `usuarios`)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
@@ -74,6 +74,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
       <div className="input-group">
         <label>Correo Electrónico</label>
+
         <input
           className="form-input"
           type="text"
@@ -86,6 +87,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
       <div className="input-group">
         <label>Contraseña</label>
+
         <input
           className="form-input"
           type="password"
@@ -118,6 +120,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       <button className="primary-button" type="submit">
         INGRESAR AL SISTEMA
       </button>
+
+      <p className="form-subtitle">
+        ¿No tenés cuenta?{' '}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onRegisterClick?.();
+          }}
+        >
+          Registrate
+        </a>
+      </p>
     </form>
   );
 };

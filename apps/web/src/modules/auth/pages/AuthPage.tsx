@@ -1,6 +1,6 @@
 // apps/web/src/modules/auth/pages/AuthPage.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AuthCard } from '../components/AuthCard';
 import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
@@ -12,22 +12,33 @@ interface AuthPageProps {
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
-  // Al registrarse con éxito, si conocemos el usuario, lo dejamos logueado directamente
+  const [view, setView] = useState<'login' | 'register'>('login');
+
   const handleRegisterSuccess = (user?: AuthUser) => {
-    if (user) onLoginSuccess?.(user);
+    if (user) {
+      onLoginSuccess?.(user);
+    }
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page">en
       <div className="auth-background" />
 
-      <AuthCard
-        loginForm={<LoginForm onLoginSuccess={onLoginSuccess} />}
-        registerForm={<RegisterForm onRegisterSuccess={handleRegisterSuccess} />}
-      />
+      <AuthCard>
+        {view === 'login' ? (
+          <LoginForm
+            onLoginSuccess={onLoginSuccess}
+            onRegisterClick={() => setView('register')}
+          />
+        ) : (
+          <RegisterForm
+            onRegisterSuccess={handleRegisterSuccess}
+            onLoginClick={() => setView('login')}
+          />
+        )}
+      </AuthCard>
     </div>
   );
 };
 
 export default AuthPage;
-

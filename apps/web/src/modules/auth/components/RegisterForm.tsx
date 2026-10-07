@@ -1,5 +1,3 @@
-// apps/web/src/modules/auth/components/RegisterForm.tsx
-
 import React, { useState } from 'react';
 
 import type { UserRole, AuthUser } from './LoginForm';
@@ -8,6 +6,7 @@ import { esEmailValido } from '../../../shared/validators';
 
 interface RegisterFormProps {
   onRegisterSuccess?: (user?: AuthUser) => void;
+  onLoginClick?: () => void;
 }
 
 // Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
@@ -24,7 +23,10 @@ const mapRolToUserRole = (rol: string): UserRole | null => {
   }
 };
 
-export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
+export const RegisterForm = ({
+  onRegisterSuccess,
+  onLoginClick
+}: RegisterFormProps) => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -289,7 +291,7 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
       </div>
 
       <button
-        className="primary-button register-button"
+        className="primary-button "
         type="submit"
       >
         CREAR CUENTA
@@ -298,6 +300,19 @@ export const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
       {message && (
         <p>{message}</p>
       )}
+
+      <p className="form-subtitle">
+        ¿Ya tenés una cuenta?{' '}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onLoginClick?.();
+          }}
+        >
+          Iniciá sesión
+        </a>
+      </p>
 
     </form>
   );
