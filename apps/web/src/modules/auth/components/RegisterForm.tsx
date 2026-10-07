@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
 
-import type { UserRole, AuthUser } from './LoginForm';
-import { registerRequest } from '../services/authService';
+import type { UsuarioRol, UsuarioAutenticado } from './LoginForm';
+import { RegistrarUsuario } from '../services/authService';
 import { esEmailValido } from '../../../shared/validators';
 
 interface RegisterFormProps {
-  onRegisterSuccess?: (user?: AuthUser) => void;
+  alSolicitarRegistro?: (user?: UsuarioAutenticado) => void;
   onLoginClick?: () => void;
 }
 
-// Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UserRole interno
-const mapRolToUserRole = (rol: string): UserRole | null => {
+// Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UsuarioRol interno
+const mapRolToUserRole = (rol: string): UsuarioRol | null => {
   switch (rol.trim().toLowerCase()) {
     case 'administrador':
       return 'admin';
     case 'empresa':
-      return 'business';
+      return 'empresa';
     case 'cliente':
-      return 'client';
+      return 'cliente';
     default:
       return null;
   }
 };
 
 export const RegisterForm = ({
-  onRegisterSuccess,
+  alSolicitarRegistro,
   onLoginClick
 }: RegisterFormProps) => {
 
@@ -34,7 +34,7 @@ export const RegisterForm = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  const [role, setRole] = useState<'cliente' | 'empresa'>('cliente');
+  const [role, setRole] = useState<'cliente' | 'empresa'>('cliente'); //este rol solo puede ser cliente o empresa, no admin.
   const [zona, setZona] = useState('');
   const [cuit, setCuit] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -42,7 +42,7 @@ export const RegisterForm = ({
   const [message, setMessage] = useState('');
 
   // Se ejecuta cuando presiono CREAR CUENTA
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const ManejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
 
     // Evita que el navegador recargue la página
     e.preventDefault();
@@ -61,13 +61,13 @@ export const RegisterForm = ({
 
     try {
 
-      const data = await registerRequest({
-        name,
-        email,
-        password,
-        confirmPassword,
-        acceptTerms,
-        role,
+      const data = await RegistrarUsuario({
+        name: name,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        acceptTerms: acceptTerms,
+        role: role,
         ...(role === 'empresa'
           ? {
               zona,
@@ -93,7 +93,7 @@ export const RegisterForm = ({
 
       const rol = mapRolToUserRole(data.user.rol);
 
-      onRegisterSuccess?.(
+      alSolicitarRegistro?.(
         rol
           ? {
               id: data.user.id,
@@ -117,7 +117,7 @@ export const RegisterForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={ManejarEnvio}>
 
       <h2 className="form-title">
         REGISTRARSE

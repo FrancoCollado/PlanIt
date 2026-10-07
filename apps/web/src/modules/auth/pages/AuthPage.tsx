@@ -2,21 +2,21 @@
 
 import React, { useState } from 'react';
 import { AuthCard } from '../components/AuthCard';
-import { LoginForm } from '../components/LoginForm';
+import { FormularioLogin } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
-import type { AuthUser } from '../components/LoginForm';
+import type { UsuarioAutenticado} from '../components/LoginForm';
 import './AuthPage.scss';
 
 interface AuthPageProps {
-  onLoginSuccess?: (user: AuthUser) => void;
+  alIniciarSesion?: (user: UsuarioAutenticado) => void;
 }
 
-export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
+export const AuthPage: React.FC<AuthPageProps> = ({ alIniciarSesion }) => {
   const [view, setView] = useState<'login' | 'register'>('login');
 
-  const handleRegisterSuccess = (user?: AuthUser) => {
+  const handleRegisterSuccess = (user?: UsuarioAutenticado) => {
     if (user) {
-      onLoginSuccess?.(user);
+      alIniciarSesion?.(user);
     }
   };
 
@@ -26,13 +26,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
 
       <AuthCard>
         {view === 'login' ? (
-          <LoginForm
-            onLoginSuccess={onLoginSuccess}
-            onRegisterClick={() => setView('register')}
+          <FormularioLogin
+            alIniciarSesion={alIniciarSesion}
+            alSolicitarRegistro={() => setView('register')}
           />
         ) : (
           <RegisterForm
-            onRegisterSuccess={handleRegisterSuccess}
+            alSolicitarRegistro={handleRegisterSuccess}
             onLoginClick={() => setView('login')}
           />
         )}

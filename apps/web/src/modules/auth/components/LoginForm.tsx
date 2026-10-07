@@ -1,71 +1,79 @@
 import React, { useState } from 'react';
 import { loginRequest } from '../services/authService';
-import './LoginForm.scss';
+import './FormularioLogin.scss';
 
-export type UserRole = 'admin' | 'business' | 'client';
+// Tipos de  roles
+export type UsuarioRol = 'admin' | 'empresa' | 'cliente';
 
-export interface AuthUser {
+export interface UsuarioAutenticado { //Un usuario autenticado tiene estas cuatro propiedades.
   id: number;
   nombre: string;
-  role: UserRole;
+  role: UsuarioRol; 
   token: string;
 }
 
-interface LoginFormProps {
-  onLoginSuccess?: (user: AuthUser) => void;
-  onRegisterClick?: () => void;
+interface PropiedadesFormularioLogin {
+  alIniciarSesion?: (usuario: UsuarioAutenticado) => void;
+  alSolicitarRegistro?: () => void;
 }
 
-export const mapRolToUserRole = (rol: string): UserRole | null => {
+
+// Función para mapear el rol del usuario recibido del backend a los roles de la app
+export const mapRolToUserRole = (rol: string): UsuarioRol | null => {
   switch (rol.trim().toLowerCase()) {
     case 'administrador':
       return 'admin';
     case 'empresa':
-      return 'business';
+      return 'empresa';
     case 'cliente':
-      return 'client';
+      return 'cliente';
     default:
       return null;
   }
 };
 
-export const LoginForm: React.FC<LoginFormProps> = ({
-  onLoginSuccess,
-  onRegisterClick,
+export const FormularioLogin: React.FC<PropiedadesFormularioLogin> = ({
+  alIniciarSesion,
+  alSolicitarRegistro,
 }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [recordarSesion, setRecordarSesion] = useState(false);
+  const [mensajeError, setMensajeError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
+  const manejarEnvio = async (evento: React.FormEvent) => {
+    evento.preventDefault();
+    setMensajeError('');
 
     try {
-      const { user, token } = await loginRequest(email.trim(), password);
-      const rol = mapRolToUserRole(user.rol);
+      const respuesta = await loginRequest(correo.trim(), contrasena); // Llamada a la función de loginRequest para autenticar al usuario
+      const usuario = respuesta.user;
+      const token = respuesta.token;
 
-      if (!rol) {
-        setErrorMessage('Rol de usuario desconocido');
+      const rol = mapRolToUserRole(usuario.rol);
+
+      if (!rol) { //Si no tengo rol valido:
+        setMensajeError('Rol de usuario desconocido');
         return;
       }
 
-      onLoginSuccess?.({
-        id: user.id,
-        nombre: user.nombre,
+      alIniciarSesion?.({
+        id: usuario.id,
+        nombre: usuario.nombre,
         role: rol,
-        token,
+        token: token,
       });
-    } catch (error) {
-      setErrorMessage(
-        error instanceof Error ? error.message : 'No se pudo iniciar sesión',
-      );
+    } catch (errorInicioSesion) {
+      if (errorInicioSesion instanceof Error) {
+        setMensajeError(errorInicioSesion.message);
+      } else {
+        setMensajeError('No se pudo iniciar sesión');
+      }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={manejarEnvio}>
       <h2 className="form-title">INICIAR SESIÓN</h2>
 
       <p className="form-subtitle">
@@ -79,8 +87,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           className="form-input"
           type="text"
           placeholder="Tu correo o usuario"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={correo}
+          onChange={(evento) => setCorreo(evento.target.value)} // Llamada a la función setCorreo para actualizar el estado del correo
           required
         />
       </div>
@@ -92,8 +100,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           className="form-input"
           type="password"
           placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={contrasena}
+          onChange={(evento) => setContrasena(evento.target.value)} // Llamada a la función setContrasena para actualizar el estado de la contraseña
           required
         />
       </div>
@@ -102,8 +110,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <label className="checkbox-label">
           <input
             type="checkbox"
-            checked={remember}
-            onChange={(e) => setRemember(e.target.checked)}
+            checked={recordarSesion}
+            onChange={(evento) => setRecordarSesion(evento.target.checked)} // Llamada a la función setRecordarSesion para actualizar el estado del checkbox
           />
           Recordar sesión
         </label>
@@ -113,8 +121,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </a>
       </div>
 
-      {errorMessage && (
-        <p className="error-text">{errorMessage}</p>
+      {mensajeError && (
+        <p className="error-text">{mensajeError}</p>
       )}
 
       <button className="primary-button" type="submit">
@@ -125,9 +133,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         ¿No tenés cuenta?{' '}
         <a
           href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onRegisterClick?.();
+          onClick={(evento) => {
+            evento.preventDefault();
+            alSolicitarRegistro?.();
           }}
         >
           Registrate
