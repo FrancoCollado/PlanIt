@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import { Boxes, Pencil, Trash2, Plus, PackageCheck, FileEdit, BookMarked, Tags, ChevronDown, ChevronUp } from 'lucide-react';
-import Card from '../../../Card/Card';
+import { useState } from 'react';
 import './dashboard.scss';
 import {
   listServiciosRequest,
@@ -10,358 +8,271 @@ import {
   subirImagenServicioRequest
 } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
-import { getBusinessStatsRequest } from '../services/statsService';
-import type { BusinessStats } from '../services/statsService';
 import { listCategoriasRequest } from '../../events/services/categoriaService';
 import type { Categoria } from '../../events/services/categoriaService';
 import { formatearTitulo } from '../../../shared/formatters';
 
-
+// Props que me manda App.tsx (el id de la empresa, el token y la funcion de salir)
 interface DashboardProps {
   onLogout?: () => void;
   usuarioId?: number;
   token: string;
 }
 
+// Objeto vacio para resetear el formulario
 const servicioVacio = { nombre: '', descripcion: '', imagen: '', categoriaId: 0, draft: true };
-const statsVacias: BusinessStats = {
-  serviciosActivos: 0,
-  serviciosBorrador: 0,
-  vecesGuardadoEnTableros: 0,
-  categoriasPresentes: 0
-};
 
 export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps) {
-  function volverAIniciarSesion() {
-    onLogout?.();
-  }
+  // Esta variable dice si se esta mostrando la lista de servicios
+  const [seccion, setSeccion] = useState<'servicios' | null>(null);
 
-  // --- Estadísticas reales de la base de datos (MikroORM) para las tarjetas superiores ---
-  const [stats, setStats] = useState<BusinessStats>(statsVacias);
-
-  function cargarStats() {
-    if (!usuarioId) return;
-    getBusinessStatsRequest(usuarioId, token).then(setStats).catch(() => {});
-  }
-
-  useEffect(() => {
-    cargarStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [usuarioId, token]);
-
-  // --- Gestión de servicios propios de la empresa (CRUD real contra la API con MikroORM) ---
-  const [desplegado, setDesplegado] = useState(false);
+  // --- SERVICIOS ---
   const [servicios, setServicios] = useState<Servicio[]>([]);
-  const [cargandoServicios, setCargandoServicios] = useState(false);
-  const [errorServicios, setErrorServicios] = useState('');
-
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
-
-  const [mostrarFormServicio, setMostrarFormServicio] = useState(false);
-  const [servicioEnEdicion, setServicioEnEdicion] = useState<Servicio | null>(null);
+  const [formServicioVisible, setFormServicioVisible] = useState(false);
+  const [servicioEditando, setServicioEditando] = useState<Servicio | null>(null);
   const [formServicio, setFormServicio] = useState(servicioVacio);
   const [subiendoImagen, setSubiendoImagen] = useState(false);
 
-  async function seleccionarImagen(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !usuarioId) return;
+  // Las categorias las crea el admin, yo solo las uso para el select
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
 
-    setSubiendoImagen(true);
-    setErrorServicios('');
+  // Uso un solo mensaje de error para todo asi no me complico
+  const [mensaje, setMensaje] = useState('');
+
+  // Traigo los servicios de la empresa de la base de datos
+  async function cargarServicios() {
+    if (!usuarioId) return;
 
     try {
-      const url = await subirImagenServicioRequest(usuarioId, file);
-      setFormServicio((prev) => ({ ...prev, imagen: url }));
-    } catch (error) {
-      setErrorServicios(error instanceof Error ? error.message : 'Error al subir la imagen');
+      const datos = await listServiciosRequest(usuarioId, token);
+      setServicios(datos);
+    } catch {
+      setMensaje('No se pudieron cargar los servicios');
+    }
+  }
+
+  async function cargarCategorias() {
+    try {
+      const datos = await listCategoriasRequest(token);
+      setCategorias(datos);
+    } catch {
+      setCategorias([]);
+    }
+  }
+
+  // Cuando toco el boton del menu muestro la seccion y traigo los datos
+  function mostrarServicios() {
+    setMensaje('');
+    setSeccion('servicios');
+    setFormServicioVisible(false);
+    cargarServicios();
+    cargarCategorias();
+  }
+
+  // Subo la imagen al servidor y me guardo la url que me devuelve
+  async function seleccionarImagen(e: React.ChangeEvent<HTMLInputElement>) {
+    const archivo = e.target.files?.[0];
+    if (!archivo || !usuarioId) return;
+
+    setSubiendoImagen(true);
+    setMensaje('');
+
+    try {
+      const url = await subirImagenServicioRequest(usuarioId, archivo);
+      setFormServicio({ ...formServicio, imagen: url });
+    } catch {
+      setMensaje('No se pudo subir la imagen');
     } finally {
       setSubiendoImagen(false);
       e.target.value = '';
     }
   }
 
-  async function cargarServicios() {
-    if (!usuarioId) return;
-    setCargandoServicios(true);
-    setErrorServicios('');
-
-    try {
-      const data = await listServiciosRequest(usuarioId, token);
-      setServicios(data);
-    } catch (error) {
-      setErrorServicios(error instanceof Error ? error.message : 'Error al cargar los servicios');
-    } finally {
-      setCargandoServicios(false);
-    }
-  }
-
-  async function cargarCategorias() {
-    try {
-      const data = await listCategoriasRequest(token);
-      setCategorias(data);
-    } catch {
-      setCategorias([]);
-    }
-  }
-
-  function alternarDesplegado() {
-    if (!desplegado) {
-      setMostrarFormServicio(false);
-      cargarServicios();
-      cargarCategorias();
-    }
-    setDesplegado(!desplegado);
-  }
-
-  function abrirCrearServicio() {
-    setServicioEnEdicion(null);
-    setFormServicio({ ...servicioVacio, categoriaId: categorias[0]?.id ?? 0 });
-    setMostrarFormServicio(true);
-  }
-
-  function abrirEditarServicio(servicio: Servicio) {
-    setServicioEnEdicion(servicio);
-    setFormServicio({
-      nombre: servicio.nombre,
-      descripcion: servicio.descripcion ?? '',
-      imagen: servicio.imagen ?? '',
-      categoriaId: servicio.categoria.id,
-      draft: servicio.draft
-    });
-    setMostrarFormServicio(true);
-  }
-
-  function cerrarFormServicio() {
-    setMostrarFormServicio(false);
-    setServicioEnEdicion(null);
-    setFormServicio(servicioVacio);
-  }
-
+  // Guarda un servicio nuevo o edita el que estoy tocando
   async function guardarServicio(e: React.FormEvent) {
     e.preventDefault();
-    setErrorServicios('');
+    setMensaje('');
 
     if (!usuarioId) return;
 
     if (!formServicio.categoriaId) {
-      setErrorServicios('Tenés que elegir una categoría para el servicio');
+      setMensaje('Tenes que elegir una categoria');
       return;
     }
 
+    const datos = { ...formServicio, nombre: formatearTitulo(formServicio.nombre) };
+
     try {
-      const payload = { ...formServicio, nombre: formatearTitulo(formServicio.nombre) };
-
-      if (servicioEnEdicion) {
-        await updateServicioRequest(servicioEnEdicion.id, usuarioId, payload, token);
+      if (servicioEditando) {
+        await updateServicioRequest(servicioEditando.id, usuarioId, datos, token);
       } else {
-        await createServicioRequest(usuarioId, payload, token);
+        await createServicioRequest(usuarioId, datos, token);
       }
-
       await cargarServicios();
-      cerrarFormServicio();
-      cargarStats();
-    } catch (error) {
-      setErrorServicios(error instanceof Error ? error.message : 'Error al guardar el servicio');
+      setFormServicioVisible(false);
+      setServicioEditando(null);
+      setFormServicio(servicioVacio);
+    } catch {
+      setMensaje('No se pudo guardar el servicio');
     }
   }
 
   async function borrarServicio(servicio: Servicio) {
     if (!usuarioId) return;
 
-    const confirmado = window.confirm(`¿Seguro que querés borrar el servicio "${servicio.nombre}"? Esta acción no se puede deshacer.`);
-    if (!confirmado) return;
+    // Pregunto antes porque sino se borra de una
+    if (!window.confirm('Seguro que queres borrar el servicio ' + servicio.nombre + '?')) return;
 
     try {
       await deleteServicioRequest(servicio.id, usuarioId, token);
       await cargarServicios();
-      cargarStats();
-    } catch (error) {
-      setErrorServicios(error instanceof Error ? error.message : 'Error al eliminar el servicio');
+    } catch {
+      setMensaje('No se pudo borrar el servicio');
     }
   }
 
   return (
-    <div className="biz-container">
-      <main className="biz-main">
-        {/* Encabezado: título, botón de logout y bajada, todo dentro de un mismo marco */}
-        <div className="biz-hero">
-          <div className="biz-dashboard-header">
-            <h1 className="biz-dashboard-title">Dashboard</h1>
-            <button className="biz-boton-logout" onClick={volverAIniciarSesion}>
-              Volver a iniciar sesión
-            </button>
+    <div className="pagina-empresa">
+      {/* Barra de arriba con el nombre de la pagina y el boton de salir */}
+      <div className="barra-superior-empresa">
+        <h1 className="titulo-pagina-empresa">PlanIt - Empresa</h1>
+        <button className="boton-salir-empresa" onClick={() => onLogout?.()}>Cerrar sesion</button>
+      </div>
+
+      <div className="contenido-empresa">
+        <h2 className="bienvenida-empresa">Bienvenido a Planit, empresa</h2>
+
+        {/* Menu (por ahora la empresa solo puede manejar sus servicios) */}
+        <div className="menu-empresa">
+          <button className="boton-menu-empresa" onClick={mostrarServicios}>Servicios</button>
+        </div>
+
+        {/* Si hubo algun error lo muestro aca */}
+        {mensaje !== '' && <p className="mensaje-error-empresa">{mensaje}</p>}
+
+        {/* Si todavia no toque el boton muestro un texto */}
+        {seccion === null && <p className="texto-ayuda-empresa">Elegi una opcion del menu para empezar.</p>}
+
+        {/* SECCION DE SERVICIOS */}
+        {seccion === 'servicios' && (
+          <div className="caja-empresa">
+            <h2 className="subtitulo-empresa">Lista de servicios</h2>
+
+            {!formServicioVisible && (
+              <button
+                className="boton-nuevo-empresa"
+                onClick={() => {
+                  setServicioEditando(null);
+                  // Si hay categorias pongo la primera por defecto
+                  setFormServicio({ ...servicioVacio, categoriaId: categorias[0]?.id ?? 0 });
+                  setFormServicioVisible(true);
+                }}
+                disabled={categorias.length === 0}
+              >
+                Agregar servicio
+              </button>
+            )}
+
+            {/* El formulario sirve para crear y para editar, cambia el titulo nomas */}
+            {formServicioVisible && (
+              <form className="formulario-empresa" onSubmit={guardarServicio}>
+                <h3>{servicioEditando ? 'Editar servicio' : 'Nuevo servicio'}</h3>
+
+                <label>Nombre</label>
+                <input
+                  type="text"
+                  value={formServicio.nombre}
+                  onChange={(e) => setFormServicio({ ...formServicio, nombre: e.target.value })}
+                  required
+                />
+
+                <label>Descripcion</label>
+                <textarea
+                  value={formServicio.descripcion}
+                  onChange={(e) => setFormServicio({ ...formServicio, descripcion: e.target.value })}
+                />
+
+                <label>Imagen</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={seleccionarImagen}
+                  disabled={subiendoImagen}
+                />
+
+                {subiendoImagen && <p className="texto-ayuda-empresa">Subiendo imagen...</p>}
+
+                {/* Muestro la imagen chiquita para ver si subio bien */}
+                {formServicio.imagen !== '' && (
+                  <img src={formServicio.imagen} alt="Imagen del servicio" className="imagen-previa-empresa" />
+                )}
+
+                <label>Categoria</label>
+                <select
+                  value={formServicio.categoriaId}
+                  onChange={(e) => setFormServicio({ ...formServicio, categoriaId: Number(e.target.value) })}
+                  required
+                >
+                  <option value={0} disabled>Elegi una categoria</option>
+                  {categorias.map((categoria) => (
+                    <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>
+                  ))}
+                </select>
+
+                <label className="label-check-empresa">
+                  <input
+                    type="checkbox"
+                    checked={formServicio.draft}
+                    onChange={(e) => setFormServicio({ ...formServicio, draft: e.target.checked })}
+                  />
+                  Guardar como borrador
+                </label>
+
+                <div className="botones-formulario-empresa">
+                  <button type="submit" disabled={subiendoImagen}>Guardar</button>
+                  <button type="button" onClick={() => setFormServicioVisible(false)}>Cancelar</button>
+                </div>
+              </form>
+            )}
+
+            {categorias.length === 0 && (
+              <p className="texto-ayuda-empresa">Todavia no hay categorias, pedile al administrador que cree alguna.</p>
+            )}
+            {categorias.length > 0 && servicios.length === 0 && (
+              <p className="texto-ayuda-empresa">Todavia no cargaste ningun servicio.</p>
+            )}
+
+            {/* Recorro el array de servicios con map para mostrarlos */}
+            <ul className="lista-empresa">
+              {servicios.map((servicio) => (
+                <li key={servicio.id} className="item-lista-empresa">
+                  <span>
+                    <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} ({servicio.draft ? 'borrador' : 'publicado'})
+                  </span>
+                  <span className="botones-item-empresa">
+                    <button
+                      onClick={() => {
+                        setServicioEditando(servicio);
+                        setFormServicio({
+                          nombre: servicio.nombre,
+                          descripcion: servicio.descripcion ?? '',
+                          imagen: servicio.imagen ?? '',
+                          categoriaId: servicio.categoria.id,
+                          draft: servicio.draft
+                        });
+                        setFormServicioVisible(true);
+                      }}
+                    >
+                      Editar
+                    </button>
+                    <button onClick={() => borrarServicio(servicio)}>Borrar</button>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          <p className="biz-subtitulo">Observa tus estadísticas</p>
-        </div>
-
-        {/* TARJETAS SUPERIORES: estadísticas reales, calculadas en la base de datos con MikroORM */}
-        <div className="cards-grid">
-          <Card
-            id="biz-servicios-activos"
-            amount={String(stats.serviciosActivos)}
-            label="Servicios activos"
-            icon={<PackageCheck size={20} />}
-          />
-          <Card
-            id="biz-servicios-borrador"
-            amount={String(stats.serviciosBorrador)}
-            label="Servicios en borrador"
-            icon={<FileEdit size={20} />}
-          />
-          <Card
-            id="biz-guardados"
-            amount={String(stats.vecesGuardadoEnTableros)}
-            label="Guardados por clientes"
-            icon={<BookMarked size={20} />}
-          />
-          <Card
-            id="biz-categorias"
-            amount={String(stats.categoriasPresentes)}
-            label="Categorías presentes"
-            icon={<Tags size={20} />}
-          />
-        </div>
-
-        {/* Única acción de la empresa: una sola card "Gestionar Servicios" con su desplegable debajo */}
-        <section className={`biz-gestion-card ${desplegado ? 'biz-gestion-card-activa' : ''}`}>
-          <button className="biz-accion-card" onClick={alternarDesplegado} aria-expanded={desplegado}>
-            <Boxes size={32} className="biz-accion-icono" />
-            <h3 className="biz-accion-titulo">Gestionar Servicios</h3>
-            <p className="biz-accion-descripcion">Publicá tus servicios, guardalos como borrador o edítalos</p>
-            <span className="biz-accion-chevron">
-              {desplegado ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </span>
-          </button>
-
-          {desplegado && (
-            <div className="biz-panel">
-              {!mostrarFormServicio ? (
-                <>
-                  <div className="biz-panel-header">
-                    <h3 className="biz-panel-titulo">Tus servicios</h3>
-                    <div className="biz-panel-header-botones">
-                      <button className="biz-boton-crear" onClick={abrirCrearServicio} disabled={categorias.length === 0}>
-                        <Plus size={16} /> Nuevo servicio
-                      </button>
-                      <button className="biz-boton-cerrar-panel" onClick={alternarDesplegado}>Cerrar</button>
-                    </div>
-                  </div>
-
-                  {errorServicios && <p className="biz-error-text">{errorServicios}</p>}
-                  {cargandoServicios && <p>Cargando servicios...</p>}
-                  {!cargandoServicios && categorias.length === 0 && <p>Todavía no hay categorías cargadas; pedile al administrador que cree alguna antes de publicar servicios.</p>}
-                  {!cargandoServicios && categorias.length > 0 && servicios.length === 0 && <p>Todavía no publicaste ningún servicio.</p>}
-
-                  <div className="biz-servicios-grid">
-                    {servicios.map((servicio) => (
-                      <article key={servicio.id} className={`biz-servicio-card ${servicio.draft ? 'es-borrador' : 'publicado'}`}>
-                        <div className="biz-servicio-media">
-                          {servicio.imagen
-                            ? <img src={servicio.imagen} alt={servicio.nombre} />
-                            : <Boxes size={36} className="biz-servicio-media-icono" />}
-                          <span className={`biz-servicio-estado ${servicio.draft ? 'es-borrador' : 'publicado'}`}>
-                            {servicio.draft ? 'Borrador' : 'Publicado'}
-                          </span>
-                        </div>
-
-                        <div className="biz-servicio-body">
-                          <span className="biz-servicio-categoria">{servicio.categoria.nombre}</span>
-                          <h4 className="biz-servicio-nombre">{servicio.nombre}</h4>
-                          {servicio.descripcion && <p className="biz-servicio-descripcion">{servicio.descripcion}</p>}
-                        </div>
-
-                        <div className="biz-servicio-footer">
-                          <button className="biz-servicio-accion" onClick={() => abrirEditarServicio(servicio)}>
-                            <Pencil size={15} /> Editar
-                          </button>
-                          <button className="biz-servicio-accion biz-servicio-accion-borrar" onClick={() => borrarServicio(servicio)}>
-                            <Trash2 size={15} /> Borrar
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="biz-panel-header">
-                    <h3 className="biz-panel-titulo">{servicioEnEdicion ? 'Editar servicio' : 'Nuevo servicio'}</h3>
-                  </div>
-
-                  {errorServicios && <p className="biz-error-text">{errorServicios}</p>}
-
-                  <form onSubmit={guardarServicio} className="biz-form">
-                    <label>
-                      Nombre
-                      <input
-                        type="text"
-                        value={formServicio.nombre}
-                        onChange={(e) => setFormServicio({ ...formServicio, nombre: e.target.value })}
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Descripción
-                      <textarea
-                        value={formServicio.descripcion}
-                        onChange={(e) => setFormServicio({ ...formServicio, descripcion: e.target.value })}
-                      />
-                    </label>
-
-                    <label>
-                      Imagen
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={seleccionarImagen}
-                        disabled={subiendoImagen}
-                      />
-                    </label>
-                    {subiendoImagen && <p>Subiendo imagen...</p>}
-                    {formServicio.imagen && (
-                      <img
-                        src={formServicio.imagen}
-                        alt="Vista previa"
-                        className="biz-form-imagen-preview"
-                      />
-                    )}
-
-                    <label>
-                      Categoría
-                      <select
-                        value={formServicio.categoriaId}
-                        onChange={(e) => setFormServicio({ ...formServicio, categoriaId: Number(e.target.value) })}
-                        required
-                      >
-                        <option value={0} disabled>Elegí una categoría</option>
-                        {categorias.map((categoria) => (
-                          <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label className="biz-form-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={formServicio.draft}
-                        onChange={(e) => setFormServicio({ ...formServicio, draft: e.target.checked })}
-                      />
-                      Guardar como borrador
-                    </label>
-
-                    <div className="biz-form-actions">
-                      <button type="button" onClick={cerrarFormServicio}>Cancelar</button>
-                      <button type="submit" disabled={subiendoImagen}>Guardar</button>
-                    </div>
-                  </form>
-                </>
-              )}
-            </div>
-          )}
-        </section>
-      </main>
+        )}
+      </div>
     </div>
   );
 }

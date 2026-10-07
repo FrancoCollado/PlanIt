@@ -1,448 +1,138 @@
-import { useEffect, useState } from 'react';
-import { Search, CalendarDays, Tags, Pencil } from 'lucide-react';
+import { useState } from 'react';
 import './dashboard.scss';
+import { buscarServiciosRequest } from '../services/servicioService';
+import type { Servicio } from '../services/servicioService';
+import ItemServicio from './ItemServicio';
+import BuscarPorEvento from './BuscarPorEvento';
+import BuscarPorCategoria from './BuscarPorCategoria';
+import MisTableros from './MisTableros';
 
-import {
-  buscarServiciosRequest,
-  listEmpresasRequest
-} from '../services/servicioService';
-
-import type {
-  Empresa,
-  Servicio
-} from '../services/servicioService';
-
-import CategoriasPage from './CategoriasPage';
-import EventosPage from './EventosPage';
-import TablerosPage from './TablerosPage';
-import ServicioCard from './ServicioCard';
-
-
+// Props que me manda App.tsx (el nombre del cliente, el token y la funcion de salir)
 interface ClienteDashboardProps {
   nombreUsuario: string;
   token: string;
   onLogout?: () => void;
 }
 
+export default function DashboardCliente({ nombreUsuario, token, onLogout }: ClienteDashboardProps) {
+  // Esta variable dice que pantalla se esta mostrando
+  const [seccion, setSeccion] = useState<'buscar' | 'eventos' | 'categorias' | 'tableros' | null>(null);
 
-export default function ClienteDashboard({
-  nombreUsuario,
-  token,
-  onLogout
-}: ClienteDashboardProps) {
-
+  // --- BUSCADOR ---
   const [textoBusqueda, setTextoBusqueda] = useState('');
   const [zonaBusqueda, setZonaBusqueda] = useState('');
   const [empresaBusqueda, setEmpresaBusqueda] = useState('');
   const [servicios, setServicios] = useState<Servicio[]>([]);
-  const [buscando, setBuscando] = useState(false);
-  const [busquedaRealizada, setBusquedaRealizada] = useState(false);
-  const [errorBusqueda, setErrorBusqueda] = useState('');
+  const [busquedaHecha, setBusquedaHecha] = useState(false);
 
-  const [pantalla, setPantalla] =
-    useState<'inicio' | 'categorias' | 'eventos' | 'tableros'>('inicio');
+  // Uso un solo mensaje de error para todo asi no me complico
+  const [mensaje, setMensaje] = useState('');
 
-  // Alimenta el datalist del filtro: si falla, el input sigue siendo texto libre.
-  const [empresas, setEmpresas] = useState<Empresa[]>([]);
-
-  useEffect(() => {
-    listEmpresasRequest()
-      .then(setEmpresas)
-      .catch(() => setEmpresas([]));
-  }, []);
-
-
-  function volverAIniciarSesion() {
-    onLogout?.();
-  }
-
-
-  // ======================================================
-  // BUSCAR SERVICIOS POR NOMBRE
-  // ======================================================
-
+  // Busca los servicios con lo que escribi en los 3 campos
   async function buscarServicios(e: React.FormEvent) {
     e.preventDefault();
+    setMensaje('');
 
-    const texto = textoBusqueda.trim();
-
-    if (!texto && !zonaBusqueda.trim() && !empresaBusqueda.trim()) {
+    // Si no escribi nada en ningun campo no busco
+    if (textoBusqueda.trim() === '' && zonaBusqueda.trim() === '' && empresaBusqueda.trim() === '') {
       return;
     }
 
-    setBuscando(true);
-    setErrorBusqueda('');
-    setBusquedaRealizada(true);
+    setBusquedaHecha(true);
 
     try {
-
-      const resultados =
-        await buscarServiciosRequest(texto, zonaBusqueda, empresaBusqueda);
-
-      setServicios(resultados);
-
-    } catch (error) {
-
+      const datos = await buscarServiciosRequest(textoBusqueda.trim(), zonaBusqueda, empresaBusqueda);
+      setServicios(datos);
+    } catch {
       setServicios([]);
-
-      setErrorBusqueda(
-        error instanceof Error
-          ? error.message
-          : 'Error al buscar los servicios'
-      );
-
-    } finally {
-
-      setBuscando(false);
-
+      setMensaje('No se pudieron buscar los servicios');
     }
   }
 
+  function mostrarSeccion(nueva: 'buscar' | 'eventos' | 'categorias' | 'tableros') {
+    setMensaje('');
+    setSeccion(nueva);
+  }
 
   return (
-    <div className="cliente-container">
+    <div className="pagina-cliente">
+      {/* Barra de arriba con el nombre de la pagina y el boton de salir */}
+      <div className="barra-superior-cliente">
+        <h1 className="titulo-pagina-cliente">PlanIt - Cliente</h1>
+        <button className="boton-salir-cliente" onClick={() => onLogout?.()}>Cerrar sesion</button>
+      </div>
 
-      <main className="cliente-main">
+      <div className="contenido-cliente">
+        <h2 className="bienvenida-cliente">Bienvenido a planit,  {nombreUsuario}</h2>
 
-        {/* ==========================================
-            ENCABEZADO
-            ========================================== */}
-
-
-        <div className="cliente-header">
-
-          <div>
-
-            <h1 className="cliente-titulo">
-              PlanIt
-            </h1>
-
-            <p className="cliente-bienvenida">
-              Bienvenido {nombreUsuario}
-            </p>
-
-          </div>
-
-
-          <button
-            className="cliente-boton-logout"
-            onClick={volverAIniciarSesion}
-          >
-            Cerrar sesión
-          </button>
-
+        {/* Menu con los 4 botones principales */}
+        <div className="menu-cliente">
+          <button className="boton-menu-cliente" onClick={() => mostrarSeccion('buscar')}>Buscar servicio</button>
+          <button className="boton-menu-cliente" onClick={() => mostrarSeccion('eventos')}>Eventos</button>
+          <button className="boton-menu-cliente" onClick={() => mostrarSeccion('categorias')}>Categorias</button>
+          <button className="boton-menu-cliente" onClick={() => mostrarSeccion('tableros')}>Mis tableros</button>
         </div>
 
+        {/* Si hubo algun error lo muestro aca */}
+        {mensaje !== '' && <p className="mensaje-error-cliente">{mensaje}</p>}
 
-        {/* ==========================================
-            PANTALLA DE CATEGORÍAS
-            ========================================== */}
+        {/* Si todavia no toque ningun boton muestro un texto */}
+        {seccion === null && <p className="texto-ayuda-cliente">Elegi una opcion del menu para empezar.</p>}
 
-        {pantalla === 'categorias' && (
+        {/* SECCION DEL BUSCADOR */}
+        {seccion === 'buscar' && (
+          <div className="caja-cliente">
+            <h2 className="subtitulo-cliente">Buscar un servicio</h2>
 
-          <CategoriasPage
-            token={token}
-            onVolver={() => setPantalla('inicio')}
-          />
+            <form className="formulario-cliente" onSubmit={buscarServicios}>
+              <label>Nombre del servicio</label>
+              <input
+                type="text"
+                value={textoBusqueda}
+                onChange={(e) => setTextoBusqueda(e.target.value)}
+                placeholder="Por ejemplo: catering"
+              />
 
-        )}
+              <label>Zona de la empresa</label>
+              <input
+                type="text"
+                value={zonaBusqueda}
+                onChange={(e) => setZonaBusqueda(e.target.value)}
+                placeholder="Cualquier zona"
+              />
 
+              <label>Nombre de la empresa</label>
+              <input
+                type="text"
+                value={empresaBusqueda}
+                onChange={(e) => setEmpresaBusqueda(e.target.value)}
+                placeholder="Cualquier empresa"
+              />
 
-        {/* ==========================================
-            PANTALLA DE EVENTOS
-            ========================================== */}
+              <div className="botones-formulario-cliente">
+                <button type="submit">Buscar</button>
+              </div>
+            </form>
 
-        {pantalla === 'eventos' && (
-
-          <EventosPage
-            token={token}
-            onVolver={() => setPantalla('inicio')}
-          />
-
-        )}
-
-
-        {/* ==========================================
-            PANTALLA DE TABLEROS
-            ========================================== */}
-
-        {pantalla === 'tableros' && (
-
-          <TablerosPage
-            token={token}
-            onVolver={() => setPantalla('inicio')}
-          />
-
-        )}
-
-
-        {/* ==========================================
-            PANTALLA PRINCIPAL
-            ========================================== */}
-
-        {pantalla === 'inicio' && (
-          <>
-
-            {/* ==========================================
-                BUSCADOR DIRECTO
-                ========================================== */}
-
-            <section className="cliente-buscador-seccion">
-
-              <h2>
-                ¿Buscás algo específico?
-              </h2>
-
-              <p>
-                Buscá directamente el servicio que necesitás
-              </p>
-
-
-              <form onSubmit={buscarServicios}>
-
-                <div className="cliente-buscador">
-
-                  <input
-                    type="search"
-                    aria-label="Nombre del servicio"
-                    placeholder="Buscar servicios por nombre..."
-                    value={textoBusqueda}
-                    onChange={(e) => setTextoBusqueda(e.target.value)}
-                  />
-
-                  <button
-                    type="submit"
-                    className="cliente-buscador-boton"
-                    aria-label="Buscar servicios"
-                  >
-                    <Search size={22} />
-                  </button>
-
-                </div>
-
-
-                <div className="cliente-filtros">
-
-                  <label>
-                    Zona de la empresa
-
-                    <input
-                      type="search"
-                      value={zonaBusqueda}
-                      onChange={(e) => setZonaBusqueda(e.target.value)}
-                      placeholder="Cualquier zona"
-                    />
-                  </label>
-
-
-                  <label>
-                    Nombre de la empresa
-
-                    <input
-                      type="search"
-                      list="cliente-empresas"
-                      value={empresaBusqueda}
-                      onChange={(e) => setEmpresaBusqueda(e.target.value)}
-                      placeholder={empresas.length ? 'Elegí o escribí una empresa' : 'Cualquier empresa'}
-                    />
-
-                    <datalist id="cliente-empresas">
-                      {empresas.map((empresa) => (
-                        <option key={empresa.id} value={empresa.nombre}>
-                          {empresa.zona ?? ''}
-                        </option>
-                      ))}
-                    </datalist>
-                  </label>
-
-                </div>
-
-              </form>
-
-            </section>
-
-
-            {/* ==========================================
-                RESULTADOS DE BÚSQUEDA
-                ========================================== */}
-
-            {buscando && (
-
-              <p className="cliente-mensaje-busqueda">
-                Buscando servicios...
-              </p>
-
+            {/* Si ya busque y no encontre nada aviso */}
+            {busquedaHecha && servicios.length === 0 && (
+              <p className="texto-ayuda-cliente">No se encontraron servicios.</p>
             )}
 
-
-            {errorBusqueda && (
-
-              <p className="cliente-error-busqueda">
-                {errorBusqueda}
-              </p>
-
-            )}
-
-
-            {!buscando &&
-              busquedaRealizada &&
-              !errorBusqueda &&
-              servicios.length === 0 && (
-
-                <p className="cliente-mensaje-busqueda">
-                  No encontramos servicios con ese nombre.
-                </p>
-
-              )}
-
-
-            {!buscando &&
-              servicios.length > 0 && (
-
-                <section className="cliente-resultados">
-
-                  <h2 className="cliente-resultados-titulo">
-                    Servicios encontrados
-                  </h2>
-
-
-                  <div className="cliente-resultados-grid">
-
-                    {servicios.map((servicio) => (
-
-                      <ServicioCard
-                        key={servicio.id}
-                        servicio={servicio}
-                        token={token}
-                      />
-
-                    ))}
-
-                  </div>
-
-                </section>
-
-              )}
-
-
-            {/* ==========================================
-                FORMAS DE BÚSQUEDA
-                ========================================== */}
-
-            <section className="cliente-opciones">
-
-
-              {/* EVENTOS */}
-
-              <button
-                className="cliente-opcion-card"
-                onClick={() => setPantalla('eventos')}
-              >
-
-                <div className="cliente-opcion-icono">
-                  <CalendarDays size={42} />
-                </div>
-
-                <div className="cliente-opcion-numero">
-                  1
-                </div>
-
-                <span className="cliente-opcion-texto">
-                  Buscar servicio por
-                </span>
-
-                <h2>
-                  EVENTO
-                </h2>
-
-                <p>
-                  Elegí el tipo de evento y descubrí las categorías
-                  de servicios disponibles.
-                </p>
-
-                <span className="cliente-opcion-boton">
-                  Ver eventos
-                </span>
-
-              </button>
-
-
-              {/* CATEGORÍAS */}
-
-              <button
-                className="cliente-opcion-card"
-                onClick={() => setPantalla('categorias')}
-              >
-
-                <div className="cliente-opcion-icono">
-                  <Tags size={42} />
-                </div>
-
-                <div className="cliente-opcion-numero">
-                  2
-                </div>
-
-                <span className="cliente-opcion-texto">
-                  Buscar servicio por
-                </span>
-
-                <h2>
-                  CATEGORÍA
-                </h2>
-
-                <p>
-                  Explorá las categorías y encontrá los servicios
-                  disponibles en cada una.
-                </p>
-
-                <span className="cliente-opcion-boton">
-                  Ver categorías
-                </span>
-
-              </button>
-
-
-              {/* MIS TABLEROS */}
-
-              <button
-                className="cliente-opcion-card cliente-opcion-tableros"
-                onClick={() => setPantalla('tableros')}
-              >
-
-                <div className="cliente-opcion-icono">
-                  <Pencil size={42} />
-                </div>
-
-                <div className="cliente-opcion-numero">
-                  3
-                </div>
-
-                <span className="cliente-opcion-texto">
-                  Organizá tus servicios en
-                </span>
-
-                <h2>
-                  MIS TABLEROS
-                </h2>
-
-                <p>
-                  Creá y administrá tus tableros con los servicios
-                  que quieras guardar.
-                </p>
-
-                <span className="cliente-opcion-boton">
-                  Ver tableros
-                </span>
-
-              </button>
-
-            </section>
-
-          </>
+            {/* Recorro los servicios con map para mostrarlos */}
+            <ul className="lista-cliente">
+              {servicios.map((servicio) => (
+                <ItemServicio key={servicio.id} servicio={servicio} token={token} />
+              ))}
+            </ul>
+          </div>
         )}
 
-      </main>
-
+        {/* Las otras pantallas las hice en archivos aparte */}
+        {seccion === 'eventos' && <BuscarPorEvento token={token} onVolver={() => setSeccion(null)} />}
+        {seccion === 'categorias' && <BuscarPorCategoria token={token} onVolver={() => setSeccion(null)} />}
+        {seccion === 'tableros' && <MisTableros token={token} onVolver={() => setSeccion(null)} />}
+      </div>
     </div>
   );
 }

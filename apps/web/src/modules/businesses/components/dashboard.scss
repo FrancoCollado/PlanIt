@@ -1,437 +1,198 @@
-@use '../../../styles/variables' as vars;
+/* Estilos del dashboard de la empresa */
+/* Use los mismos colores que la pantalla de login para que no desentone */
 
-/* ==========================================
-   CONTENEDOR GENERAL
-   ========================================== */
-.biz-container {
-  width: 100%;
+h2{
+  color:#1a237e;
+}
+
+.pagina-empresa {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: white;
   min-height: 100vh;
-  flex: 1;
-  box-sizing: border-box;
 }
 
-.biz-main {
-  background-color: vars.$color-blanco;
-  padding: 20px;
-}
-
-/* ==========================================
-   MARCO SUPERIOR
-   ========================================== */
-.biz-hero {
-  background:  #222431;
-  border-radius: 12px;
-  padding: 2rem 2rem;
-  margin-bottom: 1.5rem;
-
-
-  .biz-subtitulo {
-    margin: 0.5rem 0 0 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.95rem;
-  }
-}
-
-.biz-dashboard-header {
+/* Barra de arriba */
+.barra-superior-empresa {
+  background-color: #0e0541;
+  color: white;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
 }
 
-.biz-dashboard-title {
+.titulo-pagina-empresa {
+  font-size: 20px;
   margin: 0;
-  padding-left: 0.75rem;
-  font-size: 2rem;
-  font-weight: 800;
-  color: vars.$color-blanco;
 }
 
-.biz-boton-logout {
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background-color: rgba(255, 255, 255, 0.1);
-  color: vars.$color-blanco;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
+.boton-salir-empresa {
+  background-color: #ffffff;
+  color: #0e0541;
+  border: 1px solid #ffffff;
+  padding: 6px 12px;
+  cursor: pointer;
 }
 
-/* ==========================================
-   TARJETAS DE ESTADÍSTICAS
-   Mobile first
-   ========================================== */
-.cards-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  margin-bottom: 30px;
-
-  @media (min-width: 769px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-
-
-/* ==========================================
-   GESTIONAR SERVICIOS
-   ========================================== */
-.biz-gestion-card {
-  margin-top: 1.5rem;
-  overflow: hidden;
-
-  background-color: vars.$color-blanco;
-  border: 1px solid vars.$color-borde;
-  border-top: 4px solid #2b3957;
-  border-radius: 8px;
-
-
-  &.biz-gestion-card-activa {
-    border-color: #2563eb;
-
-  }
-}
-
-.biz-accion-card {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Contenido principal de la pagina */
+/* Lo centro con margin auto y el text-align para que quede todo en el medio */
+.contenido-empresa {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
   text-align: center;
-  gap: 0.5rem;
-  padding: 2rem 1rem 1.25rem;
+}
 
-  background-color: vars.$color-blanco;
+/* El fondo es oscuro asi que las letras de afuera van en blanco */
+.bienvenida-empresa {
+  font-size: 20px;
+  margin-bottom: 25px;
+  color: #1a237e;
+}
+
+/* Botones del menu */
+.menu-empresa {
+  margin-bottom: 25px;
+}
+
+.boton-menu-empresa {
+  background-color: #0e0541;
+  color: white;
+  border: 1px solid #ffffff;
+  padding: 14px 26px;
+  margin: 0 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.boton-menu-empresa:hover {
+  background-color: #1a237e;
+}
+
+/* Mensajes */
+.mensaje-error-empresa {
+  color: #d70d0d;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.texto-ayuda-empresa {
+  color: #1a237e;
+  font-size: 15px;
+}
+
+/* Adentro de la caja el fondo es claro asi que el texto va mas oscuro */
+.caja-empresa .texto-ayuda-empresa {
+  color: #424242;
+}
+
+/* Caja gris clarita como la del login */
+/* Aca vuelvo a alinear a la izquierda porque arriba centre todo */
+.caja-empresa {
+  background-color: rgb(227, 225, 225);
+  border: 1px solid #cccccc;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.subtitulo-empresa {
+  font-size: 19px;
+  margin-top: 0;
+  color: #1a237e;
+}
+
+.boton-nuevo-empresa {
+  background-color: #1a237e;
+  color: white;
   border: none;
-  font-family: inherit;
-
-  .biz-accion-icono {
-    color: #2563eb;
-  }
-
-  .biz-accion-titulo {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: vars.$color-texto;
-  }
-
-  .biz-accion-descripcion {
-    margin: 0;
-    font-size: 0.85rem;
-    color: vars.$color-texto-secundario;
-  }
-
-  .biz-accion-chevron {
-    display: flex;
-    margin-top: 0.25rem;
-    color: #2563eb;
-  }
+  padding: 9px 16px;
+  margin-bottom: 15px;
+  font-size: 15px;
+  cursor: pointer;
 }
 
-/* ==========================================
-   PANEL DESPLEGABLE
-   ========================================== */
-.biz-panel {
-  border-top: 1px solid vars.$color-borde;
-  padding: 1.5rem;
+/* Formulario para crear o editar */
+.formulario-empresa {
+  border: 1px dashed #aaaaaa;
+  padding: 10px;
+  margin-bottom: 15px;
 }
 
-.biz-panel-header {
+.formulario-empresa label {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  color: #424242;
+}
+
+.formulario-empresa input[type="text"],
+.formulario-empresa textarea,
+.formulario-empresa select {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+}
+
+.formulario-empresa textarea {
+  height: 60px;
+}
+
+/* La imagen que subo la muestro chiquita */
+.imagen-previa-empresa {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid #cccccc;
+  margin-top: 8px;
+}
+
+/* El checkbox va al lado del texto, por eso lo pongo inline */
+.label-check-empresa {
+  margin-top: 10px;
+}
+
+.label-check-empresa input {
+  width: auto;
+  margin-right: 5px;
+}
+
+.botones-formulario-empresa {
+  margin-top: 12px;
+}
+
+.botones-formulario-empresa button {
+  background-color: #0e0541;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* Lista de servicios */
+.lista-empresa {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-lista-empresa {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  gap: 1rem;
-
-  .biz-panel-header-botones {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .biz-panel-titulo {
-    margin: 0;
-    color: vars.$color-texto;
-  }
+  border-bottom: 1px solid #cccccc;
+  padding: 10px 0;
+  font-size: 15px;
 }
 
-.biz-boton-cerrar-panel {
-  border: 1px solid vars.$color-borde;
-  background-color: vars.$color-blanco;
-  color: #374151;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-
-
-  &:hover {
-    background-color: #f3f4f6;
-  }
-}
-
-.biz-boton-crear {
+.botones-item-empresa button {
+  background-color: #0e0541;
+  color: white;
   border: none;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-
-  background-color: #2563eb;
-  color: vars.$color-blanco;
-
-  &:disabled {
-    background-color: #93c5fd;
-    cursor: not-allowed;
-  }
-}
-
-.biz-error-text {
-  color: #d32f2f;
-  font-size: 0.85rem;
-}
-
-/* ==========================================
-   CARDS DE SERVICIO
-   ========================================== */
-.biz-servicios-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
-}
-
-.biz-servicio-card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  background-color: vars.$color-blanco;
-  border: 1px solid vars.$color-borde;
-  border-radius: 12px;
- 
-
-
-
-  &:hover {
-    transform: translateY(-3px);
-  }
-
-  &.es-borrador {
-    .biz-servicio-media {
-      background:  #edbf08 ;
-    }
-
-    .biz-servicio-media-icono {
-      color: #b45309;
-    }
-  }
-}
-
-.biz-servicio-media {
-  position: relative;
-  height: 140px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background:  #1d8902;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .biz-servicio-media-icono {
-    color: #1d4ed8;
-    opacity: 0.6;
-  }
-}
-
-.biz-servicio-estado {
-  position: absolute;
-  top: 0.6rem;
-  left: 0.6rem;
-
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-
-
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-
-  &.publicado {
-    background-color: #d1fae5;
-    color: #065f46;
-  }
-
-  &.es-borrador {
-    background-color: #fef3c7;
-    color: #92400e;
-  }
-}
-
-.biz-servicio-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.9rem 1rem 0.5rem;
-}
-
-.biz-servicio-categoria {
-  align-self: flex-start;
-  padding: 0.15rem 0.55rem;
-
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  border-radius: 999px;
-
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.biz-servicio-nombre {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: vars.$color-texto;
-}
-
-.biz-servicio-descripcion {
-  margin: 0;
-  overflow: hidden;
-
-  font-size: 0.85rem;
-  color: vars.$color-texto-secundario;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.biz-servicio-footer {
-  display: flex;
-  border-top: 1px solid #f1f5f9;
-}
-
-.biz-servicio-accion {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-
-  padding: 0.6rem;
-  border: none;
-  background-color: transparent;
-  color: #374151;
-
-  font-size: 0.85rem;
-  font-family: inherit;
-
-
-  &:hover {
-    background-color: #f3f4f6;
-    color: #1d4ed8;
-  }
-
-  & + & {
-    border-left: 1px solid #f1f5f9;
-  }
-
-  &.biz-servicio-accion-borrar:hover {
-    background-color: #fef2f2;
-    color: #b91c1c;
-  }
-}
-
-/* ==========================================
-   FORMULARIO
-   ========================================== */
-.biz-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-
-  label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.85rem;
-    color: #4b5563;
-  }
-
-  .biz-form-checkbox {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .biz-form-imagen-preview {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid vars.$color-borde;
-  }
-
-  input,
-  textarea {
-    border: 1px solid vars.$color-borde;
-    border-radius: 6px;
-    padding: 0.5rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-  }
-
-  select {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 0.65rem 0.75rem;
-
-    font-size: 0.9rem;
-    font-family: inherit;
-    color: #374151;
-    background-color: vars.$color-blanco;
-
-    outline: none;
-
-
-    &:hover {
-      border-color: #93c5fd;
-    }
-
-    &:focus {
-      border-color: #2563eb;
-
-    }
-  }
-}
-
-.biz-form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1rem;
-
-  button {
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-
-    background-color: vars.$color-borde;
-    color: #374151;
-
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
+  margin-left: 6px;
+  padding: 5px 12px;
+  font-size: 14px;
+  cursor: pointer;
 }
