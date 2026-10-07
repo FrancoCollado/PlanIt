@@ -9,7 +9,6 @@ import { Tablero } from '../entities/tablero.js';
 import { TableroServicio } from '../entities/tablero-servicio.js';
 import { hashPassword } from '../modules/auth/services/auth.service.js';
 
-const dryRun = process.argv.includes('--dry-run');
 const confirm = process.argv.includes('--confirm');
 const password = 'PlanItDemo2026!';
 
@@ -51,122 +50,116 @@ const boards = [
   { key: 'bodaLuis', cliente: 'cliente2', evento: 'boda', nombre: '[Demo] Boda de Luis' }
 ];
 
-class DryRunRollback extends Error {}
-
 async function main() {
   if (process.env.NODE_ENV === 'production') throw new Error('No se permite cargar datos demo en produccion');
-  if (!dryRun && !confirm) throw new Error('Usa --dry-run para probar o --confirm para insertar datos demo');
+  if (!confirm) throw new Error('Usa --confirm para insertar los datos demo');
 
   const orm = await MikroORM.init({ ...mikroOrmConfig, debug: false });
   const created = { usuarios: 0, eventos: 0, categorias: 0, eventoCategoria: 0, servicios: 0, tableros: 0, tableroServicio: 0 };
   const passwordHash = await hashPassword(password);
+  const em = orm.em.fork();
 
   try {
-    await orm.em.transactional(async em => {
-      const demoUsers: Record<string, User> = {};
-      const demoEvents: Record<string, Evento> = {};
-      const demoCategories: Record<string, Categoria> = {};
-      const demoServices: Record<string, Servicio> = {};
-      const demoBoards: Record<string, Tablero> = {};
+    const demoUsers: Record<string, User> = {};
+    const demoEvents: Record<string, Evento> = {};
+    const demoCategories: Record<string, Categoria> = {};
+    const demoServices: Record<string, Servicio> = {};
+    const demoBoards: Record<string, Tablero> = {};
 
-      for (const data of users) {
-        let user = await em.findOne(User, { email: data.email });
-        if (user && user.rol !== data.rol) throw new Error(`Rol inesperado para ${data.email}`);
-        if (!user) {
-          user = em.create(User, {
-            nombre: data.nombre, email: data.email, password: passwordHash, rol: data.rol,
-            activo: data.activo, zona: data.zona, cuit: data.cuit, telefono: data.telefono
-          });
-          em.persist(user);
-          created.usuarios++;
-        }
-        demoUsers[data.key] = user;
+    for (const data of users) {
+      let user = await em.findOne(User, { email: data.email });
+      if (user && user.rol !== data.rol) throw new Error(`Rol inesperado para ${data.email}`);
+      if (!user) {
+        user = em.create(User, {
+          nombre: data.nombre, email: data.email, password: passwordHash, rol: data.rol,
+          activo: data.activo, zona: data.zona, cuit: data.cuit, telefono: data.telefono
+        });
+        em.persist(user);
+        created.usuarios++;
       }
-      await em.flush();
+      demoUsers[data.key] = user;
+    }
+    await em.flush();
 
-      for (const data of events) {
-        let event = await em.findOne(Evento, { nombre: data.nombre });
-        if (!event) {
-          event = em.create(Evento, { nombre: data.nombre, descripcion: data.descripcion, draft: data.draft, creadoEn: new Date() });
-          em.persist(event);
-          created.eventos++;
-        }
-        demoEvents[data.key] = event;
+    for (const data of events) {
+      let event = await em.findOne(Evento, { nombre: data.nombre });
+      if (!event) {
+        event = em.create(Evento, { nombre: data.nombre, descripcion: data.descripcion, draft: data.draft, creadoEn: new Date() });
+        em.persist(event);
+        created.eventos++;
       }
-      await em.flush();
+      demoEvents[data.key] = event;
+    }
+    await em.flush();
 
-      for (const data of categories) {
-        const event = demoEvents[data.evento];
-        let category = await em.findOne(Categoria, { evento: event, nombre: data.nombre });
-        if (!category) {
-          category = em.create(Categoria, { evento: event, nombre: data.nombre, creadoEn: new Date() });
-          em.persist(category);
-          created.categorias++;
-        }
-        demoCategories[data.key] = category;
+    for (const data of categories) {
+      const event = demoEvents[data.evento];
+      let category = await em.findOne(Categoria, { evento: event, nombre: data.nombre });
+      if (!category) {
+        category = em.create(Categoria, { evento: event, nombre: data.nombre, creadoEn: new Date() });
+        em.persist(category);
+        created.categorias++;
       }
-      await em.flush();
+      demoCategories[data.key] = category;
+    }
+    await em.flush();
 
-      for (const data of categories) {
-        const event = demoEvents[data.evento];
-        const category = demoCategories[data.key];
-        if (!await em.findOne(EventoCategoria, { evento: event, categoria: category })) {
-          em.persist(em.create(EventoCategoria, { evento: event, categoria: category }));
-          created.eventoCategoria++;
-        }
+    for (const data of categories) {
+      const event = demoEvents[data.evento];
+      const category = demoCategories[data.key];
+      if (!await em.findOne(EventoCategoria, { evento: event, categoria: category })) {
+        em.persist(em.create(EventoCategoria, { evento: event, categoria: category }));
+        created.eventoCategoria++;
       }
-      await em.flush();
+    }
+    await em.flush();
 
-      for (const data of services) {
-        const category = demoCategories[data.categoria];
-        const company = demoUsers[data.empresa];
-        let service = await em.findOne(Servicio, { categoria: category, usuario: company, nombre: data.nombre });
-        if (!service) {
-          service = em.create(Servicio, {
-            categoria: category, usuario: company, nombre: data.nombre,
-            descripcion: `Servicio de prueba de ${company.nombre}`, draft: data.draft, creadoEn: new Date()
-          });
-          em.persist(service);
-          created.servicios++;
-        }
-        demoServices[data.key] = service;
+    for (const data of services) {
+      const category = demoCategories[data.categoria];
+      const company = demoUsers[data.empresa];
+      let service = await em.findOne(Servicio, { categoria: category, usuario: company, nombre: data.nombre });
+      if (!service) {
+        service = em.create(Servicio, {
+          categoria: category, usuario: company, nombre: data.nombre,
+          descripcion: `Servicio de prueba de ${company.nombre}`, draft: data.draft, creadoEn: new Date()
+        });
+        em.persist(service);
+        created.servicios++;
       }
-      await em.flush();
+      demoServices[data.key] = service;
+    }
+    await em.flush();
 
-      for (const data of boards) {
-        const client = demoUsers[data.cliente];
-        let board = await em.findOne(Tablero, { cliente: client, nombre: data.nombre });
-        if (!board) {
-          board = em.create(Tablero, { cliente: client, evento: demoEvents[data.evento], nombre: data.nombre, fechaCreacion: new Date() });
-          em.persist(board);
-          created.tableros++;
-        }
-        demoBoards[data.key] = board;
+    for (const data of boards) {
+      const client = demoUsers[data.cliente];
+      let board = await em.findOne(Tablero, { cliente: client, nombre: data.nombre });
+      if (!board) {
+        board = em.create(Tablero, { cliente: client, evento: demoEvents[data.evento], nombre: data.nombre, fechaCreacion: new Date() });
+        em.persist(board);
+        created.tableros++;
       }
-      await em.flush();
+      demoBoards[data.key] = board;
+    }
+    await em.flush();
 
-      const savedServices = [
-        { board: 'bodaAna', service: 'djCentro' },
-        { board: 'bodaAna', service: 'comida' },
-        { board: 'cumpleAna', service: 'djNorte' },
-        { board: 'bodaLuis', service: 'djNorte' }
-      ];
-      for (const data of savedServices) {
-        const board = demoBoards[data.board];
-        const service = demoServices[data.service];
-        if (!await em.findOne(TableroServicio, { tablero: board, servicio: service })) {
-          em.persist(em.create(TableroServicio, { tablero: board, servicio: service, guardadoEn: new Date() }));
-          created.tableroServicio++;
-        }
+    const savedServices = [
+      { board: 'bodaAna', service: 'djCentro' },
+      { board: 'bodaAna', service: 'comida' },
+      { board: 'cumpleAna', service: 'djNorte' },
+      { board: 'bodaLuis', service: 'djNorte' }
+    ];
+    for (const data of savedServices) {
+      const board = demoBoards[data.board];
+      const service = demoServices[data.service];
+      if (!await em.findOne(TableroServicio, { tablero: board, servicio: service })) {
+        em.persist(em.create(TableroServicio, { tablero: board, servicio: service, guardadoEn: new Date() }));
+        created.tableroServicio++;
       }
-      await em.flush();
-      console.log(dryRun ? 'Registros que se crearian:' : 'Registros creados:', created);
-      if (dryRun) throw new DryRunRollback();
-    });
+    }
+    await em.flush();
+
+    console.log('Registros creados:', created);
     console.log(`Usuarios demo: *@planit-demo.invalid | contrasena inicial: ${password}`);
-  } catch (error) {
-    if (!(dryRun && error instanceof DryRunRollback)) throw error;
-    console.log('Simulacion finalizada: no se guardaron cambios.');
   } finally {
     await orm.close();
   }

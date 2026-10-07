@@ -3,8 +3,7 @@ import { Request, Response } from 'express';
 import { listEmpresasActivas, listUsuariosByRol, setUsuarioActivo } from '../services/usuario.service.js';
 import { respondWithError, sendApiError } from '../../../shared/api-error.js';
 
-// Endpoint público: expone sólo los datos de contacto que el cliente ya ve en las
-// cards de servicios, nunca email, CUIT ni estado de la cuenta.
+// Devuelve los datos públicos de las empresas activas
 export const getEmpresas = async (_req: Request, res: Response) => {
   try {
     const empresas = await listEmpresasActivas();

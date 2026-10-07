@@ -9,9 +9,9 @@ import AdminDashboard from './modules/admin/components/dashboard';
 import type { UsuarioAutenticado } from './modules/auth/components/LoginForm';
 
 export default function App() {
-  const [UsuarioAutenticado, setUsuarioAutenticado] = useState<UsuarioAutenticado | null>(null);
+  const [usuarioAutenticado, setUsuarioAutenticado] = useState<UsuarioAutenticado | null>(null);
 
-  if (!UsuarioAutenticado) {
+  if (!usuarioAutenticado) {
     return (
       <main className="w-full min-h-screen">
         <AuthPage alIniciarSesion={(user) => setUsuarioAutenticado(user)} />
@@ -19,15 +19,15 @@ export default function App() {
     );
   }
 
-  const userRole = UsuarioAutenticado.role;
+  const userRole = usuarioAutenticado.role;
 
   // CLIENTE
-  if (userRole === 'client') {
+  if (userRole === 'cliente') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
         <ClienteDashboard
-          nombreUsuario={UsuarioAutenticado.nombre}
-          token={UsuarioAutenticado.token}
+          nombreUsuario={usuarioAutenticado.nombre}
+          token={usuarioAutenticado.token}
           onLogout={() => setUsuarioAutenticado(null)}
         />
       </main>
@@ -38,7 +38,7 @@ export default function App() {
   if (userRole === 'admin') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
-        <AdminDashboard token={UsuarioAutenticado.token} onLogout={() => setUsuarioAutenticado(null)} />
+        <AdminDashboard token={usuarioAutenticado.token} onLogout={() => setUsuarioAutenticado(null)} />
       </main>
     );
   }
@@ -47,8 +47,8 @@ export default function App() {
   return (
     <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
       <Dashboard
-        usuarioId={UsuarioAutenticado.id}
-        token={UsuarioAutenticado.token}
+        usuarioId={usuarioAutenticado.id}
+        token={usuarioAutenticado.token}
         onLogout={() => setUsuarioAutenticado(null)}
       />
     </main>

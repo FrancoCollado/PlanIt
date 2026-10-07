@@ -2,22 +2,12 @@ import { MikroORM } from '@mikro-orm/postgresql';
 import mikroOrmConfig from './mikro-orm.config.js';
 
 let orm: MikroORM | undefined;
-let ormPromise: Promise<MikroORM> | undefined;
 
-// En serverless cada instancia arranca en frío: la conexión se crea bajo demanda
-// y se reintenta si falló, en vez de depender de un arranque previo.
-export function initOrm(): Promise<MikroORM> {
-  ormPromise ??= MikroORM.init(mikroOrmConfig)
-    .then((instance) => {
-      orm = instance;
-      return instance;
-    })
-    .catch((error) => {
-      ormPromise = undefined;
-      throw error;
-    });
-
-  return ormPromise;
+// Inicializa la conexión a la base de datos (solo una vez)
+export async function initOrm(): Promise<MikroORM> {
+  if (orm) return orm;
+  orm = await MikroORM.init(mikroOrmConfig);
+  return orm;
 }
 
 export function setOrm(instance: MikroORM) {

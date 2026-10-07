@@ -1,5 +1,3 @@
-// apps/web/src/shared/formatters.ts
-
 // Pone en mayúscula la primera letra de cada palabra de un título (ej. evento),
 // y normaliza espacios/mayúsculas sueltas que pueda tipear el usuario.
 export function formatearTitulo(texto: string): string {

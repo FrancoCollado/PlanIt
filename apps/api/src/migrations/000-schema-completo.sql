@@ -1,12 +1,8 @@
--- =====================================================================
 -- PlanIt - Esquema completo (PostgreSQL / Supabase)
 -- Ejecutar en el SQL Editor de Supabase.
 -- Supabase ya provee la base de datos: no se crea, se usa el schema public.
--- =====================================================================
 
--- ---------------------------------------------------------------------
 -- Tipo enumerado para el rol de usuario
--- ---------------------------------------------------------------------
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'rol_usuario') THEN
@@ -14,9 +10,7 @@ BEGIN
   END IF;
 END$$;
 
--- ---------------------------------------------------------------------
 -- usuarios
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS usuarios (
   id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   nombre        VARCHAR(100) NOT NULL,
@@ -33,9 +27,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_rol ON usuarios (rol);
 
--- ---------------------------------------------------------------------
 -- eventos
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS eventos (
   id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   nombre      VARCHAR(100) NOT NULL,
@@ -47,9 +39,7 @@ CREATE TABLE IF NOT EXISTS eventos (
 
 CREATE INDEX IF NOT EXISTS idx_eventos_draft ON eventos (draft);
 
--- ---------------------------------------------------------------------
 -- categorias
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS categorias (
   id          INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   evento_id   INTEGER NOT NULL,
@@ -63,9 +53,7 @@ CREATE TABLE IF NOT EXISTS categorias (
 
 CREATE INDEX IF NOT EXISTS idx_categorias_evento ON categorias (evento_id);
 
--- ---------------------------------------------------------------------
 -- servicios
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS servicios (
   id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   categoria_id INTEGER NOT NULL,
@@ -87,9 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_servicios_categoria ON servicios (categoria_id);
 CREATE INDEX IF NOT EXISTS idx_servicios_usuario   ON servicios (usuario_id);
 CREATE INDEX IF NOT EXISTS idx_servicios_draft     ON servicios (draft);
 
--- ---------------------------------------------------------------------
 -- evento_categoria (N:M)
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS evento_categoria (
   evento_id    INTEGER NOT NULL,
   categoria_id INTEGER NOT NULL,
@@ -104,9 +90,7 @@ CREATE TABLE IF NOT EXISTS evento_categoria (
 
 CREATE INDEX IF NOT EXISTS idx_evento_categoria_categoria ON evento_categoria (categoria_id);
 
--- ---------------------------------------------------------------------
 -- tableros
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tableros (
   id             INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   cliente_id     INTEGER NOT NULL,
@@ -125,9 +109,7 @@ CREATE TABLE IF NOT EXISTS tableros (
 CREATE INDEX IF NOT EXISTS idx_tableros_cliente ON tableros (cliente_id);
 CREATE INDEX IF NOT EXISTS idx_tableros_evento  ON tableros (evento_id);
 
--- ---------------------------------------------------------------------
 -- tablero_servicio (N:M)
--- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tablero_servicio (
   tablero_id  INTEGER NOT NULL,
   servicio_id INTEGER NOT NULL,
@@ -143,11 +125,7 @@ CREATE TABLE IF NOT EXISTS tablero_servicio (
 
 CREATE INDEX IF NOT EXISTS idx_tablero_servicio_servicio ON tablero_servicio (servicio_id);
 
--- ---------------------------------------------------------------------
--- Seguridad: el acceso ocurre únicamente desde la API de PlanIt mediante
--- la conexión directa de Postgres. Se habilita RLS sin políticas para que
--- las claves públicas de PostgREST (anon/authenticated) no puedan operar.
--- ---------------------------------------------------------------------
+-- Bloqueamos el acceso directo a las tablas: solo se accede a través de la API
 ALTER TABLE usuarios         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE eventos          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE categorias       ENABLE ROW LEVEL SECURITY;

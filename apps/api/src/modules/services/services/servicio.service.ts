@@ -6,9 +6,7 @@ import type { CreateServicioDto, UpdateServicioDto } from '../dtos/servicio.dto.
 import { ApiError } from '../../../shared/api-error.js';
 
 
-// ======================================================
-// LISTAR SERVICIOS DE UNA EMPRESA
-// ======================================================
+// Lista los servicios de una empresa
 
 export const listServiciosByUsuario = async (
   usuarioId: number
@@ -26,10 +24,7 @@ export const listServiciosByUsuario = async (
 };
 
 
-// ======================================================
-// BUSCAR SERVICIOS PUBLICADOS POR NOMBRE
-// Se utiliza desde la pantalla del cliente.
-// ======================================================
+// Busca servicios publicados por nombre, usado desde la pantalla del cliente
 
 export const buscarServiciosPorNombre = async (
   nombre: string,
@@ -38,18 +33,30 @@ export const buscarServiciosPorNombre = async (
 ): Promise<Servicio[]> => {
   const em = getOrm().em.fork();
 
+  // Armo el filtro del usuario (empresa) paso a paso
+  const filtroUsuario: any = {
+    rol: 'empresa',
+    activo: true
+  };
+  if (zona) {
+    filtroUsuario.zona = { $ilike: `%${zona}%` };
+  }
+  if (empresa) {
+    filtroUsuario.nombre = { $ilike: `%${empresa}%` };
+  }
+
+  // Armo el filtro completo de la búsqueda
+  const filtro: any = {
+    draft: false,
+    usuario: filtroUsuario
+  };
+  if (nombre) {
+    filtro.nombre = { $ilike: `%${nombre}%` };
+  }
+
   return em.find(
     Servicio,
-    {
-      ...(nombre && { nombre: { $ilike: `%${nombre}%` } }),
-      draft: false,
-      usuario: {
-        rol: 'empresa',
-        activo: true,
-        ...(zona && { zona: { $ilike: `%${zona}%` } }),
-        ...(empresa && { nombre: { $ilike: `%${empresa}%` } })
-      }
-    },
+    filtro,
     {
       populate: ['categoria', 'usuario'],
       orderBy: { nombre: 'ASC' }
@@ -58,10 +65,7 @@ export const buscarServiciosPorNombre = async (
 };
 
 
-// ======================================================
-// BUSCAR SERVICIOS PUBLICADOS POR CATEGORÍA
-// Se utiliza desde la pantalla del cliente.
-// ======================================================
+// Busca servicios publicados por categoría, usado desde la pantalla del cliente
 
 export const buscarServiciosPorCategoria = async (
   categoriaId: number
@@ -83,9 +87,7 @@ export const buscarServiciosPorCategoria = async (
 };
 
 
-// ======================================================
-// OBTENER SERVICIO POR ID
-// ======================================================
+// Obtiene un servicio por id
 
 export const getServicioById = async (
   id: number
@@ -100,9 +102,7 @@ export const getServicioById = async (
 };
 
 
-// ======================================================
-// CREAR SERVICIO
-// ======================================================
+// Crea un servicio nuevo
 
 export const createServicio = async (
   data: CreateServicioDto
@@ -141,9 +141,7 @@ export const createServicio = async (
 };
 
 
-// ======================================================
-// ACTUALIZAR SERVICIO
-// ======================================================
+// Actualiza un servicio existente
 
 export const updateServicio = async (
   id: number,
@@ -195,9 +193,7 @@ export const updateServicio = async (
 };
 
 
-// ======================================================
-// BORRAR SERVICIO
-// ======================================================
+// Borra un servicio
 
 export const deleteServicio = async (
   id: number,

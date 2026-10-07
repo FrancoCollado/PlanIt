@@ -27,10 +27,7 @@ export interface Empresa {
 }
 
 
-// ======================================================
-// LISTAR EMPRESAS ACTIVAS (autocompletado del buscador)
-// ======================================================
-
+// Trae las empresas activas para el autocompletado del buscador
 export const listEmpresasRequest = async (): Promise<Empresa[]> => {
 
   const response = await fetch(`${API_URL}/api/usuarios/empresas`);
@@ -47,10 +44,7 @@ export const listEmpresasRequest = async (): Promise<Empresa[]> => {
 };
 
 
-// ======================================================
-// BUSCAR SERVICIOS POR NOMBRE
-// ======================================================
-
+// Busca servicios filtrando por nombre, zona y/o empresa
 export const buscarServiciosRequest = async (
   nombre: string,
   zona = '',
@@ -78,10 +72,7 @@ export const buscarServiciosRequest = async (
 };
 
 
-// ======================================================
-// BUSCAR SERVICIOS POR CATEGORÍA
-// ======================================================
-
+// Busca servicios que pertenezcan a una categoría
 export const buscarServiciosPorCategoriaRequest = async (
   categoriaId: number
 ): Promise<Servicio[]> => {

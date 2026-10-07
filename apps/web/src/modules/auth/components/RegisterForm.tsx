@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 import type { UsuarioRol, UsuarioAutenticado } from './LoginForm';
-import { RegistrarUsuario } from '../services/authService';
+import { registrarUsuario } from '../services/authService';
+import type { DatosRegistro } from '../services/authService';
 import { esEmailValido } from '../../../shared/validators';
 
 interface RegisterFormProps {
@@ -10,7 +11,7 @@ interface RegisterFormProps {
 }
 
 // Traduce el valor de `rol` guardado en la BD (admin/empresa/cliente) al UsuarioRol interno
-const mapRolToUserRole = (rol: string): UsuarioRol | null => {
+const convertirRolDeBackend = (rol: string): UsuarioRol | null => {
   switch (rol.trim().toLowerCase()) {
     case 'administrador':
       return 'admin';
@@ -28,77 +29,78 @@ export const RegisterForm = ({
   onLoginClick
 }: RegisterFormProps) => {
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [nombre, setNombre] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [confirmarContrasena, setConfirmarContrasena] = useState('');
+  const [aceptoTerminos, setAceptoTerminos] = useState(false);
 
-  const [role, setRole] = useState<'cliente' | 'empresa'>('cliente'); //este rol solo puede ser cliente o empresa, no admin.
+  const [rol, setRol] = useState<'cliente' | 'empresa'>('cliente'); //este rol solo puede ser cliente o empresa, no admin.
   const [zona, setZona] = useState('');
   const [cuit, setCuit] = useState('');
   const [telefono, setTelefono] = useState('');
 
-  const [message, setMessage] = useState('');
+  const [mensaje, setMensaje] = useState('');
 
   // Se ejecuta cuando presiono CREAR CUENTA
-  const ManejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
+  const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
 
     // Evita que el navegador recargue la página
     e.preventDefault();
 
-    setMessage('');
+    setMensaje('');
 
-    if (!esEmailValido(email)) {
-      setMessage('Ingresá un email válido');
+    if (!esEmailValido(correo)) {
+      setMensaje('Ingresá un email válido');
       return;
     }
 
-    if (role === 'empresa' && (!zona || !cuit || !telefono)) {
-      setMessage('Zona, CUIT y teléfono son requeridos para cuentas de empresa');
+    if (rol === 'empresa' && (!zona || !cuit || !telefono)) {
+      setMensaje('Zona, CUIT y teléfono son requeridos para cuentas de empresa');
       return;
     }
 
     try {
 
-      const data = await RegistrarUsuario({
-        name: name,
-        email: email,
-        password: password,
-        confirmPassword: confirmPassword,
-        acceptTerms: acceptTerms,
-        role: role,
-        ...(role === 'empresa'
-          ? {
-              zona,
-              cuit: Number(cuit),
-              telefono: Number(telefono)
-            }
-          : {})
-      });
+      const datosRegistro: DatosRegistro = {
+        nombre: nombre,
+        email: correo,
+        password: contrasena,
+        confirmarContrasena: confirmarContrasena,
+        aceptaTerminos: aceptoTerminos,
+        role: rol,
+      };
+
+      if (rol === 'empresa') {
+        datosRegistro.zona = zona;
+        datosRegistro.cuit = Number(cuit);
+        datosRegistro.telefono = Number(telefono);
+      }
+
+      const data = await registrarUsuario(datosRegistro);
 
       // Registro correcto
-      setMessage(data.message);
+      setMensaje(data.message);
 
       // Limpio el formulario
-      setName('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      setAcceptTerms(false);
-      setRole('cliente');
+      setNombre('');
+      setCorreo('');
+      setContrasena('');
+      setConfirmarContrasena('');
+      setAceptoTerminos(false);
+      setRol('cliente');
       setZona('');
       setCuit('');
       setTelefono('');
 
-      const rol = mapRolToUserRole(data.user.rol);
+      const rolConvertido = convertirRolDeBackend(data.user.rol);
 
       alSolicitarRegistro?.(
-        rol
+        rolConvertido
           ? {
               id: data.user.id,
               nombre: data.user.nombre,
-              role: rol,
+              role: rolConvertido,
               token: data.token
             }
           : undefined
@@ -108,7 +110,7 @@ export const RegisterForm = ({
 
       console.error('Error al registrar usuario:', error);
 
-      setMessage(
+      setMensaje(
         error instanceof Error
           ? error.message
           : 'No se pudo conectar con el servidor'
@@ -117,7 +119,7 @@ export const RegisterForm = ({
   };
 
   return (
-    <form onSubmit={ManejarEnvio}>
+    <form onSubmit={manejarEnvio}>
 
       <h2 className="form-title">
         REGISTRARSE
@@ -139,8 +141,8 @@ export const RegisterForm = ({
         <input
           className="form-input compact-input"
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
         />
 
       </div>
@@ -154,8 +156,8 @@ export const RegisterForm = ({
         <input
           className="form-input compact-input"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={correo}
+          onChange={(e) => setCorreo(e.target.value)}
         />
 
       </div>
@@ -169,8 +171,8 @@ export const RegisterForm = ({
         <input
           className="form-input compact-input"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={contrasena}
+          onChange={(e) => setContrasena(e.target.value)}
         />
 
       </div>
@@ -184,8 +186,8 @@ export const RegisterForm = ({
         <input
           className="form-input compact-input"
           type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          value={confirmarContrasena}
+          onChange={(e) => setConfirmarContrasena(e.target.value)}
         />
 
       </div>
@@ -202,8 +204,8 @@ export const RegisterForm = ({
             <input
               type="radio"
               name="role"
-              checked={role === 'cliente'}
-              onChange={() => setRole('cliente')}
+              checked={rol === 'cliente'}
+              onChange={() => setRol('cliente')}
             />
             Cliente
           </label>
@@ -212,8 +214,8 @@ export const RegisterForm = ({
             <input
               type="radio"
               name="role"
-              checked={role === 'empresa'}
-              onChange={() => setRole('empresa')}
+              checked={rol === 'empresa'}
+              onChange={() => setRol('empresa')}
             />
             Empresa
           </label>
@@ -222,7 +224,7 @@ export const RegisterForm = ({
 
       </div>
 
-      {role === 'empresa' && (
+      {rol === 'empresa' && (
         <>
           <div className="input-group">
 
@@ -280,8 +282,8 @@ export const RegisterForm = ({
 
           <input
             type="checkbox"
-            checked={acceptTerms}
-            onChange={(e) => setAcceptTerms(e.target.checked)}
+            checked={aceptoTerminos}
+            onChange={(e) => setAceptoTerminos(e.target.checked)}
           />
 
           Acepto Términos y Condiciones
@@ -297,8 +299,8 @@ export const RegisterForm = ({
         CREAR CUENTA
       </button>
 
-      {message && (
-        <p>{message}</p>
+      {mensaje && (
+        <p>{mensaje}</p>
       )}
 
       <p className="form-subtitle">

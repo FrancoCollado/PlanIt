@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { randomBytes } from 'crypto';
+import { fileURLToPath } from 'url';
 
 import authRoutes from './modules/auth/routes/auth.routes.js';
 import eventoRoutes from './modules/events/routes/evento.routes.js';
@@ -13,10 +14,11 @@ import servicioRoutes from './modules/services/routes/servicio.routes.js';
 import tableroRoutes from './modules/boards/tablero.routes.js';
 
 import { apiErrorHandler, respondWithError } from './shared/api-error.js';
-import { initOrm } from './config/orm.js';
-import { connectionInfo } from './config/mikro-orm.config.js';
 
-dotenv.config({ path: path.resolve(import.meta.dirname, '../../../.env') });
+const nombreArchivoActual = fileURLToPath(import.meta.url);
+const carpetaActual = path.dirname(nombreArchivoActual);
+
+dotenv.config({ path: path.resolve(carpetaActual, '../../../.env') });
 
 if (!process.env.JWT_SECRET) {
   if (process.env.NODE_ENV === 'production') throw new Error('JWT_SECRET es obligatorio en producción');
@@ -27,10 +29,21 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// En Vercel el frontend se sirve bajo el mismo dominio, así que CORS sólo se
-// habilita si se declaran orígenes externos explícitos.
-const corsOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()).filter(Boolean);
-if (corsOrigins?.length) {
+// CORS solo se activa si se configuran orígenes externos permitidos
+const corsOriginsEnv = process.env.CORS_ORIGINS;
+const corsOrigins: string[] = [];
+
+if (corsOriginsEnv) {
+  const partes = corsOriginsEnv.split(',');
+  for (const parte of partes) {
+    const origen = parte.trim();
+    if (origen !== '') {
+      corsOrigins.push(origen);
+    }
+  }
+}
+
+if (corsOrigins.length > 0) {
   app.use(cors({ origin: corsOrigins }));
 }
 
@@ -42,29 +55,6 @@ app.get('/api/health', (_req, res) => {
     status: 'ok',
     message: 'API de planIt funcionando'
   });
-});
-
-// Diagnóstico de la base: informa qué variables se usaron y el error exacto de
-// pg. Nunca devuelve la contraseña, sólo su longitud y una huella SHA-256.
-app.get('/api/health/db', async (_req, res) => {
-  try {
-    const orm = await initOrm();
-    const [identidad] = await orm.em.getConnection().execute(
-      'select current_user, current_database(), inet_server_port() as port'
-    );
-    res.json({ status: 'ok', conexion: connectionInfo, identidad });
-  } catch (error) {
-    const err = error as { message?: string; code?: string; cause?: { message?: string; code?: string } };
-    res.status(500).json({
-      status: 'error',
-      conexion: connectionInfo,
-      error: {
-        message: err.message,
-        code: err.code ?? err.cause?.code,
-        causa: err.cause?.message
-      }
-    });
-  }
 });
 
 app.use('/api/auth', authRoutes);
@@ -81,8 +71,6 @@ app.use('/api', (_req, res) => {
 
 app.use(apiErrorHandler);
 
-// Vercel ejecuta este proceso y rutea las peticiones al puerto que escucha,
-// igual que en local. La conexión a la base se hace por request con ensureOrm.
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en el puerto ${PORT}`);
 });

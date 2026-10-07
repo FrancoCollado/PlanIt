@@ -7,11 +7,13 @@ import {
   updateCategoria,
   deleteCategoria
 } from '../services/categoria.service.js';
+import type { Categoria } from '../../../entities/categoria.js';
 
 import type { CreateCategoriaDto, UpdateCategoriaDto } from '../dtos/categoria.dto.js';
 import { respondWithError, sendApiError } from '../../../shared/api-error.js';
+import { obtenerAuth } from '../../../middlewares/authorization.js';
 
-const serializeCategoria = (categoria: Awaited<ReturnType<typeof getCategoriaById>>) => {
+const serializeCategoria = (categoria: Categoria | null) => {
   if (!categoria) return null;
 
   return {
@@ -28,7 +30,7 @@ const serializeCategoria = (categoria: Awaited<ReturnType<typeof getCategoriaByI
 
 export const getCategorias = async (req: Request, res: Response) => {
   try {
-    const categorias = await listCategorias(req.auth?.role === 'administrador');
+    const categorias = await listCategorias(obtenerAuth(req)?.role === 'administrador');
     res.json({ categorias: categorias.map(serializeCategoria) });
   } catch (error) {
     sendApiError(res, error, 'Error al obtener las categorías');
@@ -41,7 +43,7 @@ export const getCategoria = async (req: Request, res: Response) => {
   try {
     const categoria = await getCategoriaById(id);
 
-    if (!categoria || (categoria.evento.draft && req.auth?.role !== 'administrador')) {
+    if (!categoria || (categoria.evento.draft && obtenerAuth(req)?.role !== 'administrador')) {
       return respondWithError(res, 404, 'NOT_FOUND', 'Categoría no encontrada');
     }
 

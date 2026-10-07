@@ -21,12 +21,10 @@ export interface BusinessStats {
 export const getAdminStats = async (): Promise<AdminStats> => {
   const em = getOrm().em.fork();
 
-  const [empresasActivas, eventosPublicados, eventosBorrador, clientesRegistrados] = await Promise.all([
-    em.count(User, { rol: 'empresa', activo: true }),
-    em.count(Evento, { draft: false }),
-    em.count(Evento, { draft: true }),
-    em.count(User, { rol: 'cliente' })
-  ]);
+  const empresasActivas = await em.count(User, { rol: 'empresa', activo: true });
+  const eventosPublicados = await em.count(Evento, { draft: false });
+  const eventosBorrador = await em.count(Evento, { draft: true });
+  const clientesRegistrados = await em.count(User, { rol: 'cliente' });
 
   return { empresasActivas, eventosPublicados, eventosBorrador, clientesRegistrados };
 };
@@ -34,14 +32,18 @@ export const getAdminStats = async (): Promise<AdminStats> => {
 export const getBusinessStats = async (usuarioId: number): Promise<BusinessStats> => {
   const em = getOrm().em.fork();
 
-  const [serviciosActivos, serviciosBorrador, vecesGuardadoEnTableros, serviciosDelUsuario] = await Promise.all([
-    em.count(Servicio, { usuario: usuarioId, draft: false }),
-    em.count(Servicio, { usuario: usuarioId, draft: true }),
-    em.count(TableroServicio, { servicio: { usuario: usuarioId } }),
-    em.find(Servicio, { usuario: usuarioId }, { populate: ['categoria'] })
-  ]);
+  const serviciosActivos = await em.count(Servicio, { usuario: usuarioId, draft: false });
+  const serviciosBorrador = await em.count(Servicio, { usuario: usuarioId, draft: true });
+  const vecesGuardadoEnTableros = await em.count(TableroServicio, { servicio: { usuario: usuarioId } });
+  const serviciosDelUsuario = await em.find(Servicio, { usuario: usuarioId }, { populate: ['categoria'] });
 
-  const categoriasPresentes = new Set(serviciosDelUsuario.map((s) => s.categoria.id)).size;
+  const idsDeCategoriasVistas: number[] = [];
+  for (const servicio of serviciosDelUsuario) {
+    if (!idsDeCategoriasVistas.includes(servicio.categoria.id)) {
+      idsDeCategoriasVistas.push(servicio.categoria.id);
+    }
+  }
+  const categoriasPresentes = idsDeCategoriasVistas.length;
 
   return { serviciosActivos, serviciosBorrador, vecesGuardadoEnTableros, categoriasPresentes };
 };

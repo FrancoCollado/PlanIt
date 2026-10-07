@@ -1,9 +1,9 @@
 export interface RegisterDto {
-  name: string;
+  nombre: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
+  confirmarContrasena: string;
+  aceptaTerminos: boolean;
   role: 'cliente' | 'empresa';
   zona?: string;
   cuit?: number;

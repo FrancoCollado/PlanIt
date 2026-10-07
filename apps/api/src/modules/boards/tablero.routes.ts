@@ -9,7 +9,7 @@ import { respondWithError, sendApiError } from '../../shared/api-error.js';
 import { validateRequest } from '../../shared/request-validation.js';
 import { requestSchemas } from '../../shared/request-schemas.js';
 import { ensureOrm } from '../../middlewares/ensure-orm.js';
-import { authenticate, ensureActiveUser, requireRoles } from '../../middlewares/authorization.js';
+import { authenticate, ensureActiveUser, obtenerAuth, requireRoles } from '../../middlewares/authorization.js';
 
 const router = Router();
 router.use(authenticate, requireRoles('cliente'));
@@ -28,8 +28,8 @@ const serialize = (tablero: Tablero, servicios: TableroServicio[] = []) => ({
 router.get('/', ensureOrm, ensureActiveUser, async (req: Request, res: Response) => {
   try {
     const em = getOrm().em.fork();
-    const tableros = await em.find(Tablero, { cliente: req.auth!.userId }, { populate: ['evento'], orderBy: { fechaCreacion: 'DESC' } });
-    const guardados = await em.find(TableroServicio, { tablero: { cliente: req.auth!.userId } }, { populate: ['servicio.categoria'] });
+    const tableros = await em.find(Tablero, { cliente: obtenerAuth(req)!.userId }, { populate: ['evento'], orderBy: { fechaCreacion: 'DESC' } });
+    const guardados = await em.find(TableroServicio, { tablero: { cliente: obtenerAuth(req)!.userId } }, { populate: ['servicio.categoria'] });
     res.json({ tableros: tableros.map(tablero => serialize(tablero, guardados.filter(item => item.tablero.id === tablero.id))) });
   } catch (error) {
     console.error('Error al listar tableros:', error);
@@ -41,10 +41,8 @@ router.post('/', validateRequest(requestSchemas.createTablero), ensureOrm, ensur
   const { nombre, eventoId } = req.body ?? {};
   try {
     const em = getOrm().em.fork();
-    const [cliente, evento] = await Promise.all([
-      em.findOne(User, { id: req.auth!.userId, rol: 'cliente', activo: true }),
-      em.findOne(Evento, { id: Number(eventoId), draft: false })
-    ]);
+    const cliente = await em.findOne(User, { id: obtenerAuth(req)!.userId, rol: 'cliente', activo: true });
+    const evento = await em.findOne(Evento, { id: Number(eventoId), draft: false });
     if (!cliente || !evento) {
       respondWithError(res, 404, 'NOT_FOUND', 'Cliente o evento no disponible');
       return;
@@ -61,7 +59,7 @@ router.post('/', validateRequest(requestSchemas.createTablero), ensureOrm, ensur
 router.get('/:id', validateRequest(requestSchemas.tableroIdParam), ensureOrm, ensureActiveUser, async (req: Request, res: Response) => {
   try {
     const em = getOrm().em.fork();
-    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: req.auth!.userId }, { populate: ['evento'] });
+    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: obtenerAuth(req)!.userId }, { populate: ['evento'] });
     if (!tablero) { respondWithError(res, 404, 'NOT_FOUND', 'Tablero no encontrado'); return; }
     const guardados = await em.find(TableroServicio, { tablero: tablero.id }, { populate: ['servicio.categoria'] });
     res.json({ tablero: serialize(tablero, guardados) });
@@ -75,7 +73,7 @@ router.put('/:id', validateRequest(requestSchemas.updateTablero), ensureOrm, ens
   const { nombre, eventoId } = req.body ?? {};
   try {
     const em = getOrm().em.fork();
-    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: req.auth!.userId }, { populate: ['evento'] });
+    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: obtenerAuth(req)!.userId }, { populate: ['evento'] });
     if (!tablero) { respondWithError(res, 404, 'NOT_FOUND', 'Tablero no encontrado'); return; }
     const evento = await em.findOne(Evento, { id: Number(eventoId), draft: false });
     if (!evento) { respondWithError(res, 404, 'NOT_FOUND', 'Evento no disponible'); return; }
@@ -93,7 +91,7 @@ router.put('/:id', validateRequest(requestSchemas.updateTablero), ensureOrm, ens
 router.delete('/:id', validateRequest(requestSchemas.tableroIdParam), ensureOrm, ensureActiveUser, async (req: Request, res: Response) => {
   try {
     const em = getOrm().em.fork();
-    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: req.auth!.userId });
+    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: obtenerAuth(req)!.userId });
     if (!tablero) { respondWithError(res, 404, 'NOT_FOUND', 'Tablero no encontrado'); return; }
     await em.remove(tablero).flush();
     res.status(204).end();
@@ -106,7 +104,7 @@ router.delete('/:id', validateRequest(requestSchemas.tableroIdParam), ensureOrm,
 router.post('/:id/servicios', validateRequest(requestSchemas.addServicioToTablero), ensureOrm, ensureActiveUser, async (req: Request, res: Response) => {
   try {
     const em = getOrm().em.fork();
-    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: req.auth!.userId });
+    const tablero = await em.findOne(Tablero, { id: Number(req.params.id), cliente: obtenerAuth(req)!.userId });
     if (!tablero) { respondWithError(res, 404, 'NOT_FOUND', 'Tablero no encontrado'); return; }
     const servicio = await em.findOne(Servicio, { id: Number(req.body.servicioId), draft: false });
     if (!servicio) { respondWithError(res, 404, 'NOT_FOUND', 'Servicio no disponible'); return; }
@@ -124,7 +122,7 @@ router.delete('/:id/servicios/:servicioId', validateRequest(requestSchemas.remov
   try {
     const em = getOrm().em.fork();
     const guardado = await em.findOne(TableroServicio, {
-      tablero: { id: Number(req.params.id), cliente: req.auth!.userId }, servicio: Number(req.params.servicioId)
+      tablero: { id: Number(req.params.id), cliente: obtenerAuth(req)!.userId }, servicio: Number(req.params.servicioId)
     });
     if (!guardado) { respondWithError(res, 404, 'NOT_FOUND', 'Servicio no encontrado en el tablero'); return; }
     await em.remove(guardado).flush();

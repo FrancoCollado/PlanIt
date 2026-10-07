@@ -59,7 +59,7 @@ export const register = async (
 ) => {
 
   const {
-    name,
+    nombre,
     email,
     password,
     role,
@@ -70,7 +70,7 @@ export const register = async (
 
   try {
     const user = await createUser(
-      name,
+      nombre,
       email,
       password,
       role,

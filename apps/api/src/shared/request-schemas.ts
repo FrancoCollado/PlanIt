@@ -19,18 +19,18 @@ export const requestSchemas = {
   },
   register: {
     body: z.object({
-      name: optionalName,
+      nombre: optionalName,
       email,
       password,
-      confirmPassword: z.string().min(1).max(255),
-      acceptTerms: z.literal(true),
+      confirmarContrasena: z.string().min(1).max(255),
+      aceptaTerminos: z.literal(true),
       role: z.enum(['cliente', 'empresa']),
       zona: z.string().trim().min(1).max(100).optional(),
       cuit: positiveId.optional(),
       telefono: positiveId.optional()
     }).strict().superRefine((data, context) => {
-      if (data.password !== data.confirmPassword) {
-        context.addIssue({ code: 'custom', path: ['confirmPassword'], message: 'Las contraseñas no coinciden' });
+      if (data.password !== data.confirmarContrasena) {
+        context.addIssue({ code: 'custom', path: ['confirmarContrasena'], message: 'Las contraseñas no coinciden' });
       }
       if (data.role === 'empresa') {
         for (const field of ['zona', 'cuit', 'telefono'] as const) {

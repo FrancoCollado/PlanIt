@@ -1,6 +1,6 @@
 import { API_URL } from '../../../config/api';
 
-export interface LoginResponse {
+export interface RespuestaLogin {
   message: string; // Mensaje de éxito o error
   token: string;
   user: {
@@ -12,7 +12,7 @@ export interface LoginResponse {
   };
 }
 
-export const loginRequest = async (email: string, password: string): Promise<LoginResponse> => { 
+export const iniciarSesionRequest = async (email: string, password: string): Promise<RespuestaLogin> => { 
 
   const respuesta = await fetch(`${API_URL}/api/auth/login`, {
     method: 'POST',
@@ -33,11 +33,11 @@ export const loginRequest = async (email: string, password: string): Promise<Log
 // Función para registrar un nuevo usuario
 
 export interface DatosRegistro { //Formato que espero que tenga el usuario que se va a registrar
-  name: string;
+  nombre: string;
   email: string;
   password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
+  confirmarContrasena: string;
+  aceptaTerminos: boolean;
   role: 'cliente' | 'empresa';
   zona?: string;
   cuit?: number;
@@ -56,7 +56,7 @@ export interface RespuestaRegistro { //Formato que espero recibir del backend al
   };
 }
 
-export const RegistrarUsuario = async (datos: DatosRegistro): Promise<RespuestaRegistro> => { //Esta función es asíncrona y, cuando termine, promete devolverme una RespuestaRegistro. 
+export const registrarUsuario = async (datos: DatosRegistro): Promise<RespuestaRegistro> => { //Esta función es asíncrona y, cuando termine, promete devolverme una RespuestaRegistro. 
   const respuesta = await fetch(`${API_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

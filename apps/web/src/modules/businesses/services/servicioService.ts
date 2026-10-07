@@ -73,7 +73,13 @@ export const createServicioRequest = async (usuarioId: number, payload: Servicio
 export const updateServicioRequest = async (
   id: number,
   usuarioId: number,
-  payload: Partial<ServicioPayload>,
+  payload: {
+    nombre?: string;
+    descripcion?: string;
+    imagen?: string;
+    categoriaId?: number;
+    draft?: boolean;
+  },
   token: string
 ): Promise<Servicio> => {
   const response = await fetch(`${API_URL}/api/servicios/${id}`, {

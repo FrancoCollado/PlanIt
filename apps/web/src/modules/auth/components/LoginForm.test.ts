@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { mapRolToUserRole } from './LoginForm';
+import { convertirRolDeBackend } from './LoginForm';
 
-describe('mapRolToUserRole', () => {
-  it('traduce el rol "empresa" de la base a "business"', () => {
+describe('convertirRolDeBackend', () => {
+  it('traduce el rol "empresa" de la base a "empresa"', () => {
     // ARRANGE
     const rolDeLaBase = 'empresa';
 
     // ACT
-    const resultado = mapRolToUserRole(rolDeLaBase);
+    const resultado = convertirRolDeBackend(rolDeLaBase);
 
     // ASSERT
-    expect(resultado).toBe('business');
+    expect(resultado).toBe('empresa');
   });
 });

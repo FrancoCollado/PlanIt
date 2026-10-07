@@ -11,37 +11,64 @@ export interface Tablero {
   servicios: Servicio[];
 }
 
-async function request<T>(token: string, path = '', init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${TABLEROS_URL}${path}`, {
-    ...init,
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...init.headers }
+export async function listTableros(token: string): Promise<Tablero[]> {
+  const response = await fetch(TABLEROS_URL, {
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
-  if (response.status === 204) return undefined as T;
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
-  return data;
-}
-
-export async function listTableros(token: string): Promise<Tablero[]> {
-  return (await request<{ tableros: Tablero[] }>(token)).tableros;
+  return data.tableros;
 }
 
 export async function createTablero(token: string, nombre: string, eventoId: number): Promise<Tablero> {
-  return (await request<{ tablero: Tablero }>(token, '', { method: 'POST', body: JSON.stringify({ nombre, eventoId }) })).tablero;
+  const response = await fetch(TABLEROS_URL, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, eventoId })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  return data.tablero;
 }
 
 export async function updateTablero(token: string, id: number, nombre: string, eventoId: number): Promise<Tablero> {
-  return (await request<{ tablero: Tablero }>(token, `/${id}`, { method: 'PUT', body: JSON.stringify({ nombre, eventoId }) })).tablero;
+  const response = await fetch(`${TABLEROS_URL}/${id}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, eventoId })
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  return data.tablero;
 }
 
 export async function deleteTablero(token: string, id: number): Promise<void> {
-  await request<void>(token, `/${id}`, { method: 'DELETE' });
+  const response = await fetch(`${TABLEROS_URL}/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (response.status === 204) return;
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
 }
 
 export async function addServicio(token: string, id: number, servicioId: number): Promise<void> {
-  await request(token, `/${id}/servicios`, { method: 'POST', body: JSON.stringify({ servicioId }) });
+  const response = await fetch(`${TABLEROS_URL}/${id}/servicios`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ servicioId })
+  });
+  if (response.status === 204) return;
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
 }
 
 export async function removeServicio(token: string, id: number, servicioId: number): Promise<void> {
-  await request<void>(token, `/${id}/servicios/${servicioId}`, { method: 'DELETE' });
+  const response = await fetch(`${TABLEROS_URL}/${id}/servicios/${servicioId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (response.status === 204) return;
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
 }

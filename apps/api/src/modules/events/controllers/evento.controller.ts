@@ -10,11 +10,12 @@ import {
 
 import type { CreateEventoDto, UpdateEventoDto } from '../dtos/evento.dto.js';
 import { respondWithError, sendApiError } from '../../../shared/api-error.js';
+import { obtenerAuth } from '../../../middlewares/authorization.js';
 
 
 export const getEventos = async (req: Request, res: Response) => {
   try {
-    const eventos = await listEventos(req.auth?.role === 'administrador');
+    const eventos = await listEventos(obtenerAuth(req)?.role === 'administrador');
     res.json({ eventos });
   } catch (error) {
     sendApiError(res, error, 'Error al obtener los eventos');
@@ -27,7 +28,7 @@ export const getEvento = async (req: Request, res: Response) => {
   try {
     const evento = await getEventoById(id);
 
-    if (!evento || (evento.draft && req.auth?.role !== 'administrador')) {
+    if (!evento || (evento.draft && obtenerAuth(req)?.role !== 'administrador')) {
       return respondWithError(res, 404, 'NOT_FOUND', 'Evento no encontrado');
     }
 

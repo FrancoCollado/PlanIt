@@ -4,7 +4,8 @@ import { User } from '../../../entities/usuario.js';
 export const listUsuariosByRol = async (rol?: string): Promise<User[]> => {
   const em = getOrm().em.fork();
 
-  return em.find(User, rol ? { rol: rol as User['rol'] } : {}, { orderBy: { nombre: 'ASC' } });
+  const rolValido = rol as 'cliente' | 'administrador' | 'empresa' | undefined;
+  return em.find(User, rolValido ? { rol: rolValido } : {}, { orderBy: { nombre: 'ASC' } });
 };
 
 // Alimenta el autocompletado del buscador del cliente: sólo empresas operativas.

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { loginRequest } from '../services/authService';
+import { iniciarSesionRequest } from '../services/authService';
 import './FormularioLogin.scss';
 
 // Tipos de  roles
@@ -19,7 +19,7 @@ interface PropiedadesFormularioLogin {
 
 
 // Función para mapear el rol del usuario recibido del backend a los roles de la app
-export const mapRolToUserRole = (rol: string): UsuarioRol | null => {
+export const convertirRolDeBackend = (rol: string): UsuarioRol | null => {
   switch (rol.trim().toLowerCase()) {
     case 'administrador':
       return 'admin';
@@ -46,11 +46,11 @@ export const FormularioLogin: React.FC<PropiedadesFormularioLogin> = ({
     setMensajeError('');
 
     try {
-      const respuesta = await loginRequest(correo.trim(), contrasena); // Llamada a la función de loginRequest para autenticar al usuario
+      const respuesta = await iniciarSesionRequest(correo.trim(), contrasena); // Llamada a la función de iniciarSesionRequest para autenticar al usuario
       const usuario = respuesta.user;
       const token = respuesta.token;
 
-      const rol = mapRolToUserRole(usuario.rol);
+      const rol = convertirRolDeBackend(usuario.rol);
 
       if (!rol) { //Si no tengo rol valido:
         setMensajeError('Rol de usuario desconocido');

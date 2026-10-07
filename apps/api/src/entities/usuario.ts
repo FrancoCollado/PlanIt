@@ -18,7 +18,7 @@ export class User {
   @Property({ type: 'string', length: 100, unique: true }) //aca por ser email hago que sea unique
   email!: string;
 
-  // hidden excluye el hash de toJSON: ninguna respuesta de la API lo expone.
+  // No se muestra en las respuestas de la API
   @Property({
     type: 'string',
     fieldName: 'contraseña',
@@ -35,8 +35,7 @@ export class User {
   @Property({ type: 'string', length: 100, nullable: true })
   zona?: string;
 
-  // Las columnas son BIGINT y pg las devuelve como string: BigIntType('number')
-  // las convierte a número. Un CUIT (11 dígitos) entra holgado en un safe integer.
+  // BigIntType convierte el CUIT a número (si no, llega como string)
   @Property({ type: new BigIntType('number'), nullable: true })
   cuit?: number;
 

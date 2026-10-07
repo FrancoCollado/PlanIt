@@ -54,10 +54,6 @@ const serializeServicio = (servicio: {
 });
 
 
-// ======================================================
-// LISTAR SERVICIOS DE UNA EMPRESA
-// ======================================================
-
 export const getServicios = async (
   req: Request,
   res: Response
@@ -75,10 +71,6 @@ export const getServicios = async (
   }
 };
 
-
-// ======================================================
-// BUSCAR SERVICIOS PUBLICADOS POR NOMBRE
-// ======================================================
 
 export const buscarServicios = async (
   req: Request,
@@ -100,10 +92,6 @@ export const buscarServicios = async (
 };
 
 
-// ======================================================
-// BUSCAR SERVICIOS PUBLICADOS POR CATEGORÍA
-// ======================================================
-
 export const buscarServiciosCategoria = async (
   req: Request,
   res: Response
@@ -121,10 +109,6 @@ export const buscarServiciosCategoria = async (
   }
 };
 
-
-// ======================================================
-// CREAR SERVICIO
-// ======================================================
 
 export const crearServicio = async (
   req: Request<{}, {}, CreateServicioDto>,
@@ -159,10 +143,6 @@ export const crearServicio = async (
 };
 
 
-// ======================================================
-// ACTUALIZAR SERVICIO
-// ======================================================
-
 export const actualizarServicio = async (
   req: Request<
     { id: string },
@@ -194,10 +174,6 @@ export const actualizarServicio = async (
   }
 };
 
-
-// ======================================================
-// BORRAR SERVICIO
-// ======================================================
 
 export const borrarServicio = async (
   req: Request,

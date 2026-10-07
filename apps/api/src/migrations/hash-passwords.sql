@@ -1,9 +1,5 @@
--- =====================================================================
 -- Hashea las contraseñas que quedaron en texto plano.
 -- Ejecutar UNA vez en el SQL Editor de Supabase (o con psql en local).
--- pgcrypto con gen_salt('bf') genera hashes bcrypt ($2a$) compatibles
--- con bcrypt.compare() de la API.
--- =====================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 

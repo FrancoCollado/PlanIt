@@ -29,7 +29,7 @@ export const findUserByCredentials = async (
 
 // Crea un nuevo usuario
 export const createUser = async (
-  name: string,
+  nombre: string,
   email: string,
   password: string,
   role: 'cliente' | 'empresa',
@@ -39,7 +39,7 @@ export const createUser = async (
   const em = getOrm().em.fork();
 
   const user = em.create(User, {
-    nombre: name,
+    nombre: nombre,
     email,
     password: await hashPassword(password),
     rol: role,
