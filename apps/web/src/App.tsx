@@ -6,29 +6,29 @@ import Dashboard from './modules/businesses/components/dashboard';
 import ClienteDashboard from './modules/clientes/components/dashboard';
 import AdminDashboard from './modules/admin/components/dashboard';
 
-import type { AuthUser } from './modules/auth/components/LoginForm';
+import type { UsuarioAutenticado } from './modules/auth/components/LoginForm';
 
 export default function App() {
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [UsuarioAutenticado, setUsuarioAutenticado] = useState<UsuarioAutenticado | null>(null);
 
-  if (!authUser) {
+  if (!UsuarioAutenticado) {
     return (
       <main className="w-full min-h-screen">
-        <AuthPage onLoginSuccess={(user) => setAuthUser(user)} />
+        <AuthPage alIniciarSesion={(user) => setUsuarioAutenticado(user)} />
       </main>
     );
   }
 
-  const userRole = authUser.role;
+  const userRole = UsuarioAutenticado.role;
 
   // CLIENTE
   if (userRole === 'client') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
         <ClienteDashboard
-          nombreUsuario={authUser.nombre}
-          token={authUser.token}
-          onLogout={() => setAuthUser(null)}
+          nombreUsuario={UsuarioAutenticado.nombre}
+          token={UsuarioAutenticado.token}
+          onLogout={() => setUsuarioAutenticado(null)}
         />
       </main>
     );
@@ -38,7 +38,7 @@ export default function App() {
   if (userRole === 'admin') {
     return (
       <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
-        <AdminDashboard token={authUser.token} onLogout={() => setAuthUser(null)} />
+        <AdminDashboard token={UsuarioAutenticado.token} onLogout={() => setUsuarioAutenticado(null)} />
       </main>
     );
   }
@@ -47,9 +47,9 @@ export default function App() {
   return (
     <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
       <Dashboard
-        usuarioId={authUser.id}
-        token={authUser.token}
-        onLogout={() => setAuthUser(null)}
+        usuarioId={UsuarioAutenticado.id}
+        token={UsuarioAutenticado.token}
+        onLogout={() => setUsuarioAutenticado(null)}
       />
     </main>
   );
