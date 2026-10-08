@@ -10,3 +10,7 @@ export { default as AuthPage } from './pages/AuthPage';
 export { AuthCard } from './components/AuthCard';
 export { FormularioLogin } from './components/LoginForm';
 export { RegisterForm } from './components/RegisterForm';
+
+// 3. (A futuro) Exportar Hooks o Servicios si otros módulos los requieren
+// export * from './hooks/useAuth';
+// export * from './services/auth.service';

@@ -11,9 +11,9 @@ export interface Usuario {
   activo: boolean;
   creadoEn?: string;
 }
-
+// Función para obtener la lista de usuarios según el rol
 export const listUsuariosRequest = async (rol: string | undefined, token: string): Promise<Usuario[]> => {
-  const query = rol ? `?rol=${encodeURIComponent(rol)}` : '';
+  const query = rol ? `?rol=${encodeURIComponent(rol)}` : ''; 
   const response = await fetch(`${API_URL}/api/usuarios${query}`, {
     headers: { Authorization: `Bearer ${token}` },
   });

@@ -7,13 +7,14 @@ import ClienteDashboard from './modules/clientes/components/dashboard';
 import AdminDashboard from './modules/admin/components/dashboard';
 
 import type { UsuarioAutenticado } from './modules/auth/components/LoginForm';
+import './App.scss';
 
 export default function App() {
   const [usuarioAutenticado, setUsuarioAutenticado] = useState<UsuarioAutenticado | null>(null);
 
   if (!usuarioAutenticado) {
     return (
-      <main className="w-full min-h-screen">
+      <main className="contenedor-app">
         <AuthPage alIniciarSesion={(user) => setUsuarioAutenticado(user)} />
       </main>
     );
@@ -24,7 +25,7 @@ export default function App() {
   // CLIENTE
   if (userRole === 'cliente') {
     return (
-      <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
+      <main className="contenedor-app contenedor-dashboard">
         <ClienteDashboard
           nombreUsuario={usuarioAutenticado.nombre}
           token={usuarioAutenticado.token}
@@ -35,17 +36,21 @@ export default function App() {
   }
 
   // ADMINISTRADOR
-  if (userRole === 'admin') {
-    return (
-      <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
-        <AdminDashboard token={usuarioAutenticado.token} onLogout={() => setUsuarioAutenticado(null)} />
-      </main>
-    );
-  }
+// ADMINISTRADOR
+if (userRole === 'admin') {
+  return (
+    <main className="contenedor-app contenedor-dashboard">
+      <AdminDashboard
+        token={usuarioAutenticado.token}
+        onLogout={() => setUsuarioAutenticado(null)}
+      />
+    </main>
+  );
+}
 
   // EMPRESA
   return (
-    <main className="w-full min-h-screen p-6 flex flex-col items-center gap-6">
+    <main className="contenedor-app contenedor-dashboard">
       <Dashboard
         usuarioId={usuarioAutenticado.id}
         token={usuarioAutenticado.token}
