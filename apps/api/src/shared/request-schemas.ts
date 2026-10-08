@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+// Fuente de verdad para la VALIDACIÓN en runtime de requests (body/params/query).
+// Los `dtos/*.dto.ts` de cada módulo son sólo tipos de compilación para las
+// firmas de controllers/services; no validan nada por sí mismos, por eso
+// deben reflejar (a mano) la forma de estos schemas.
+
 const positiveId = z.number().int().positive().safe();
 const positiveIdParam = z.string()
   .regex(/^[1-9]\d*$/, 'Debe ser un ID entero positivo')

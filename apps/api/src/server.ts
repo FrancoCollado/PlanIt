@@ -6,12 +6,12 @@ import { randomBytes } from 'crypto';
 import { fileURLToPath } from 'url';
 
 import authRoutes from './modules/auth/routes/auth.routes.js';
-import eventoRoutes from './modules/events/routes/evento.routes.js';
-import usuarioRoutes from './modules/users/routes/usuario.routes.js';
+import eventoRoutes from './modules/eventos/routes/evento.routes.js';
+import usuarioRoutes from './modules/usuarios/routes/usuario.routes.js';
 import statsRoutes from './modules/stats/routes/stats.routes.js';
-import categoriaRoutes from './modules/categories/routes/categoria.routes.js';
-import servicioRoutes from './modules/services/routes/servicio.routes.js';
-import tableroRoutes from './modules/boards/tablero.routes.js';
+import categoriaRoutes from './modules/categorias/routes/categoria.routes.js';
+import servicioRoutes from './modules/servicios/routes/servicio.routes.js';
+import tableroRoutes from './modules/tableros/routes/tablero.routes.js';
 
 import { apiErrorHandler, respondWithError } from './shared/api-error.js';
 

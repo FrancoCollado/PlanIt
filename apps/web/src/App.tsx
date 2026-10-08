@@ -2,9 +2,9 @@ import { useState } from 'react';
 
 import AuthPage from './modules/auth/pages/AuthPage';
 
-import Dashboard from './modules/businesses/components/dashboard';
-import ClienteDashboard from './modules/clientes/components/dashboard';
-import AdminDashboard from './modules/admin/components/dashboard';
+import Dashboard from './modules/empresas/components/Dashboard';
+import ClienteDashboard from './modules/clientes/components/Dashboard';
+import AdminDashboard from './modules/admin/components/Dashboard';
 
 import type { UsuarioAutenticado } from './modules/auth/components/LoginForm';
 import './App.scss';

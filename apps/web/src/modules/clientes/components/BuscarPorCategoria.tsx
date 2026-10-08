@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { buscarServiciosPorCategoriaRequest } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
-import { listCategoriasRequest } from '../../events/services/categoriaService';
-import type { Categoria } from '../../events/services/categoriaService';
+import { listCategoriasRequest } from '../../eventos/services/categoriaService';
+import type { Categoria } from '../../eventos/services/categoriaService';
 import ItemServicio from './ItemServicio';
 
 // Pantalla para buscar servicios eligiendo una categoria

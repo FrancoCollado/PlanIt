@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { listEventosRequest } from '../../events/services/eventoService';
-import type { Evento } from '../../events/services/eventoService';
+import { listEventosRequest } from '../../eventos/services/eventoService';
+import type { Evento } from '../../eventos/services/eventoService';
 import {
   createTablero,
   deleteTablero,

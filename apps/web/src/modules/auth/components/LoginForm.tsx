@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { iniciarSesionRequest } from '../services/authService';
-import './FormularioLogin.scss';
+import './LoginForm.scss';
 
 // Tipos de  roles
 export type UsuarioRol = 'admin' | 'empresa' | 'cliente';

@@ -7,15 +7,17 @@
 * 54283 - Aleart, Tomas
 
 ### Repositorios
-* [frontend app](https://github.com/FrancoCollado/PlanIt/apps/web)
-* [backend app](https://github.com/FrancoCollado/PlanIt/apps/api)
+* [Monorepo PlanIt](https://github.com/FrancoCollado/PlanIt)
+* [frontend app](https://github.com/FrancoCollado/PlanIt/tree/main/apps/web)
+* [backend app](https://github.com/FrancoCollado/PlanIt/tree/main/apps/api)
 
 ## Tema
 ### Descripción
 Una aplicación estilo “marketplace” para bienes y servicios relacionados a eventos, donde las personas puedan acceder en un solo lugar a diferentes propuestas por parte de los negocios. Nuestra intención es que la persona pueda organizar el evento en su totalidad a través de la app, es una especie de vidriera virtual.
 
 ### Modelo
-![Dsp subo modelo]()
+<!-- TODO: agregar el diagrama del modelo de datos (por ejemplo en docs/modelo.png) -->
+
 
 ## Alcance Funcional
 

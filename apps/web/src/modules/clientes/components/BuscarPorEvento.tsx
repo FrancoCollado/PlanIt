@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { listEventosRequest } from '../../events/services/eventoService';
-import type { Evento } from '../../events/services/eventoService';
-import { listCategoriasRequest } from '../../events/services/categoriaService';
-import type { Categoria } from '../../events/services/categoriaService';
+import { listEventosRequest } from '../../eventos/services/eventoService';
+import type { Evento } from '../../eventos/services/eventoService';
+import { listCategoriasRequest } from '../../eventos/services/categoriaService';
+import type { Categoria } from '../../eventos/services/categoriaService';
 import { buscarServiciosPorCategoriaRequest } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
 import ItemServicio from './ItemServicio';
