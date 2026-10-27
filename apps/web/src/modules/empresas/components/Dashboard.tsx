@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Dashboard.scss';
 import {
   listServiciosRequest,
@@ -6,7 +6,9 @@ import {
   updateServicioRequest,
   deleteServicioRequest,
   subirImagenServicioRequest,
-  crearCheckoutPruebaMercadoPagoRequest
+  crearCheckoutPlanProRequest,
+  confirmarPlanProRequest,
+  getUsuarioPlanRequest
 } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
 import { listCategoriasRequest } from '../../eventos/services/categoriaService';
@@ -20,8 +22,24 @@ interface DashboardProps {
   token: string;
 }
 
+// Con el plan gratis la empresa puede tener como mucho esta cantidad de servicios cargados
+const LIMITE_SERVICIOS_PLAN_GRATIS = 3;
+
 // Objeto vacio para resetear el formulario
-const servicioVacio = { nombre: '', descripcion: '', imagen: '', categoriaId: 0, draft: true };
+const servicioVacio: { nombre: string; descripcion: string; imagen: string; categoriaId: number; estado: 'borrador' | 'revision' } = {
+  nombre: '', descripcion: '', imagen: '', categoriaId: 0, estado: 'borrador'
+};
+
+// Traduce el estado del servicio a un texto para mostrar en la lista
+function textoEstadoServicio(estado: Servicio['estado']): string {
+  if (estado === 'borrador') {
+    return 'borrador';
+  } else if (estado === 'revision') {
+    return 'en revision, esperando al administrador';
+  } else {
+    return 'publicado';
+  }
+}
 
 export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps) {
   // Esta variable dice si se esta mostrando la lista de servicios
@@ -33,17 +51,21 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
   const [servicioEditando, setServicioEditando] = useState<Servicio | null>(null);
   const [formServicio, setFormServicio] = useState(servicioVacio);
   const [subiendoImagen, setSubiendoImagen] = useState(false);
-  const [probandoMercadoPago, setProbandoMercadoPago] = useState(false);
-  const [resultadoMercadoPago, setResultadoMercadoPago] = useState<{
+
+  // --- PLAN PRO ---
+  const [plan, setPlan] = useState<'gratis' | 'pro'>('gratis');
+  const [creandoPagoPro, setCreandoPagoPro] = useState(false);
+  const [mensajePago, setMensajePago] = useState<{
     tipo: 'exito' | 'error';
     mensaje: string;
   } | null>(null);
-  
+
   // Las categorias las crea el admin, yo solo las uso para el select
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   // Uso un solo mensaje de error para todo asi no me complico
   const [mensaje, setMensaje] = useState('');
+
 
   // Traigo los servicios de la empresa de la base de datos
   async function cargarServicios() {
@@ -66,6 +88,19 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
     }
   }
 
+  // Traigo el plan actual de la empresa (gratis o pro)
+  async function cargarPlan() {
+    if (!usuarioId) return;
+
+    try {
+      const planDelUsuario = await getUsuarioPlanRequest(usuarioId, token);
+      setPlan(planDelUsuario);
+    } catch {
+      // Si no lo puedo traer lo dejo en gratis, no es grave
+      setPlan('gratis');
+    }
+  }
+
   // Cuando toco el boton del menu muestro la seccion y traigo los datos
   function mostrarServicios() {
     setMensaje('');
@@ -73,7 +108,58 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
     setFormServicioVisible(false);
     cargarServicios();
     cargarCategorias();
+    cargarPlan();
   }
+
+  // Al entrar al dashboard traigo el plan para saber si ya es Pro
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- cargarPlan hace un fetch y recien ahi actualiza el estado
+    cargarPlan();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuarioId]);
+
+  // Mercado Pago nos redirige de vuelta aca con parametros en la url
+  // (por ejemplo ?pago=pro&status=approved&payment_id=123). Los leo una
+  // sola vez cuando se carga la pagina y confirmo el pago si corresponde.
+  useEffect(() => {
+    if (!usuarioId) return;
+
+    const parametros = new URLSearchParams(window.location.search);
+    const pago = parametros.get('pago');
+
+    if (pago !== 'pro') return;
+
+    const paymentId = parametros.get('payment_id');
+    const status = parametros.get('status');
+
+    // Saco los parametros de la url para que si recargo la pagina no se vuelva a procesar
+    window.history.replaceState({}, '', window.location.pathname);
+
+    if (status !== 'approved' || !paymentId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- es el resultado de leer la url al entrar, no un render en loop
+      setMensajePago({
+        tipo: 'error',
+        mensaje: 'El pago no se aprobo. Si fue un error, podes intentar pasar a Pro de nuevo.'
+      });
+      return;
+    }
+
+    confirmarPlanProRequest(usuarioId, paymentId, token)
+      .then(() => {
+        setPlan('pro');
+        setMensajePago({
+          tipo: 'exito',
+          mensaje: 'Listo! Tu cuenta ahora es Pro, ya podes subir todos los servicios que quieras.'
+        });
+      })
+      .catch(() => {
+        setMensajePago({
+          tipo: 'error',
+          mensaje: 'Mercado Pago aprobo el pago pero no pudimos confirmarlo en el servidor.'
+        });
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuarioId]);
 
   // Subo la imagen al servidor y me guardo la url que me devuelve
   async function seleccionarImagen(e: React.ChangeEvent<HTMLInputElement>) {
@@ -106,6 +192,14 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
       return;
     }
 
+    // Si estoy creando un servicio nuevo (no editando) y ya llegue al limite del plan
+    // gratis, no dejo guardar. El boton ya deberia estar deshabilitado, pero controlo
+    // de nuevo aca por las dudas.
+    if (!servicioEditando && plan === 'gratis' && servicios.length >= LIMITE_SERVICIOS_PLAN_GRATIS) {
+      setMensaje('Llegaste al limite de ' + LIMITE_SERVICIOS_PLAN_GRATIS + ' servicios del plan gratis. Pasate a Pro para seguir subiendo.');
+      return;
+    }
+
     const datos = { ...formServicio, nombre: formatearTitulo(formServicio.nombre) };
 
     try {
@@ -123,24 +217,24 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
     }
   }
 
-  async function manejarPruebaMercadoPago() {
+  // Crea el pago del plan Pro en Mercado Pago y manda a la empresa al checkout
+  async function manejarPasarAPro() {
     if (!usuarioId) return;
 
-    setProbandoMercadoPago(true);
-    setResultadoMercadoPago(null);
+    setCreandoPagoPro(true);
+    setMensajePago(null);
     try {
-      const checkout = await crearCheckoutPruebaMercadoPagoRequest(usuarioId, token);
-      if (!checkout.sandboxInitPoint) {
-        throw new Error('Mercado Pago no devolvió un enlace de prueba. Verificá que MP_ACCESS_TOKEN sea un token de prueba.');
-      }
-      window.location.assign(checkout.sandboxInitPoint);
+      const checkout = await crearCheckoutPlanProRequest(usuarioId, token);
+      // En desarrollo usamos el sandbox, en produccion se deberia usar initPoint
+      const urlDePago = checkout.sandboxInitPoint ?? checkout.initPoint;
+      window.location.assign(urlDePago);
     } catch (error) {
-      setResultadoMercadoPago({
+      setMensajePago({
         tipo: 'error',
-        mensaje: error instanceof Error ? error.message : 'No se pudo verificar la integración con Mercado Pago.'
+        mensaje: error instanceof Error ? error.message : 'No se pudo iniciar el pago del plan Pro.'
       });
     } finally {
-      setProbandoMercadoPago(false);
+      setCreandoPagoPro(false);
     }
   }
 
@@ -157,6 +251,9 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
       setMensaje('No se pudo borrar el servicio');
     }
   }
+
+  // Si tiene el plan gratis y ya llego al limite, no puede cargar mas servicios
+  const llegoAlLimiteDelPlanGratis = plan === 'gratis' && servicios.length >= LIMITE_SERVICIOS_PLAN_GRATIS;
 
   return (
     <div className="pagina-empresa">
@@ -185,6 +282,24 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
           <div className="caja-empresa">
             <h2 className="subtitulo-empresa">Lista de servicios</h2>
 
+            {/* Si ya es plan Pro se lo digo, si no le muestro cuantos le quedan */}
+            {plan === 'pro' ? (
+              <p className="texto-ayuda-empresa">Tenes el plan Pro: podes cargar todos los servicios que quieras.</p>
+            ) : (
+              <p className="texto-ayuda-empresa">
+                Plan gratis: llevas {servicios.length} de {LIMITE_SERVICIOS_PLAN_GRATIS} servicios.
+              </p>
+            )}
+
+            {mensajePago && (
+              <p
+                role="status"
+                className={mensajePago.tipo === 'exito' ? 'texto-ayuda-empresa' : 'mensaje-error-empresa'}
+              >
+                {mensajePago.mensaje}
+              </p>
+            )}
+
             {!formServicioVisible && (
               <button
                 className="boton-nuevo-empresa"
@@ -194,9 +309,20 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
                   setFormServicio({ ...servicioVacio, categoriaId: categorias[0]?.id ?? 0 });
                   setFormServicioVisible(true);
                 }}
-                disabled={categorias.length === 0}
+                disabled={categorias.length === 0 || llegoAlLimiteDelPlanGratis}
               >
                 Agregar servicio
+              </button>
+            )}
+
+            {/* Si llego al limite del plan gratis le muestro el boton para pasar a Pro */}
+            {!formServicioVisible && llegoAlLimiteDelPlanGratis && (
+              <button
+                className="boton-nuevo-empresa"
+                onClick={manejarPasarAPro}
+                disabled={creandoPagoPro}
+              >
+                {creandoPagoPro ? 'Preparando el pago...' : 'Pasar a Pro'}
               </button>
             )}
 
@@ -249,31 +375,22 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
                 <label className="label-check-empresa">
                   <input
                     type="checkbox"
-                    checked={formServicio.draft}
-                    onChange={(e) => setFormServicio({ ...formServicio, draft: e.target.checked })}
+                    checked={formServicio.estado === 'borrador'}
+                    onChange={(e) => setFormServicio({ ...formServicio, estado: e.target.checked ? 'borrador' : 'revision' })}
                   />
                   Guardar como borrador
                 </label>
 
-                <div className="botones-formulario-empresa">
-                  <button type="submit" disabled={subiendoImagen}>Guardar</button>
-                  <button
-                    type="button"
-                    onClick={manejarPruebaMercadoPago}
-                    disabled={probandoMercadoPago}
-                  >
-                    {probandoMercadoPago ? 'Creando checkout...' : 'Probar Checkout Pro (ARS 100)'}
-                  </button>
-                  <button type="button" onClick={() => setFormServicioVisible(false)}>Cancelar</button>
-                </div>
-                {resultadoMercadoPago && (
-                  <p
-                    role="status"
-                    className={resultadoMercadoPago.tipo === 'exito' ? 'texto-ayuda-empresa' : 'mensaje-error-empresa'}
-                  >
-                    {resultadoMercadoPago.mensaje}
+                {formServicio.estado === 'revision' && (
+                  <p className="texto-ayuda-empresa">
+                    Al guardar, el servicio queda en revision hasta que un administrador lo apruebe.
                   </p>
                 )}
+
+                <div className="botones-formulario-empresa">
+                  <button type="submit" disabled={subiendoImagen}>Guardar</button>
+                  <button type="button" onClick={() => setFormServicioVisible(false)}>Cancelar</button>
+                </div>
               </form>
             )}
 
@@ -289,18 +406,28 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
               {servicios.map((servicio) => (
                 <li key={servicio.id} className="item-lista-empresa">
                   <span>
-                    <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} ({servicio.draft ? 'borrador' : 'publicado'})
+                    <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} ({textoEstadoServicio(servicio.estado)})
                   </span>
                   <span className="botones-item-empresa">
                     <button
                       onClick={() => {
                         setServicioEditando(servicio);
+
+                        // Si el servicio ya esta publicado y la empresa lo edita, lo mando
+                        // de nuevo a revision porque cambio el contenido que el admin aprobo.
+                        let estadoParaEditar: 'borrador' | 'revision';
+                        if (servicio.estado === 'publicado') {
+                          estadoParaEditar = 'revision';
+                        } else {
+                          estadoParaEditar = servicio.estado;
+                        }
+
                         setFormServicio({
                           nombre: servicio.nombre,
                           descripcion: servicio.descripcion ?? '',
                           imagen: servicio.imagen ?? '',
                           categoriaId: servicio.categoria.id,
-                          draft: servicio.draft
+                          estado: estadoParaEditar
                         });
                         setFormServicioVisible(true);
                       }}

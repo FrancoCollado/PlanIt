@@ -6,3 +6,14 @@ export interface CreatePaymentPreferenceDto {
     unit_price: number;
   }>;
 }
+
+export interface CreatePlanProPreferenceDto {
+  usuarioId: number;
+  // Origen del sitio (por ejemplo http://localhost:5173) para armar las urls de vuelta
+  origin: string;
+}
+
+export interface ConfirmarPlanProDto {
+  usuarioId: number;
+  paymentId: string;
+}

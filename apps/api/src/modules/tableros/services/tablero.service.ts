@@ -88,7 +88,7 @@ export const addServicioToTablero = async (tableroId: number, clienteId: number,
   const tablero = await em.findOne(Tablero, { id: tableroId, cliente: clienteId });
   if (!tablero) return 'TABLERO_NOT_FOUND' as const;
 
-  const servicio = await em.findOne(Servicio, { id: servicioId, draft: false });
+  const servicio = await em.findOne(Servicio, { id: servicioId, estado: 'publicado' });
   if (!servicio) return 'SERVICIO_NOT_FOUND' as const;
 
   const existing = await em.findOne(TableroServicio, { tablero: tablero.id, servicio: servicio.id });

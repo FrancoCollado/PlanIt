@@ -6,7 +6,10 @@ import {
   buscarServiciosCategoria,
   crearServicio,
   actualizarServicio,
-  borrarServicio
+  borrarServicio,
+  getServiciosEnRevision,
+  aprobarServicioAdmin,
+  denegarServicioAdmin
 } from '../controllers/servicio.controller.js';
 import { validateRequest } from '../../../shared/request-validation.js';
 import { requestSchemas } from '../../../shared/request-schemas.js';
@@ -20,6 +23,11 @@ router.get('/', authenticate, requireRoles('empresa'), validateRequest(requestSc
 router.get('/buscar', validateRequest(requestSchemas.searchServicios), ensureOrm, buscarServicios);
 
 router.get('/categoria/:categoriaId', validateRequest(requestSchemas.categoriaIdParam), ensureOrm, buscarServiciosCategoria);
+
+// El administrador revisa los servicios que las empresas mandaron a publicar
+router.get('/admin/revision', authenticate, requireRoles('administrador'), ensureOrm, ensureActiveUser, getServiciosEnRevision);
+router.post('/admin/:id/aprobar', authenticate, requireRoles('administrador'), validateRequest(requestSchemas.idParams), ensureOrm, ensureActiveUser, aprobarServicioAdmin);
+router.post('/admin/:id/denegar', authenticate, requireRoles('administrador'), validateRequest(requestSchemas.idParams), ensureOrm, ensureActiveUser, denegarServicioAdmin);
 
 router.post('/', authenticate, requireRoles('empresa'), validateRequest(requestSchemas.createServicio), requireOwnUserId, ensureOrm, ensureActiveUser, crearServicio);
 

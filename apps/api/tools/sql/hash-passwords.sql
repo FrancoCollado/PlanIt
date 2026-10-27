@@ -1,6 +1,3 @@
--- Hashea las contraseñas que quedaron en texto plano.
--- Ejecutar UNA vez en el SQL Editor de Supabase (o con psql en local).
-
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- El filtro evita volver a hashear un hash si el script se corre dos veces.

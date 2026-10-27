@@ -5,7 +5,7 @@ export interface Servicio {
   nombre: string;
   descripcion?: string;
   imagen?: string;
-  draft: boolean;
+  estado: 'borrador' | 'revision' | 'publicado';
   creadoEn?: string;
   categoria: {
     id: number;

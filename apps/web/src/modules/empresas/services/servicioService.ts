@@ -1,12 +1,16 @@
 import { API_URL } from '../../../config/api';
 import { supabase, SERVICIOS_IMAGENES_BUCKET } from '../../../config/supabase';
 
+// El estado puede ser 'borrador' (todavia lo estoy armando), 'revision'
+// (ya lo mande y espero que el admin lo revise) o 'publicado' (el admin lo aprobo)
+export type EstadoServicio = 'borrador' | 'revision' | 'publicado';
+
 export interface Servicio {
   id: number;
   nombre: string;
   descripcion?: string;
   imagen?: string;
-  draft: boolean;
+  estado: EstadoServicio;
   creadoEn?: string;
   categoria: {
     id: number;
@@ -19,7 +23,8 @@ export interface ServicioPayload {
   descripcion?: string;
   imagen?: string;
   categoriaId: number;
-  draft?: boolean;
+  // La empresa solo puede mandar 'borrador' o 'revision', 'publicado' lo pone el admin
+  estado?: 'borrador' | 'revision';
 }
 
 // Sube el archivo a Supabase Storage y devuelve la URL pública para guardar en `imagen`.
@@ -78,7 +83,7 @@ export const updateServicioRequest = async (
     descripcion?: string;
     imagen?: string;
     categoriaId?: number;
-    draft?: boolean;
+    estado?: 'borrador' | 'revision';
   },
   token: string
 ): Promise<Servicio> => {
@@ -115,19 +120,21 @@ export interface MercadoPagoCheckoutResponse {
   sandboxInitPoint?: string;
 }
 
-export const crearCheckoutPruebaMercadoPagoRequest = async (
+// Crea la preferencia de pago para pasar al plan Pro. Le mandamos el origin
+// (por ejemplo http://localhost:5173) para que el backend arme las urls de vuelta.
+export const crearCheckoutPlanProRequest = async (
   usuarioId: number,
   token: string
 ): Promise<MercadoPagoCheckoutResponse> => {
-  const response = await fetch(`${API_URL}/api/payment/test/checkout`, {
+  const response = await fetch(`${API_URL}/api/payment/plan-pro/preference`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ usuarioId })
+    body: JSON.stringify({ usuarioId, origin: window.location.origin })
   });
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || 'No se pudo iniciar el checkout de prueba de Mercado Pago');
+    throw new Error(data.error || 'No se pudo iniciar el pago del plan Pro');
   }
 
   if (
@@ -136,7 +143,7 @@ export const crearCheckoutPruebaMercadoPagoRequest = async (
     typeof data.initPoint !== 'string' ||
     (data.sandboxInitPoint !== undefined && typeof data.sandboxInitPoint !== 'string')
   ) {
-    throw new Error('Mercado Pago devolvió una respuesta inválida al iniciar el checkout');
+    throw new Error('Mercado Pago devolvió una respuesta inválida al iniciar el pago');
   }
 
   return {
@@ -144,4 +151,38 @@ export const crearCheckoutPruebaMercadoPagoRequest = async (
     initPoint: data.initPoint,
     ...(data.sandboxInitPoint ? { sandboxInitPoint: data.sandboxInitPoint } : {})
   };
+};
+
+// Confirma el pago del plan Pro una vez que Mercado Pago nos redirige de vuelta
+export const confirmarPlanProRequest = async (
+  usuarioId: number,
+  paymentId: string,
+  token: string
+): Promise<'pro'> => {
+  const response = await fetch(`${API_URL}/api/payment/plan-pro/confirmar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ usuarioId, paymentId })
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'No se pudo confirmar el pago del plan Pro');
+  }
+
+  return 'pro';
+};
+
+// Trae el perfil del usuario logueado (lo usamos para saber si ya es plan Pro)
+export const getUsuarioPlanRequest = async (usuarioId: number, token: string): Promise<'gratis' | 'pro'> => {
+  const response = await fetch(`${API_URL}/api/usuarios/${usuarioId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Error al obtener el usuario');
+  }
+
+  return data.usuario.plan;
 };

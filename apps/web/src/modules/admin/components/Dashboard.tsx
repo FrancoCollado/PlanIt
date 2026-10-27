@@ -16,6 +16,12 @@ import {
 import type { Categoria } from '../../eventos/services/categoriaService';
 import { listUsuariosRequest, setUsuarioActivoRequest } from '../services/usuarioService';
 import type { Usuario } from '../services/usuarioService';
+import {
+  listServiciosRevisionRequest,
+  aprobarServicioRequest,
+  denegarServicioRequest
+} from '../services/servicioAdminService';
+import type { ServicioRevision } from '../services/servicioAdminService';
 import { formatearTitulo } from '../../../shared/formatters';
 
 // Props que me manda App.tsx (el token para la API y la funcion de salir)
@@ -30,7 +36,7 @@ const categoriaVacia = { nombre: '', descripcion: '', eventoId: 0 };
 
 export default function AdminDashboard({ token, onLogout }: AdminDashboardProps) {
   // Esta variable dice que seccion se esta mostrando abajo de los botones
-  const [seccion, setSeccion] = useState<'eventos' | 'categorias' | 'empresas' | null>(null);
+  const [seccion, setSeccion] = useState<'eventos' | 'categorias' | 'empresas' | 'servicios' | null>(null);
 
   // --- EVENTOS ---
   const [eventos, setEventos] = useState<Evento[]>([]);
@@ -46,6 +52,9 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
 
   // --- EMPRESAS ---
   const [empresas, setEmpresas] = useState<Usuario[]>([]);
+
+  // --- SERVICIOS EN REVISION ---
+  const [serviciosRevision, setServiciosRevision] = useState<ServicioRevision[]>([]);
 
   // Uso un solo mensaje de error para todo asi no me complico
   const [mensaje, setMensaje] = useState('');
@@ -78,6 +87,15 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     }
   }
 
+  async function cargarServiciosRevision() {
+    try {
+      const datos = await listServiciosRevisionRequest(token);
+      setServiciosRevision(datos);
+    } catch {
+      setMensaje('No se pudieron cargar los servicios en revision');
+    }
+  }
+
   // Cuando toco un boton del menu muestro la seccion y traigo los datos
   function mostrarEventos() {
     setMensaje('');
@@ -98,6 +116,12 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     setMensaje('');
     setSeccion('empresas');
     cargarEmpresas();
+  }
+
+  function mostrarServicios() {
+    setMensaje('');
+    setSeccion('servicios');
+    cargarServiciosRevision();
   }
 
   // Guarda un evento nuevo o edita el que estoy tocando
@@ -181,6 +205,30 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     }
   }
 
+  // Aprueba el servicio: pasa a publicado y ya se puede ver en las busquedas
+  async function aprobarServicio(servicio: ServicioRevision) {
+    if (!window.confirm('Seguro que queres aprobar y publicar el servicio ' + servicio.nombre + '?')) return;
+
+    try {
+      await aprobarServicioRequest(servicio.id, token);
+      await cargarServiciosRevision();
+    } catch {
+      setMensaje('No se pudo aprobar el servicio');
+    }
+  }
+
+  // Deniega el servicio: se borra de una, la empresa lo tiene que volver a cargar
+  async function denegarServicio(servicio: ServicioRevision) {
+    if (!window.confirm('Seguro que queres denegar el servicio ' + servicio.nombre + '? Se va a borrar.')) return;
+
+    try {
+      await denegarServicioRequest(servicio.id, token);
+      await cargarServiciosRevision();
+    } catch {
+      setMensaje('No se pudo denegar el servicio');
+    }
+  }
+
   return (
     <div className="pagina-admin">
       {/* Barra de arriba con el nombre de la pagina y el boton de salir */}
@@ -192,11 +240,12 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
       <div className="contenido">
         <h2 className="bienvenida">Bienvenido al panel de administracion</h2>
 
-        {/* Menu con los 3 botones principales */}
+        {/* Menu con los 4 botones principales */}
         <div className="menu">
           <button className="boton-menu" onClick={mostrarEventos}>Eventos</button>
           <button className="boton-menu" onClick={mostrarCategorias}>Categorias</button>
           <button className="boton-menu" onClick={mostrarEmpresas}>Empresas</button>
+          <button className="boton-menu" onClick={mostrarServicios}>Servicios en revision</button>
         </div>
 
         {/* Si hubo algun error lo muestro aca */}
@@ -402,6 +451,31 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
                     <button onClick={() => cambiarEstadoEmpresa(empresa)}>
                       {empresa.activo ? 'Suspender' : 'Activar'}
                     </button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* SECCION DE SERVICIOS EN REVISION */}
+        {seccion === 'servicios' && (
+          <div className="caja">
+            <h2 className="subtitulo">Servicios esperando aprobacion</h2>
+
+            {serviciosRevision.length === 0 && (
+              <p className="texto-ayuda">No hay servicios en revision por el momento.</p>
+            )}
+
+            <ul className="lista">
+              {serviciosRevision.map((servicio) => (
+                <li key={servicio.id} className="item-lista">
+                  <span>
+                    <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} - empresa: {servicio.empresa.nombre}
+                  </span>
+                  <span className="botones-item">
+                    <button onClick={() => aprobarServicio(servicio)}>Aprobar</button>
+                    <button onClick={() => denegarServicio(servicio)}>Denegar</button>
                   </span>
                 </li>
               ))}

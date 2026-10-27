@@ -9,7 +9,8 @@ import { ensureOrm } from '../../../middlewares/ensure-orm.js';
 import { validateRequest } from '../../../shared/request-validation.js';
 import { requestSchemas } from '../../../shared/request-schemas.js';
 import {
-  crearCheckoutPruebaMercadoPago,
+  confirmarPlanPro,
+  crearCheckoutPlanPro,
   crearPreferenciaPago,
   probarIntegracionMercadoPago
 } from '../controllers/payment.controller.js';
@@ -27,14 +28,25 @@ router.post(
 );
 
 router.post(
-  '/test/checkout',
+  '/plan-pro/preference',
   authenticate,
   requireRoles('empresa'),
-  validateRequest(requestSchemas.testPaymentCheckout),
+  validateRequest(requestSchemas.createPlanProPreference),
   requireOwnUserId,
   ensureOrm,
   ensureActiveUser,
-  crearCheckoutPruebaMercadoPago
+  crearCheckoutPlanPro
+);
+
+router.post(
+  '/plan-pro/confirmar',
+  authenticate,
+  requireRoles('empresa'),
+  validateRequest(requestSchemas.confirmarPlanPro),
+  requireOwnUserId,
+  ensureOrm,
+  ensureActiveUser,
+  confirmarPlanPro
 );
 
 router.post(

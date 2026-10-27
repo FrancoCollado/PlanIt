@@ -6,7 +6,10 @@ import {
   buscarServiciosPorCategoria,
   createServicio,
   updateServicio,
-  deleteServicio
+  deleteServicio,
+  listServiciosEnRevision,
+  aprobarServicio,
+  denegarServicio
 } from '../services/servicio.service.js';
 
 import type {
@@ -21,7 +24,7 @@ const serializeServicio = (servicio: {
   nombre: string;
   descripcion?: string;
   imagen?: string;
-  draft: boolean;
+  estado: 'borrador' | 'revision' | 'publicado';
   creadoEn: Date;
   categoria: {
     id: number;
@@ -38,7 +41,7 @@ const serializeServicio = (servicio: {
   nombre: servicio.nombre,
   descripcion: servicio.descripcion,
   imagen: servicio.imagen,
-  draft: servicio.draft,
+  estado: servicio.estado,
   creadoEn: servicio.creadoEn,
   categoria: {
     id: servicio.categoria.id,
@@ -120,7 +123,7 @@ export const crearServicio = async (
     imagen,
     categoriaId,
     usuarioId,
-    draft
+    estado
   } = req.body;
 
   try {
@@ -130,7 +133,7 @@ export const crearServicio = async (
       imagen,
       categoriaId: Number(categoriaId),
       usuarioId: Number(usuarioId),
-      draft
+      estado
     });
 
     res.status(201).json({
@@ -204,5 +207,72 @@ export const borrarServicio = async (
     });
   } catch (error) {
     sendApiError(res, error, 'Error al eliminar el servicio');
+  }
+};
+
+
+// Lista los servicios que estan en estado "revision", para que el admin los vea
+
+export const getServiciosEnRevision = async (
+  _req: Request,
+  res: Response
+) => {
+  try {
+    const servicios = await listServiciosEnRevision();
+
+    res.json({
+      servicios: servicios.map(serializeServicio)
+    });
+  } catch (error) {
+    sendApiError(res, error, 'Error al obtener los servicios en revisión');
+  }
+};
+
+
+// El admin aprueba un servicio en revision: pasa a "publicado"
+
+export const aprobarServicioAdmin = async (
+  req: Request,
+  res: Response
+) => {
+  const id = Number(req.params.id);
+
+  try {
+    const servicio = await aprobarServicio(id);
+
+    if (!servicio) {
+      return respondWithError(res, 404, 'NOT_FOUND', 'Servicio no encontrado');
+    }
+
+    res.json({
+      message: 'Servicio aprobado y publicado correctamente',
+      servicio: serializeServicio(servicio)
+    });
+  } catch (error) {
+    sendApiError(res, error, 'Error al aprobar el servicio');
+  }
+};
+
+
+// El admin deniega un servicio en revision: se borra directamente
+
+export const denegarServicioAdmin = async (
+  req: Request,
+  res: Response
+) => {
+  const id = Number(req.params.id);
+
+  try {
+    const eliminado = await denegarServicio(id);
+
+    if (!eliminado) {
+      return respondWithError(res, 404, 'NOT_FOUND', 'Servicio no encontrado');
+    }
+
+    res.json({
+      message: 'Servicio denegado y eliminado correctamente'
+    });
+  } catch (error) {
+    sendApiError(res, error, 'Error al denegar el servicio');
   }
 };

@@ -46,8 +46,9 @@ export const buscarServiciosPorNombre = async (
   }
 
   // Armo el filtro completo de la búsqueda
+  // Solo se muestran los servicios que ya estan "publicado" (el admin los aprobo)
   const filtro: any = {
-    draft: false,
+    estado: 'publicado',
     usuario: filtroUsuario
   };
   if (nombre) {
@@ -76,12 +77,28 @@ export const buscarServiciosPorCategoria = async (
     Servicio,
     {
       categoria: categoriaId,
-      draft: false,
+      estado: 'publicado',
       usuario: { rol: 'empresa', activo: true }
     },
     {
       populate: ['categoria', 'usuario'],
       orderBy: { nombre: 'ASC' }
+    }
+  );
+};
+
+
+// Lista los servicios que estan esperando que el administrador los revise
+
+export const listServiciosEnRevision = async (): Promise<Servicio[]> => {
+  const em = getOrm().em.fork();
+
+  return em.find(
+    Servicio,
+    { estado: 'revision' },
+    {
+      populate: ['categoria', 'usuario'],
+      orderBy: { creadoEn: 'ASC' }
     }
   );
 };
@@ -131,7 +148,7 @@ export const createServicio = async (
     imagen: data.imagen,
     categoria,
     usuario,
-    draft: data.draft ?? true,
+    estado: data.estado ?? 'borrador',
     creadoEn: new Date()
   });
 
@@ -171,8 +188,14 @@ export const updateServicio = async (
     servicio.imagen = data.imagen;
   }
 
-  if (data.draft !== undefined) {
-    servicio.draft = data.draft;
+  if (data.estado !== undefined) {
+    // La empresa nunca puede publicar un servicio por su cuenta, eso lo valida
+    // el schema de zod (solo permite 'borrador' o 'revision'), pero lo volvemos
+    // a chequear aca por las dudas.
+    if (data.estado === 'publicado') {
+      throw new ApiError(403, 'FORBIDDEN', 'Las empresas no pueden publicar un servicio directamente, esperá a que el administrador lo apruebe');
+    }
+    servicio.estado = data.estado;
   }
 
   if (data.categoriaId !== undefined) {
@@ -205,6 +228,45 @@ export const deleteServicio = async (
     id,
     usuario: usuarioId
   });
+
+  if (!servicio) {
+    return false;
+  }
+
+  await em.remove(servicio).flush();
+
+  return true;
+};
+
+
+// El administrador aprueba el servicio que esta en revision y lo publica
+
+export const aprobarServicio = async (
+  id: number
+): Promise<Servicio | null> => {
+  const em = getOrm().em.fork();
+
+  const servicio = await em.findOne(Servicio, { id });
+
+  if (!servicio) {
+    return null;
+  }
+
+  servicio.estado = 'publicado';
+  await em.flush();
+
+  return servicio;
+};
+
+
+// El administrador deniega el servicio que esta en revision: se borra directamente
+
+export const denegarServicio = async (
+  id: number
+): Promise<boolean> => {
+  const em = getOrm().em.fork();
+
+  const servicio = await em.findOne(Servicio, { id });
 
   if (!servicio) {
     return false;

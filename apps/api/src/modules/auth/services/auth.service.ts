@@ -44,6 +44,7 @@ export const createUser = async (
     password: await hashPassword(password),
     rol: role,
     activo: true,
+    plan: 'gratis',
     ...(businessData ?? {})
   });
 

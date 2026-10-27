@@ -1,10 +1,14 @@
+// El estado lo puede mandar la empresa como 'borrador' o 'revision'.
+// 'publicado' solo lo pone el administrador cuando aprueba el servicio.
+export type EstadoServicio = 'borrador' | 'revision' | 'publicado';
+
 export interface CreateServicioDto {
   nombre: string;
   descripcion?: string;
   imagen?: string;
   categoriaId: number;
   usuarioId: number;
-  draft?: boolean;
+  estado?: EstadoServicio;
 }
 
 export interface UpdateServicioDto {
@@ -12,5 +16,5 @@ export interface UpdateServicioDto {
   descripcion?: string;
   imagen?: string;
   categoriaId?: number;
-  draft?: boolean;
+  estado?: EstadoServicio;
 }

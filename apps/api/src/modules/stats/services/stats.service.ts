@@ -14,6 +14,7 @@ export interface AdminStats {
 export interface BusinessStats {
   serviciosActivos: number;
   serviciosBorrador: number;
+  serviciosEnRevision: number;
   vecesGuardadoEnTableros: number;
   categoriasPresentes: number;
 }
@@ -32,8 +33,9 @@ export const getAdminStats = async (): Promise<AdminStats> => {
 export const getBusinessStats = async (usuarioId: number): Promise<BusinessStats> => {
   const em = getOrm().em.fork();
 
-  const serviciosActivos = await em.count(Servicio, { usuario: usuarioId, draft: false });
-  const serviciosBorrador = await em.count(Servicio, { usuario: usuarioId, draft: true });
+  const serviciosActivos = await em.count(Servicio, { usuario: usuarioId, estado: 'publicado' });
+  const serviciosBorrador = await em.count(Servicio, { usuario: usuarioId, estado: 'borrador' });
+  const serviciosEnRevision = await em.count(Servicio, { usuario: usuarioId, estado: 'revision' });
   const vecesGuardadoEnTableros = await em.count(TableroServicio, { servicio: { usuario: usuarioId } });
   const serviciosDelUsuario = await em.find(Servicio, { usuario: usuarioId }, { populate: ['categoria'] });
 
@@ -45,5 +47,5 @@ export const getBusinessStats = async (usuarioId: number): Promise<BusinessStats
   }
   const categoriasPresentes = idsDeCategoriasVistas.length;
 
-  return { serviciosActivos, serviciosBorrador, vecesGuardadoEnTableros, categoriasPresentes };
+  return { serviciosActivos, serviciosBorrador, serviciosEnRevision, vecesGuardadoEnTableros, categoriasPresentes };
 };

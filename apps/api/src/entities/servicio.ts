@@ -49,10 +49,14 @@ export class Servicio {
   })
   creadoEn!: Date;
 
-  // Indica si el servicio ya está publicado (activo) o si es un borrador
+  // Estado de la publicación del servicio:
+  // 'borrador'  -> la empresa todavia lo esta armando, no lo mando a revisar
+  // 'revision'  -> la empresa lo mando y esta esperando que el administrador lo revise
+  // 'publicado' -> el administrador lo aprobo y ya se ve en las busquedas
   @Property({
-    type: 'boolean',
-    default: true
+    type: 'string',
+    length: 20,
+    default: 'borrador'
   })
-  draft: boolean = true;
+  estado: 'borrador' | 'revision' | 'publicado' = 'borrador';
 }

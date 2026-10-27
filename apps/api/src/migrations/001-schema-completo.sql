@@ -11,6 +11,8 @@ BEGIN
 END$$;
 
 -- usuarios
+-- El plan es 'gratis' (hasta 3 servicios activos) o 'pro' (sin limite).
+-- Solo se usa para empresas, el resto de los roles lo deja en 'gratis' sin usarlo.
 CREATE TABLE IF NOT EXISTS usuarios (
   id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   nombre        VARCHAR(100) NOT NULL,
@@ -21,8 +23,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
   cuit          BIGINT,
   telefono      BIGINT,
   activo        BOOLEAN NOT NULL DEFAULT TRUE,
+  plan          VARCHAR(10) NOT NULL DEFAULT 'gratis',
   creado_en     TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT uq_usuarios_email UNIQUE (email)
+  CONSTRAINT uq_usuarios_email UNIQUE (email),
+  CONSTRAINT chk_usuarios_plan CHECK (plan IN ('gratis', 'pro'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_rol ON usuarios (rol);
@@ -54,6 +58,9 @@ CREATE TABLE IF NOT EXISTS categorias (
 CREATE INDEX IF NOT EXISTS idx_categorias_evento ON categorias (evento_id);
 
 -- servicios
+-- El estado de la publicacion puede ser: 'borrador', 'revision' o 'publicado'.
+-- La empresa solo puede poner 'borrador' o 'revision', el que pasa a 'publicado'
+-- siempre es el administrador cuando aprueba la publicacion.
 CREATE TABLE IF NOT EXISTS servicios (
   id           INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   categoria_id INTEGER NOT NULL,
@@ -61,19 +68,21 @@ CREATE TABLE IF NOT EXISTS servicios (
   nombre       VARCHAR(100) NOT NULL,
   descripcion  TEXT,
   imagen       VARCHAR(255),
-  draft        BOOLEAN NOT NULL DEFAULT TRUE,
+  estado       VARCHAR(20) NOT NULL DEFAULT 'borrador',
   creado_en    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT fk_servicios_categoria
     FOREIGN KEY (categoria_id) REFERENCES categorias (id)
     ON DELETE CASCADE,
   CONSTRAINT fk_servicios_usuario
     FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT chk_servicios_estado
+    CHECK (estado IN ('borrador', 'revision', 'publicado'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_servicios_categoria ON servicios (categoria_id);
 CREATE INDEX IF NOT EXISTS idx_servicios_usuario   ON servicios (usuario_id);
-CREATE INDEX IF NOT EXISTS idx_servicios_draft     ON servicios (draft);
+CREATE INDEX IF NOT EXISTS idx_servicios_estado    ON servicios (estado);
 
 -- evento_categoria (N:M)
 CREATE TABLE IF NOT EXISTS evento_categoria (

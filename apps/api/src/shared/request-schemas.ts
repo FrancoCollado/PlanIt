@@ -13,6 +13,9 @@ const optionalName = z.string().trim().min(1).max(100);
 const optionalDescription = z.string().max(10_000).optional();
 const optionalImage = z.string().trim().max(255).optional();
 const optionalDraft = z.boolean().optional();
+// La empresa solo puede guardar el servicio como borrador o mandarlo a revision,
+// nunca lo puede publicar directamente: eso lo hace el administrador al aprobarlo.
+const optionalEstadoServicio = z.enum(['borrador', 'revision']).optional();
 const email = z.string().trim().email().max(100);
 const password = z.string().min(1).max(255);
 const idParams = z.object({ id: positiveIdParam }).strict();
@@ -101,7 +104,7 @@ export const requestSchemas = {
       imagen: optionalImage,
       categoriaId: positiveId,
       usuarioId: positiveId,
-      draft: optionalDraft
+      estado: optionalEstadoServicio
     }).strict()
   },
   updateServicio: {
@@ -111,7 +114,7 @@ export const requestSchemas = {
       descripcion: optionalDescription,
       imagen: optionalImage,
       categoriaId: positiveId.optional(),
-      draft: optionalDraft,
+      estado: optionalEstadoServicio,
       usuarioId: positiveId
     }).strict().refine(({ usuarioId: _usuarioId, ...data }) => updateHasFields(data), {
       message: 'Debe enviar al menos un campo para actualizar'
@@ -135,8 +138,17 @@ export const requestSchemas = {
       }).strict()).min(1).max(50)
     }).strict()
   },
-  testPaymentCheckout: {
-    body: z.object({ usuarioId: positiveId }).strict()
+  createPlanProPreference: {
+    body: z.object({
+      usuarioId: positiveId,
+      origin: z.string().trim().url().max(200)
+    }).strict()
+  },
+  confirmarPlanPro: {
+    body: z.object({
+      usuarioId: positiveId,
+      paymentId: z.string().trim().min(1).max(50)
+    }).strict()
   },
   listUsuarios: {
     query: z.object({ rol: z.enum(['cliente', 'administrador', 'empresa']).optional() }).strict()

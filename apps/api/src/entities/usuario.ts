@@ -46,6 +46,11 @@ export class User {
   @Property({ type: 'boolean', default: true })
   activo: boolean = true;
 
+  // Plan de la empresa: 'gratis' tiene un limite de servicios, 'pro' no tiene limite.
+  // Lo usan solo las cuentas de rol 'empresa', para cliente/administrador queda en 'gratis' sin usarse.
+  @Property({ type: 'string', length: 10, default: 'gratis' })
+  plan: 'gratis' | 'pro' = 'gratis';
+
   @Property({
     type: 'Date',
     fieldName: 'creado_en',

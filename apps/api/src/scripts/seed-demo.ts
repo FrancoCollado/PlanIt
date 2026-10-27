@@ -37,11 +37,12 @@ const categories = [
 ];
 
 const services = [
-  { key: 'djCentro', categoria: 'musica', empresa: 'centro', nombre: '[Demo] DJ para fiestas', draft: false },
-  { key: 'djNorte', categoria: 'musica', empresa: 'norte', nombre: '[Demo] DJ para fiestas', draft: false },
-  { key: 'comida', categoria: 'catering', empresa: 'centro', nombre: '[Demo] Catering para eventos', draft: false },
-  { key: 'decoracion', categoria: 'decoracion', empresa: 'norte', nombre: '[Demo] Decoracion de salon', draft: true },
-  { key: 'suspendido', categoria: 'catering', empresa: 'inactiva', nombre: '[Demo] Catering suspendido', draft: false }
+  { key: 'djCentro', categoria: 'musica', empresa: 'centro', nombre: '[Demo] DJ para fiestas', estado: 'publicado' as const },
+  { key: 'djNorte', categoria: 'musica', empresa: 'norte', nombre: '[Demo] DJ para fiestas', estado: 'publicado' as const },
+  { key: 'comida', categoria: 'catering', empresa: 'centro', nombre: '[Demo] Catering para eventos', estado: 'publicado' as const },
+  { key: 'decoracion', categoria: 'decoracion', empresa: 'norte', nombre: '[Demo] Decoracion de salon', estado: 'borrador' as const },
+  { key: 'enRevision', categoria: 'catering', empresa: 'norte', nombre: '[Demo] Catering esperando aprobacion', estado: 'revision' as const },
+  { key: 'suspendido', categoria: 'catering', empresa: 'inactiva', nombre: '[Demo] Catering suspendido', estado: 'publicado' as const }
 ];
 
 const boards = [
@@ -72,7 +73,7 @@ async function main() {
       if (!user) {
         user = em.create(User, {
           nombre: data.nombre, email: data.email, password: passwordHash, rol: data.rol,
-          activo: data.activo, zona: data.zona, cuit: data.cuit, telefono: data.telefono
+          activo: data.activo, plan: 'gratis', zona: data.zona, cuit: data.cuit, telefono: data.telefono
         });
         em.persist(user);
         created.usuarios++;
@@ -121,7 +122,7 @@ async function main() {
       if (!service) {
         service = em.create(Servicio, {
           categoria: category, usuario: company, nombre: data.nombre,
-          descripcion: `Servicio de prueba de ${company.nombre}`, draft: data.draft, creadoEn: new Date()
+          descripcion: `Servicio de prueba de ${company.nombre}`, estado: data.estado, creadoEn: new Date()
         });
         em.persist(service);
         created.servicios++;
