@@ -122,6 +122,22 @@ export const requestSchemas = {
     query: z.object({ usuarioId: positiveIdParam.optional() }).strict(),
     body: z.object({ usuarioId: positiveId.optional() }).strict().optional()
   },
+  createPaymentPreference: {
+    body: z.object({
+      usuarioId: positiveId,
+      items: z.array(z.object({
+        title: z.string().trim().min(1).max(256),
+        quantity: z.number().int().positive().safe(),
+        unit_price: z.number().positive().finite().refine(
+          (price) => Math.round(price * 100) === price * 100,
+          'El precio debe tener como máximo dos decimales'
+        )
+      }).strict()).min(1).max(50)
+    }).strict()
+  },
+  testPaymentCheckout: {
+    body: z.object({ usuarioId: positiveId }).strict()
+  },
   listUsuarios: {
     query: z.object({ rol: z.enum(['cliente', 'administrador', 'empresa']).optional() }).strict()
   },

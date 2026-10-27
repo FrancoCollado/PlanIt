@@ -108,3 +108,40 @@ export const deleteServicioRequest = async (id: number, usuarioId: number, token
     throw new Error(data.error || 'Error al eliminar el servicio');
   }
 };
+
+export interface MercadoPagoCheckoutResponse {
+  preferenceId: string;
+  initPoint: string;
+  sandboxInitPoint?: string;
+}
+
+export const crearCheckoutPruebaMercadoPagoRequest = async (
+  usuarioId: number,
+  token: string
+): Promise<MercadoPagoCheckoutResponse> => {
+  const response = await fetch(`${API_URL}/api/payment/test/checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ usuarioId })
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'No se pudo iniciar el checkout de prueba de Mercado Pago');
+  }
+
+  if (
+    !data ||
+    typeof data.preferenceId !== 'string' ||
+    typeof data.initPoint !== 'string' ||
+    (data.sandboxInitPoint !== undefined && typeof data.sandboxInitPoint !== 'string')
+  ) {
+    throw new Error('Mercado Pago devolvió una respuesta inválida al iniciar el checkout');
+  }
+
+  return {
+    preferenceId: data.preferenceId,
+    initPoint: data.initPoint,
+    ...(data.sandboxInitPoint ? { sandboxInitPoint: data.sandboxInitPoint } : {})
+  };
+};

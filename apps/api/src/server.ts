@@ -12,6 +12,7 @@ import statsRoutes from './modules/stats/routes/stats.routes.js';
 import categoriaRoutes from './modules/categorias/routes/categoria.routes.js';
 import servicioRoutes from './modules/servicios/routes/servicio.routes.js';
 import tableroRoutes from './modules/tableros/routes/tablero.routes.js';
+import paymentRoutes from './modules/payment/routes/payment.routes.js';
 
 import { apiErrorHandler, respondWithError } from './shared/api-error.js';
 
@@ -47,7 +48,7 @@ if (corsOrigins.length > 0) {
   app.use(cors({ origin: corsOrigins }));
 }
 
-app.use(express.json());
+app.use(express.json()); 
 
 // Diagnóstico: no toca la base de datos, así que responde aunque la conexión falle.
 app.get('/api/health', (_req, res) => {
@@ -64,6 +65,7 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/servicios', servicioRoutes);
 app.use('/api/tableros', tableroRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.use('/api', (_req, res) => {
   respondWithError(res, 404, 'NOT_FOUND', 'Ruta de API no encontrada');

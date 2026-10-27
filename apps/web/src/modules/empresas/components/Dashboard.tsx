@@ -5,7 +5,8 @@ import {
   createServicioRequest,
   updateServicioRequest,
   deleteServicioRequest,
-  subirImagenServicioRequest
+  subirImagenServicioRequest,
+  crearCheckoutPruebaMercadoPagoRequest
 } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
 import { listCategoriasRequest } from '../../eventos/services/categoriaService';
@@ -32,7 +33,12 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
   const [servicioEditando, setServicioEditando] = useState<Servicio | null>(null);
   const [formServicio, setFormServicio] = useState(servicioVacio);
   const [subiendoImagen, setSubiendoImagen] = useState(false);
-
+  const [probandoMercadoPago, setProbandoMercadoPago] = useState(false);
+  const [resultadoMercadoPago, setResultadoMercadoPago] = useState<{
+    tipo: 'exito' | 'error';
+    mensaje: string;
+  } | null>(null);
+  
   // Las categorias las crea el admin, yo solo las uso para el select
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
@@ -114,6 +120,27 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
       setFormServicio(servicioVacio);
     } catch {
       setMensaje('No se pudo guardar el servicio');
+    }
+  }
+
+  async function manejarPruebaMercadoPago() {
+    if (!usuarioId) return;
+
+    setProbandoMercadoPago(true);
+    setResultadoMercadoPago(null);
+    try {
+      const checkout = await crearCheckoutPruebaMercadoPagoRequest(usuarioId, token);
+      if (!checkout.sandboxInitPoint) {
+        throw new Error('Mercado Pago no devolvió un enlace de prueba. Verificá que MP_ACCESS_TOKEN sea un token de prueba.');
+      }
+      window.location.assign(checkout.sandboxInitPoint);
+    } catch (error) {
+      setResultadoMercadoPago({
+        tipo: 'error',
+        mensaje: error instanceof Error ? error.message : 'No se pudo verificar la integración con Mercado Pago.'
+      });
+    } finally {
+      setProbandoMercadoPago(false);
     }
   }
 
@@ -230,8 +257,23 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
 
                 <div className="botones-formulario-empresa">
                   <button type="submit" disabled={subiendoImagen}>Guardar</button>
+                  <button
+                    type="button"
+                    onClick={manejarPruebaMercadoPago}
+                    disabled={probandoMercadoPago}
+                  >
+                    {probandoMercadoPago ? 'Creando checkout...' : 'Probar Checkout Pro (ARS 100)'}
+                  </button>
                   <button type="button" onClick={() => setFormServicioVisible(false)}>Cancelar</button>
                 </div>
+                {resultadoMercadoPago && (
+                  <p
+                    role="status"
+                    className={resultadoMercadoPago.tipo === 'exito' ? 'texto-ayuda-empresa' : 'mensaje-error-empresa'}
+                  >
+                    {resultadoMercadoPago.mensaje}
+                  </p>
+                )}
               </form>
             )}
 

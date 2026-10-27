@@ -8,6 +8,8 @@ export type ApiErrorCode =
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'CONFLICT'
+  | 'BAD_GATEWAY'
+  | 'SERVICE_UNAVAILABLE'
   | 'PAYLOAD_TOO_LARGE'
   | 'INTERNAL_SERVER_ERROR';
 
