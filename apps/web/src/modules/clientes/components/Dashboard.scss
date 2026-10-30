@@ -160,6 +160,7 @@ h2{
   padding: 6px;
   border: 1px solid #cccccc;
   background-color: #ffffff;
+  color: #000000;
 }
 
 .botones-formulario-cliente {
@@ -180,6 +181,23 @@ h2{
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.detalle-item-cliente {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.imagen-servicio-cliente {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  background-color: #f7f6f4;
 }
 
 /* Cada fila de la lista */

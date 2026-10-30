@@ -38,7 +38,6 @@ export const FormularioLogin: React.FC<PropiedadesFormularioLogin> = ({
 }) => {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [recordarSesion, setRecordarSesion] = useState(false);
   const [mensajeError, setMensajeError] = useState('');
 
   const manejarEnvio = async (evento: React.FormEvent) => {
@@ -107,15 +106,6 @@ export const FormularioLogin: React.FC<PropiedadesFormularioLogin> = ({
       </div>
 
       <div className="options-row">
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={recordarSesion}
-            onChange={(evento) => setRecordarSesion(evento.target.checked)} // Llamada a la función setRecordarSesion para actualizar el estado del checkbox
-          />
-          Recordar sesión
-        </label>
-
         <a className="forgot-password" href="#">
           ¿Olvidaste tu contraseña?
         </a>

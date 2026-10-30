@@ -46,7 +46,11 @@ export default function ItemServicio({ servicio, token }: { servicio: Servicio; 
 
   return (
     <li className="item-lista-cliente">
-      <span>
+      <span className="detalle-item-cliente">
+        {servicio.imagen ? (
+          <img src={servicio.imagen} alt="" className="imagen-servicio-cliente" />
+        ) : null}
+        <span>
         <b>{servicio.nombre}</b> - {servicio.categoria.nombre}
         <br />
         Empresa: {servicio.empresa.nombre}
@@ -72,6 +76,7 @@ export default function ItemServicio({ servicio, token }: { servicio: Servicio; 
         )}
 
         {mensaje !== '' && <span className="texto-ayuda-cliente"> {mensaje}</span>}
+        </span>
       </span>
 
       <span className="botones-item-cliente">

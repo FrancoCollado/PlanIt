@@ -470,8 +470,13 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
             <ul className="lista">
               {serviciosRevision.map((servicio) => (
                 <li key={servicio.id} className="item-lista">
-                  <span>
-                    <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} - empresa: {servicio.empresa.nombre}
+                  <span className="detalle-item">
+                    {servicio.imagen ? (
+                      <img src={servicio.imagen} alt="" className="imagen-servicio" />
+                    ) : null}
+                    <span>
+                      <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} - empresa: {servicio.empresa.nombre}
+                    </span>
                   </span>
                   <span className="botones-item">
                     <button onClick={() => aprobarServicio(servicio)}>Aprobar</button>

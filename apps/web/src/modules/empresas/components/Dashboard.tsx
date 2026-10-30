@@ -171,7 +171,7 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
 
     try {
       const url = await subirImagenServicioRequest(usuarioId, archivo);
-      setFormServicio({ ...formServicio, imagen: url });
+      setFormServicio((actual) => ({ ...actual, imagen: url }));
     } catch {
       setMensaje('No se pudo subir la imagen');
     } finally {
@@ -405,8 +405,13 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
             <ul className="lista-empresa">
               {servicios.map((servicio) => (
                 <li key={servicio.id} className="item-lista-empresa">
-                  <span>
-                    <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} ({textoEstadoServicio(servicio.estado)})
+                  <span className="detalle-item-empresa">
+                    {servicio.imagen ? (
+                      <img src={servicio.imagen} alt="" className="imagen-servicio-empresa" />
+                    ) : null}
+                    <span>
+                      <b>{servicio.nombre}</b> - categoria: {servicio.categoria.nombre} ({textoEstadoServicio(servicio.estado)})
+                    </span>
                   </span>
                   <span className="botones-item-empresa">
                     <button

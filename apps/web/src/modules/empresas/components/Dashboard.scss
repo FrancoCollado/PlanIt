@@ -148,10 +148,15 @@ h2{
   padding: 6px;
   border: 1px solid #cccccc;
   background-color: #ffffff;
+  color: #000000;
 }
 
 .formulario-empresa textarea {
   height: 60px;
+}
+
+.formulario-empresa input[type="file"] {
+  color: #000000;
 }
 
 /* La imagen que subo la muestro chiquita */
@@ -161,6 +166,23 @@ h2{
   object-fit: cover;
   border: 1px solid #cccccc;
   margin-top: 8px;
+}
+
+.detalle-item-empresa {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.imagen-servicio-empresa {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  background-color: #f7f6f4;
 }
 
 /* El checkbox va al lado del texto, por eso lo pongo inline */

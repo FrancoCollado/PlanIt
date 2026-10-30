@@ -162,7 +162,12 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
           <ul className="lista-cliente">
             {tablero.servicios.map((servicio) => (
               <li key={servicio.id} className="item-lista-cliente">
-                <span>{servicio.nombre} - {servicio.categoria.nombre}</span>
+                <span className="detalle-item-cliente">
+                  {servicio.imagen ? (
+                    <img src={servicio.imagen} alt="" className="imagen-servicio-cliente" />
+                  ) : null}
+                  <span>{servicio.nombre} - {servicio.categoria.nombre}</span>
+                </span>
                 <span className="botones-item-cliente">
                   <button onClick={() => quitarServicio(tablero.id, servicio.id)}>Quitar</button>
                 </span>
