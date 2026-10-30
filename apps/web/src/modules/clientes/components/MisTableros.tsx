@@ -140,7 +140,7 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
         </form>
       )}
 
-      {tableros.length === 0 && <p className="texto-ayuda-cliente">Todavia no tenes tableros.</p>}
+      {tableros.length === 0 && <p className="mensaje-error-cliente">Todavia no tenes tableros.</p>}
 
       {/* Recorro mis tableros y adentro de cada uno los servicios guardados */}
       {tableros.map((tablero) => (

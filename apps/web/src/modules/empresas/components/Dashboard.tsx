@@ -301,29 +301,31 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
             )}
 
             {!formServicioVisible && (
-              <button
-                className="boton-nuevo-empresa"
-                onClick={() => {
-                  setServicioEditando(null);
-                  // Si hay categorias pongo la primera por defecto
-                  setFormServicio({ ...servicioVacio, categoriaId: categorias[0]?.id ?? 0 });
-                  setFormServicioVisible(true);
-                }}
-                disabled={categorias.length === 0 || llegoAlLimiteDelPlanGratis}
-              >
-                Agregar servicio
-              </button>
-            )}
+              <div className="acciones-servicios-empresa">
+                <button
+                  className="boton-nuevo-empresa"
+                  onClick={() => {
+                    setServicioEditando(null);
+                    // Si hay categorias pongo la primera por defecto
+                    setFormServicio({ ...servicioVacio, categoriaId: categorias[0]?.id ?? 0 });
+                    setFormServicioVisible(true);
+                  }}
+                  disabled={categorias.length === 0 || llegoAlLimiteDelPlanGratis}
+                >
+                  Agregar servicio
+                </button>
 
-            {/* Si llego al limite del plan gratis le muestro el boton para pasar a Pro */}
-            {!formServicioVisible && llegoAlLimiteDelPlanGratis && (
-              <button
-                className="boton-nuevo-empresa"
-                onClick={manejarPasarAPro}
-                disabled={creandoPagoPro}
-              >
-                {creandoPagoPro ? 'Preparando el pago...' : 'Pasar a Pro'}
-              </button>
+                {/* Si llego al limite del plan gratis le muestro el boton para pasar a Pro */}
+                {llegoAlLimiteDelPlanGratis && (
+                  <button
+                    className="boton-nuevo-empresa"
+                    onClick={manejarPasarAPro}
+                    disabled={creandoPagoPro}
+                  >
+                    {creandoPagoPro ? 'Preparando el pago...' : 'Pasar a Pro'}
+                  </button>
+                )}
+              </div>
             )}
 
             {/* El formulario sirve para crear y para editar, cambia el titulo nomas */}

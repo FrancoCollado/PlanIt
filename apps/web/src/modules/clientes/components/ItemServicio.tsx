@@ -72,7 +72,7 @@ export default function ItemServicio({ servicio, token }: { servicio: Servicio; 
         )}
 
         {mostrarTableros && tableros.length === 0 && (
-          <span className="texto-ayuda-cliente"> Todavia no tenes tableros, crea uno primero.</span>
+          <span className="mensaje-error-cliente"> Todavia no tenes tableros, crea uno primero.</span>
         )}
 
         {mensaje !== '' && <span className="texto-ayuda-cliente"> {mensaje}</span>}

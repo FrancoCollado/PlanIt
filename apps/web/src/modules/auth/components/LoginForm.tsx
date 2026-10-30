@@ -105,12 +105,6 @@ export const FormularioLogin: React.FC<PropiedadesFormularioLogin> = ({
         />
       </div>
 
-      <div className="options-row">
-        <a className="forgot-password" href="#">
-          ¿Olvidaste tu contraseña?
-        </a>
-      </div>
-
       {mensajeError && (
         <p className="error-text">{mensajeError}</p>
       )}

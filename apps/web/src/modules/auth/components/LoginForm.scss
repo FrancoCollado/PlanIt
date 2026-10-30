@@ -35,20 +35,6 @@
   background-color: #ffffff;
 }
 
-.options-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    color: #000000;
-  }
-}
-
 .primary-button {
   background-color: #0e0541;
   color: white;
@@ -69,10 +55,6 @@
 }
 
 
-
-.forgot-password {
-  margin-left: auto;
-}
 
 .form-link {
   color: #090329;
