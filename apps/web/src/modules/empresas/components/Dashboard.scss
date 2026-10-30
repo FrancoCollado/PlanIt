@@ -54,6 +54,40 @@ h2{
   color: #1a237e;
 }
 
+/* Alerta del resultado de Mercado Pago, afuera del menu */
+.alerta-pago-empresa {
+  max-width: 640px;
+  margin: 0 auto 24px;
+  padding: 16px 18px;
+  border: 2px solid;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.alerta-pago-titulo {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.alerta-pago-texto {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.alerta-pago-exito {
+  background-color: #e8f5e9;
+  border-color: #2e7d32;
+  color: #1b5e20;
+}
+
+.alerta-pago-error {
+  background-color: #ffebee;
+  border-color: #c62828;
+  color: #b71c1c;
+}
+
 /* Botones del menu */
 /* Mobile first: en el celular van uno abajo del otro */
 .menu-empresa {

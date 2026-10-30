@@ -266,6 +266,23 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
       <div className="contenido-empresa">
         <h2 className="bienvenida-empresa">Bienvenido a Planit, empresa</h2>
 
+        {/* Resultado del pago de Mercado Pago: va afuera del menu para que se vea al volver */}
+        {mensajePago && (
+          <div
+            role={mensajePago.tipo === 'error' ? 'alert' : 'status'}
+            className={
+              mensajePago.tipo === 'exito'
+                ? 'alerta-pago-empresa alerta-pago-exito'
+                : 'alerta-pago-empresa alerta-pago-error'
+            }
+          >
+            <p className="alerta-pago-titulo">
+              {mensajePago.tipo === 'exito' ? 'Pago registrado' : 'Pago no registrado'}
+            </p>
+            <p className="alerta-pago-texto">{mensajePago.mensaje}</p>
+          </div>
+        )}
+
         {/* Menu (por ahora la empresa solo puede manejar sus servicios) */}
         <div className="menu-empresa">
           <button className="boton-menu-empresa" onClick={mostrarServicios}>Servicios</button>
@@ -288,15 +305,6 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
             ) : (
               <p className="texto-ayuda-empresa">
                 Plan gratis: llevas {servicios.length} de {LIMITE_SERVICIOS_PLAN_GRATIS} servicios.
-              </p>
-            )}
-
-            {mensajePago && (
-              <p
-                role="status"
-                className={mensajePago.tipo === 'exito' ? 'texto-ayuda-empresa' : 'mensaje-error-empresa'}
-              >
-                {mensajePago.mensaje}
               </p>
             )}
 
