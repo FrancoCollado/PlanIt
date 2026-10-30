@@ -159,9 +159,9 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
             <p className="texto-ayuda-cliente">Todavia no guardaste servicios aca.</p>
           )}
 
-          <ul className="lista-cliente">
+          <ul className="lista-cliente lista-servicios-cliente">
             {tablero.servicios.map((servicio) => (
-              <li key={servicio.id} className="item-lista-cliente">
+              <li key={servicio.id} className="item-lista-cliente card-servicio-cliente">
                 <span className="detalle-item-cliente">
                   {servicio.imagen ? (
                     <img src={servicio.imagen} alt="" className="imagen-servicio-cliente" />

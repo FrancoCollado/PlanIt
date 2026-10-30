@@ -60,7 +60,7 @@ h2{
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 25px;
+  margin-bottom: 48px;
 }
 
 .boton-menu-cliente {
@@ -185,19 +185,28 @@ h2{
 
 .detalle-item-cliente {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 12px;
   min-width: 0;
+  width: 100%;
 }
 
 .imagen-servicio-cliente {
-  width: 64px;
-  height: 64px;
+  width: 100%;
+  height: 180px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid #cccccc;
-  border-radius: 4px;
+  border: 1px solid #e5e4e7;
+  border-radius: 12px;
   background-color: #f7f6f4;
+}
+
+.lista-servicios-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 28px;
 }
 
 /* Cada fila de la lista */
@@ -236,6 +245,51 @@ h2{
     justify-content: space-between;
     align-items: center;
   }
+
+  .detalle-item-cliente {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .imagen-servicio-cliente {
+    width: 180px;
+    height: 140px;
+  }
+
+  .card-servicio-cliente {
+    align-items: center;
+  }
+}
+
+.card-servicio-cliente .botones-item-cliente {
+  align-self: center;
+  width: auto;
+}
+
+.card-servicio-cliente .botones-item-cliente button {
+  height: auto;
+  background-color: transparent;
+  color: #0e0541;
+  border: 1px solid #c5c3d4;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.card-servicio-cliente .botones-item-cliente button:hover {
+  background-color: #0e0541;
+  color: #ffffff;
+  border-color: #0e0541;
+}
+
+.card-servicio-cliente {
+  background-color: #ffffff;
+  border: 1px solid #e5e4e7;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* El select para guardar un servicio en un tablero */

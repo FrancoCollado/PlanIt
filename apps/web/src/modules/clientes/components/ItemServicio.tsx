@@ -45,7 +45,7 @@ export default function ItemServicio({ servicio, token }: { servicio: Servicio; 
   }
 
   return (
-    <li className="item-lista-cliente">
+    <li className="item-lista-cliente card-servicio-cliente">
       <span className="detalle-item-cliente">
         {servicio.imagen ? (
           <img src={servicio.imagen} alt="" className="imagen-servicio-cliente" />

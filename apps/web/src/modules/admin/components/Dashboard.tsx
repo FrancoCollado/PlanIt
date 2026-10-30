@@ -36,7 +36,7 @@ const categoriaVacia = { nombre: '', descripcion: '', eventoId: 0 };
 
 export default function AdminDashboard({ token, onLogout }: AdminDashboardProps) {
   // Esta variable dice que seccion se esta mostrando abajo de los botones
-  const [seccion, setSeccion] = useState<'eventos' | 'categorias' | 'empresas' | 'servicios' | null>(null);
+  const [seccion, setSeccion] = useState<'eventos' | 'categorias' | 'cuentas' | 'servicios' | null>(null);
 
   // --- EVENTOS ---
   const [eventos, setEventos] = useState<Evento[]>([]);
@@ -51,7 +51,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
   const [formCategoria, setFormCategoria] = useState(categoriaVacia);
 
   // --- EMPRESAS ---
-  const [empresas, setEmpresas] = useState<Usuario[]>([]);
+  const [cuentas, setCuentas] = useState<Usuario[]>([]);
 
   // --- SERVICIOS EN REVISION ---
   const [serviciosRevision, setServiciosRevision] = useState<ServicioRevision[]>([]);
@@ -78,12 +78,15 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     }
   }
 
-  async function cargarEmpresas() {
+  async function cargarCuentas() {
     try {
-      const datos = await listUsuariosRequest('empresa', token);
-      setEmpresas(datos);
+      const [empresas, clientes] = await Promise.all([
+        listUsuariosRequest('empresa', token),
+        listUsuariosRequest('cliente', token)
+      ]);
+      setCuentas([...empresas, ...clientes]);
     } catch {
-      setMensaje('No se pudieron cargar las empresas');
+      setMensaje('No se pudieron cargar las cuentas');
     }
   }
 
@@ -112,10 +115,10 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     cargarEventos(); // los necesito para el select del formulario
   }
 
-  function mostrarEmpresas() {
+  function mostrarCuentas() {
     setMensaje('');
-    setSeccion('empresas');
-    cargarEmpresas();
+    setSeccion('cuentas');
+    cargarCuentas();
   }
 
   function mostrarServicios() {
@@ -193,15 +196,23 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
     }
   }
 
-  // Si la empresa esta activa la suspendo y si esta suspendida la activo
-  async function cambiarEstadoEmpresa(empresa: Usuario) {
-    if (!window.confirm('Queres cambiar el estado de la cuenta ' + empresa.nombre + '?')) return;
+  // Si la cuenta esta activa la suspendo y si esta suspendida la activo
+  async function cambiarEstadoCuenta(cuenta: Usuario) {
+    if (!window.confirm('Queres cambiar el estado de la cuenta ' + cuenta.nombre + '?')) return;
+
+    const activoNuevo = !cuenta.activo;
+    setMensaje('');
+    setCuentas((actuales) => actuales.map((item) => (
+      item.id === cuenta.id ? { ...item, activo: activoNuevo } : item
+    )));
 
     try {
-      await setUsuarioActivoRequest(empresa.id, !empresa.activo, token);
-      await cargarEmpresas();
+      await setUsuarioActivoRequest(cuenta.id, activoNuevo, token);
     } catch {
-      setMensaje('No se pudo cambiar el estado de la empresa');
+      setCuentas((actuales) => actuales.map((item) => (
+        item.id === cuenta.id ? { ...item, activo: cuenta.activo } : item
+      )));
+      setMensaje('No se pudo cambiar el estado de la cuenta');
     }
   }
 
@@ -244,7 +255,7 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
         <div className="menu">
           <button className="boton-menu" onClick={mostrarEventos}>Eventos</button>
           <button className="boton-menu" onClick={mostrarCategorias}>Categorias</button>
-          <button className="boton-menu" onClick={mostrarEmpresas}>Empresas</button>
+          <button className="boton-menu" onClick={mostrarCuentas}>Cuentas</button>
           <button className="boton-menu" onClick={mostrarServicios}>Servicios en revision</button>
         </div>
 
@@ -434,22 +445,22 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
           </div>
         )}
 
-        {/* SECCION DE EMPRESAS */}
-        {seccion === 'empresas' && (
+        {/* SECCION DE CUENTAS: empresas y clientes */}
+        {seccion === 'cuentas' && (
           <div className="caja">
-            <h2 className="subtitulo">Lista de empresas</h2>
+            <h2 className="subtitulo">Empresas y clientes</h2>
 
-            {empresas.length === 0 && <p className="texto-ayuda">No hay empresas registradas.</p>}
+            {cuentas.length === 0 && <p className="texto-ayuda">No hay cuentas registradas.</p>}
 
             <ul className="lista">
-              {empresas.map((empresa) => (
-                <li key={empresa.id} className="item-lista">
+              {cuentas.map((cuenta) => (
+                <li key={cuenta.id} className="item-lista">
                   <span>
-                    <b>{empresa.nombre}</b> - {empresa.email} ({empresa.activo ? 'activa' : 'suspendida'})
+                    <b>{cuenta.nombre}</b> - {cuenta.rol === 'empresa' ? 'Empresa' : 'Cliente'} - {cuenta.email} ({cuenta.activo ? 'activa' : 'suspendida'})
                   </span>
                   <span className="botones-item">
-                    <button onClick={() => cambiarEstadoEmpresa(empresa)}>
-                      {empresa.activo ? 'Suspender' : 'Activar'}
+                    <button onClick={() => cambiarEstadoCuenta(cuenta)}>
+                      {cuenta.activo ? 'Suspender' : 'Activar'}
                     </button>
                   </span>
                 </li>
@@ -467,9 +478,9 @@ export default function AdminDashboard({ token, onLogout }: AdminDashboardProps)
               <p className="texto-ayuda">No hay servicios en revision por el momento.</p>
             )}
 
-            <ul className="lista">
+            <ul className="lista lista-servicios">
               {serviciosRevision.map((servicio) => (
-                <li key={servicio.id} className="item-lista">
+                <li key={servicio.id} className="item-lista card-servicio">
                   <span className="detalle-item">
                     {servicio.imagen ? (
                       <img src={servicio.imagen} alt="" className="imagen-servicio" />

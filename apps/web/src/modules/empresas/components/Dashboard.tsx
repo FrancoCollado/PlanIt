@@ -402,9 +402,9 @@ export default function Dashboard({ onLogout, usuarioId, token }: DashboardProps
             )}
 
             {/* Recorro el array de servicios con map para mostrarlos */}
-            <ul className="lista-empresa">
+            <ul className="lista-empresa lista-servicios-empresa">
               {servicios.map((servicio) => (
-                <li key={servicio.id} className="item-lista-empresa">
+                <li key={servicio.id} className="item-lista-empresa card-servicio-empresa">
                   <span className="detalle-item-empresa">
                     {servicio.imagen ? (
                       <img src={servicio.imagen} alt="" className="imagen-servicio-empresa" />

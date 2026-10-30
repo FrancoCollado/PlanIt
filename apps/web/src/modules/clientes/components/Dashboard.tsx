@@ -120,7 +120,7 @@ export default function DashboardCliente({ nombreUsuario, token, onLogout }: Cli
             )}
 
             {/* Recorro los servicios con map para mostrarlos */}
-            <ul className="lista-cliente">
+            <ul className="lista-cliente lista-servicios-cliente">
               {servicios.map((servicio) => (
                 <ItemServicio key={servicio.id} servicio={servicio} token={token} />
               ))}

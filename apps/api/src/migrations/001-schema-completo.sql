@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   zona          VARCHAR(100),
   cuit          BIGINT,
   telefono      BIGINT,
+  -- activo permite suspender la cuenta sin borrarla (empresas y clientes)
   activo        BOOLEAN NOT NULL DEFAULT TRUE,
   plan          VARCHAR(10) NOT NULL DEFAULT 'gratis',
   creado_en     TIMESTAMPTZ DEFAULT NOW(),

@@ -60,7 +60,7 @@ export default function BuscarPorCategoria({ token, onVolver }: { token: string;
 
           {servicios.length === 0 && <p className="texto-ayuda-cliente">No hay servicios en esta categoria.</p>}
 
-          <ul className="lista-cliente">
+          <ul className="lista-cliente lista-servicios-cliente">
             {servicios.map((servicio) => (
               <ItemServicio key={servicio.id} servicio={servicio} token={token} />
             ))}

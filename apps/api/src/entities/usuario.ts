@@ -42,7 +42,7 @@ export class User {
   @Property({ type: new BigIntType('number'), nullable: true })
   telefono?: number;
 
-  // Permite suspender una cuenta sin borrarla, lo usamos para empresas
+  // Permite suspender una cuenta sin borrarla. Vale para empresas y clientes.
   @Property({ type: 'boolean', default: true })
   activo: boolean = true;
 
