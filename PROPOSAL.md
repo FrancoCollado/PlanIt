@@ -43,4 +43,4 @@ Adicionales para Aprobación
 | Req | Detalle |
 | :--- | :--- |
 | **Listados** | 1. Filtrar servicio por atributo zona<br>2. Filtrar servicio por empresa (por nombre, ej. filtrar los servicios de “Marta Cura”) |
-| **Otros** | 1. Verificación de login a través de un código de un solo uso enviado al email |
+| **Otros** | 1. Identificacion y manejo de servicios excedidos en cuenta de empresa<br>2. Integracion de mercado pago para contratacion de cuenta pro<br>3. Suspension de cuenta de cliente por parte del administrador |
