@@ -1,3 +1,8 @@
+# Contactos para coordinar la defensa:
+Franco Collado: 341 252 2600
+Franco Massagli: 341 371 5847
+Tomas Agustin Aleart: 341 394 9024
+
 # Link al deploy ( sin necesidad levantar local )
 https://planit-8k5i.vercel.app/
 
