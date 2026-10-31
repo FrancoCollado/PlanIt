@@ -6,6 +6,9 @@ Tomas Agustin Aleart: 341 394 9024
 # Link al deploy ( sin necesidad levantar local )
 https://planit-8k5i.vercel.app/
 
+# Links al modelo y video (demo del sistema)
+https://drive.google.com/drive/folders/1pC8MOQ4j7PGTVeKOBd9cnFKYB3b6aRF_?usp=drive_link
+
 # Credenciales del deploy
    CLIENTE
 Usuario: cliente@gmail.com
