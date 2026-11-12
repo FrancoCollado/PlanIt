@@ -8,7 +8,7 @@ export type UsuarioRol = 'admin' | 'empresa' | 'cliente';
 export interface UsuarioAutenticado { //Un usuario autenticado tiene estas cuatro propiedades.
   id: number;
   nombre: string;
-  role: UsuarioRol; 
+  role: UsuarioRol;
   token: string;
 }
 
