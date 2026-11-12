@@ -22,6 +22,7 @@ import {
 } from '../services/servicioAdminService';
 import type { ServicioRevision } from '../services/servicioAdminService';
 import { formatearTitulo } from '../../../shared/formatters';
+import { mensajeDeError } from '../../../shared/api';
 
 export type SeccionAdmin = 'eventos' | 'categorias' | 'cuentas' | 'servicios' | null;
 
@@ -62,8 +63,8 @@ export function useAdminDashboard(token: string) {
     try {
       const datos = await listEventosRequest(token);
       setEventos(datos);
-    } catch {
-      setMensaje('No se pudieron cargar los eventos');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar los eventos'));
     }
   }
 
@@ -71,8 +72,8 @@ export function useAdminDashboard(token: string) {
     try {
       const datos = await listCategoriasRequest(token);
       setCategorias(datos);
-    } catch {
-      setMensaje('No se pudieron cargar las categorias');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar las categorias'));
     }
   }
 
@@ -83,8 +84,8 @@ export function useAdminDashboard(token: string) {
         listUsuariosRequest('cliente', token)
       ]);
       setCuentas([...empresas, ...clientes]);
-    } catch {
-      setMensaje('No se pudieron cargar las cuentas');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar las cuentas'));
     }
   }
 
@@ -92,8 +93,8 @@ export function useAdminDashboard(token: string) {
     try {
       const datos = await listServiciosRevisionRequest(token);
       setServiciosRevision(datos);
-    } catch {
-      setMensaje('No se pudieron cargar los servicios en revision');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar los servicios en revision'));
     }
   }
 
@@ -157,8 +158,8 @@ export function useAdminDashboard(token: string) {
       setFormEventoVisible(false);
       setEventoEditando(null);
       setFormEvento(eventoVacio);
-    } catch {
-      setMensaje('No se pudo guardar el evento');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo guardar el evento'));
     }
   }
 
@@ -168,8 +169,8 @@ export function useAdminDashboard(token: string) {
     try {
       await deleteEventoRequest(evento.id, token);
       await cargarEventos();
-    } catch {
-      setMensaje('No se pudo borrar el evento');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo borrar el evento'));
     }
   }
 
@@ -208,8 +209,8 @@ export function useAdminDashboard(token: string) {
       setFormCategoriaVisible(false);
       setCategoriaEditando(null);
       setFormCategoria(categoriaVacia);
-    } catch {
-      setMensaje('No se pudo guardar la categoria');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo guardar la categoria'));
     }
   }
 
@@ -219,8 +220,8 @@ export function useAdminDashboard(token: string) {
     try {
       await deleteCategoriaRequest(categoria.id, token);
       await cargarCategorias();
-    } catch {
-      setMensaje('No se pudo borrar la categoria');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo borrar la categoria'));
     }
   }
 
@@ -235,11 +236,11 @@ export function useAdminDashboard(token: string) {
 
     try {
       await setUsuarioActivoRequest(cuenta.id, activoNuevo, token);
-    } catch {
+    } catch (error) {
       setCuentas((actuales) => actuales.map((item) => (
         item.id === cuenta.id ? { ...item, activo: cuenta.activo } : item
       )));
-      setMensaje('No se pudo cambiar el estado de la cuenta');
+      setMensaje(mensajeDeError(error, 'No se pudo cambiar el estado de la cuenta'));
     }
   }
 
@@ -249,8 +250,8 @@ export function useAdminDashboard(token: string) {
     try {
       await aprobarServicioRequest(servicio.id, token);
       await cargarServiciosRevision();
-    } catch {
-      setMensaje('No se pudo aprobar el servicio');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo aprobar el servicio'));
     }
   }
 
@@ -260,8 +261,8 @@ export function useAdminDashboard(token: string) {
     try {
       await denegarServicioRequest(servicio.id, token);
       await cargarServiciosRevision();
-    } catch {
-      setMensaje('No se pudo denegar el servicio');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo denegar el servicio'));
     }
   }
 

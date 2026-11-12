@@ -6,6 +6,7 @@ import type { Categoria } from '../../eventos/services/categoriaService';
 import { buscarServiciosPorCategoriaRequest } from '../services/servicioService';
 import type { Servicio } from '../services/servicioService';
 import ItemServicio from './ItemServicio';
+import { mensajeDeError } from '../../../shared/api';
 
 // Pantalla para buscar servicios eligiendo primero un evento y despues una categoria
 export default function BuscarPorEvento({ token, onVolver }: { token: string; onVolver: () => void }) {
@@ -26,8 +27,8 @@ export default function BuscarPorEvento({ token, onVolver }: { token: string; on
         // Los borradores no los muestro porque todavia no estan publicados
         setEventos(listaEventos.filter((evento) => !evento.draft));
         setCategorias(listaCategorias);
-      } catch {
-        setMensaje('No se pudieron cargar los eventos');
+      } catch (error) {
+        setMensaje(mensajeDeError(error, 'No se pudieron cargar los eventos'));
       }
     }
 
@@ -50,8 +51,8 @@ export default function BuscarPorEvento({ token, onVolver }: { token: string; on
     try {
       const datos = await buscarServiciosPorCategoriaRequest(categoria.id);
       setServicios(datos);
-    } catch {
-      setMensaje('No se pudieron buscar los servicios');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron buscar los servicios'));
     }
   }
 

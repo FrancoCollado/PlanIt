@@ -1,7 +1,5 @@
 import type { Servicio } from './servicioService';
-import { API_URL } from '../../../config/api';
-
-const TABLEROS_URL = `${API_URL}/api/tableros`;
+import { headersConToken, requestJson, requestVoid } from '../../../shared/api';
 
 export interface Tablero {
   id: number;
@@ -11,64 +9,79 @@ export interface Tablero {
   servicios: Servicio[];
 }
 
+type ListaTablerosResponse = { tableros: Tablero[] };
+type TableroResponse = { tablero: Tablero };
+
+const headers = (token: string) => headersConToken(token, true);
+
 export async function listTableros(token: string): Promise<Tablero[]> {
-  const response = await fetch(TABLEROS_URL, {
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  const data = await requestJson<ListaTablerosResponse>(
+    '/api/tableros',
+    'Error al gestionar el tablero',
+    { headers: headers(token) }
+  );
+
   return data.tableros;
 }
 
 export async function createTablero(token: string, nombre: string, eventoId: number): Promise<Tablero> {
-  const response = await fetch(TABLEROS_URL, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nombre, eventoId })
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  const data = await requestJson<TableroResponse>(
+    '/api/tableros',
+    'Error al gestionar el tablero',
+    {
+      method: 'POST',
+      headers: headers(token),
+      body: JSON.stringify({ nombre, eventoId })
+    }
+  );
+
   return data.tablero;
 }
 
 export async function updateTablero(token: string, id: number, nombre: string, eventoId: number): Promise<Tablero> {
-  const response = await fetch(`${TABLEROS_URL}/${id}`, {
-    method: 'PUT',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nombre, eventoId })
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  const data = await requestJson<TableroResponse>(
+    `/api/tableros/${id}`,
+    'Error al gestionar el tablero',
+    {
+      method: 'PUT',
+      headers: headers(token),
+      body: JSON.stringify({ nombre, eventoId })
+    }
+  );
+
   return data.tablero;
 }
 
 export async function deleteTablero(token: string, id: number): Promise<void> {
-  const response = await fetch(`${TABLEROS_URL}/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (response.status === 204) return;
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  await requestVoid(
+    `/api/tableros/${id}`,
+    'Error al gestionar el tablero',
+    {
+      method: 'DELETE',
+      headers: headersConToken(token)
+    }
+  );
 }
 
 export async function addServicio(token: string, id: number, servicioId: number): Promise<void> {
-  const response = await fetch(`${TABLEROS_URL}/${id}/servicios`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ servicioId })
-  });
-  if (response.status === 204) return;
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  await requestVoid(
+    `/api/tableros/${id}/servicios`,
+    'Error al gestionar el tablero',
+    {
+      method: 'POST',
+      headers: headers(token),
+      body: JSON.stringify({ servicioId })
+    }
+  );
 }
 
 export async function removeServicio(token: string, id: number, servicioId: number): Promise<void> {
-  const response = await fetch(`${TABLEROS_URL}/${id}/servicios/${servicioId}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (response.status === 204) return;
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Error al gestionar el tablero');
+  await requestVoid(
+    `/api/tableros/${id}/servicios/${servicioId}`,
+    'Error al gestionar el tablero',
+    {
+      method: 'DELETE',
+      headers: headersConToken(token)
+    }
+  );
 }

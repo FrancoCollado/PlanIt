@@ -1,4 +1,4 @@
-import { API_URL } from '../../../config/api';
+import { headersConToken, requestJson, requestVoid } from '../../../shared/api';
 
 export interface Evento {
   id: number;
@@ -16,59 +16,54 @@ export interface EventoPayload {
   draft?: boolean;
 }
 
-export const listEventosRequest = async (token: string): Promise<Evento[]> => {
-  const response = await fetch(`${API_URL}/api/eventos`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await response.json();
+type ListaEventosResponse = { eventos: Evento[] };
+type EventoResponse = { evento: Evento };
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener los eventos');
-  }
+export const listEventosRequest = async (token: string): Promise<Evento[]> => {
+  const data = await requestJson<ListaEventosResponse>(
+    '/api/eventos',
+    'Error al obtener los eventos',
+    { headers: headersConToken(token) }
+  );
 
   return data.eventos;
 };
 
 export const createEventoRequest = async (payload: EventoPayload, token: string): Promise<Evento> => {
-  const response = await fetch(`${API_URL}/api/eventos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al crear el evento');
-  }
+  const data = await requestJson<EventoResponse>(
+    '/api/eventos',
+    'Error al crear el evento',
+    {
+      method: 'POST',
+      headers: headersConToken(token, true),
+      body: JSON.stringify(payload)
+    }
+  );
 
   return data.evento;
 };
 
 export const updateEventoRequest = async (id: number, payload: Partial<EventoPayload>, token: string): Promise<Evento> => {
-  const response = await fetch(`${API_URL}/api/eventos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al actualizar el evento');
-  }
+  const data = await requestJson<EventoResponse>(
+    `/api/eventos/${id}`,
+    'Error al actualizar el evento',
+    {
+      method: 'PUT',
+      headers: headersConToken(token, true),
+      body: JSON.stringify(payload)
+    }
+  );
 
   return data.evento;
 };
 
 export const deleteEventoRequest = async (id: number, token: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/eventos/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Error al eliminar el evento');
-  }
+  await requestVoid(
+    `/api/eventos/${id}`,
+    'Error al eliminar el evento',
+    {
+      method: 'DELETE',
+      headers: headersConToken(token)
+    }
+  );
 };

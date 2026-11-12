@@ -4,6 +4,7 @@ import type { Servicio } from '../services/servicioService';
 import { listCategoriasRequest } from '../../eventos/services/categoriaService';
 import type { Categoria } from '../../eventos/services/categoriaService';
 import ItemServicio from './ItemServicio';
+import { mensajeDeError } from '../../../shared/api';
 
 // Pantalla para buscar servicios eligiendo una categoria
 export default function BuscarPorCategoria({ token, onVolver }: { token: string; onVolver: () => void }) {
@@ -16,7 +17,7 @@ export default function BuscarPorCategoria({ token, onVolver }: { token: string;
   useEffect(() => {
     listCategoriasRequest(token)
       .then(setCategorias)
-      .catch(() => setMensaje('No se pudieron cargar las categorias'));
+      .catch((error) => setMensaje(mensajeDeError(error, 'No se pudieron cargar las categorias')));
   }, [token]);
 
   // Cuando toco una categoria busco los servicios que tiene
@@ -28,8 +29,8 @@ export default function BuscarPorCategoria({ token, onVolver }: { token: string;
     try {
       const datos = await buscarServiciosPorCategoriaRequest(categoria.id);
       setServicios(datos);
-    } catch {
-      setMensaje('No se pudieron buscar los servicios');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron buscar los servicios'));
     }
   }
 

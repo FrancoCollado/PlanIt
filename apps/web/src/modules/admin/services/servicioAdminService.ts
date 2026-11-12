@@ -1,6 +1,5 @@
-import { API_URL } from '../../../config/api';
+import { headersConToken, requestJson, requestVoid } from '../../../shared/api';
 
-// Mismo tipo que usa la empresa: el admin ve los servicios que estan en revision
 export interface ServicioRevision {
   id: number;
   nombre: string;
@@ -20,46 +19,39 @@ export interface ServicioRevision {
   };
 }
 
-// Trae todos los servicios que las empresas mandaron a revisar
+type ListaRevisionResponse = { servicios: ServicioRevision[] };
+type ServicioRevisionResponse = { servicio: ServicioRevision };
+
 export const listServiciosRevisionRequest = async (token: string): Promise<ServicioRevision[]> => {
-  const response = await fetch(`${API_URL}/api/servicios/admin/revision`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener los servicios en revision');
-  }
+  const data = await requestJson<ListaRevisionResponse>(
+    '/api/servicios/admin/revision',
+    'Error al obtener los servicios en revision',
+    { headers: headersConToken(token) }
+  );
 
   return data.servicios;
 };
 
-// Aprueba un servicio en revision: queda publicado
 export const aprobarServicioRequest = async (id: number, token: string): Promise<ServicioRevision> => {
-  const response = await fetch(`${API_URL}/api/servicios/admin/${id}/aprobar`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al aprobar el servicio');
-  }
+  const data = await requestJson<ServicioRevisionResponse>(
+    `/api/servicios/admin/${id}/aprobar`,
+    'Error al aprobar el servicio',
+    {
+      method: 'POST',
+      headers: headersConToken(token)
+    }
+  );
 
   return data.servicio;
 };
 
-// Deniega un servicio en revision: se borra directamente
 export const denegarServicioRequest = async (id: number, token: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/servicios/admin/${id}/denegar`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Error al denegar el servicio');
-  }
+  await requestVoid(
+    `/api/servicios/admin/${id}/denegar`,
+    'Error al denegar el servicio',
+    {
+      method: 'POST',
+      headers: headersConToken(token)
+    }
+  );
 };

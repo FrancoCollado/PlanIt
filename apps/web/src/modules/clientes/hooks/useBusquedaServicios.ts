@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { buscarServiciosRequest } from '../services/servicioService';
+import { mensajeDeError } from '../../../shared/api';
 import type { Servicio } from '../services/servicioService';
 
 export function useBusquedaServicios() {
@@ -27,9 +28,9 @@ export function useBusquedaServicios() {
     try {
       const datos = await buscarServiciosRequest(textoBusqueda.trim(), zonaBusqueda, empresaBusqueda);
       setServicios(datos);
-    } catch {
+    } catch (error) {
       setServicios([]);
-      setMensaje('No se pudieron buscar los servicios');
+      setMensaje(mensajeDeError(error, 'No se pudieron buscar los servicios'));
     }
   }
 

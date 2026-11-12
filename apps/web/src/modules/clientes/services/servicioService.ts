@@ -1,4 +1,4 @@
-import { API_URL } from '../../../config/api';
+import { requestJson } from '../../../shared/api';
 
 export interface Servicio {
   id: number;
@@ -26,68 +26,41 @@ export interface Empresa {
   telefono?: number;
 }
 
+type ListaEmpresasResponse = { empresas: Empresa[] };
+type ListaServiciosResponse = { servicios: Servicio[] };
 
-// Trae las empresas activas para el autocompletado del buscador
 export const listEmpresasRequest = async (): Promise<Empresa[]> => {
-
-  const response = await fetch(`${API_URL}/api/usuarios/empresas`);
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || 'Error al obtener las empresas'
-    );
-  }
+  const data = await requestJson<ListaEmpresasResponse>(
+    '/api/usuarios/empresas',
+    'Error al obtener las empresas'
+  );
 
   return data.empresas;
 };
 
-
-// Busca servicios filtrando por nombre, zona y/o empresa
 export const buscarServiciosRequest = async (
   nombre: string,
   zona = '',
   empresa = ''
 ): Promise<Servicio[]> => {
-
   const params = new URLSearchParams();
   if (nombre.trim()) params.set('nombre', nombre.trim());
   if (zona.trim()) params.set('zona', zona.trim());
   if (empresa.trim()) params.set('empresa', empresa.trim());
 
-  const response = await fetch(
-    `${API_URL}/api/servicios/buscar?${params.toString()}`
+  const data = await requestJson<ListaServiciosResponse>(
+    `/api/servicios/buscar?${params.toString()}`,
+    'Error al buscar los servicios'
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || 'Error al buscar los servicios'
-    );
-  }
 
   return data.servicios;
 };
 
-
-// Busca servicios que pertenezcan a una categoría
-export const buscarServiciosPorCategoriaRequest = async (
-  categoriaId: number
-): Promise<Servicio[]> => {
-
-  const response = await fetch(
-    `${API_URL}/api/servicios/categoria/${categoriaId}`
+export const buscarServiciosPorCategoriaRequest = async (categoriaId: number): Promise<Servicio[]> => {
+  const data = await requestJson<ListaServiciosResponse>(
+    `/api/servicios/categoria/${categoriaId}`,
+    'Error al buscar los servicios por categoría'
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || 'Error al buscar los servicios por categoría'
-    );
-  }
 
   return data.servicios;
 };

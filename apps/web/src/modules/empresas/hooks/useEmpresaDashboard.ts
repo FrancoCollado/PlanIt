@@ -3,12 +3,15 @@ import {
   listServiciosRequest,
   createServicioRequest,
   updateServicioRequest,
-  deleteServicioRequest,
-  subirImagenServicioRequest,
+  deleteServicioRequest
+} from '../services/servicioService';
+import { subirImagenServicioRequest } from '../services/imagenService';
+import {
   crearCheckoutPlanProRequest,
   confirmarPlanProRequest,
   getUsuarioPlanRequest
-} from '../services/servicioService';
+} from '../services/planService';
+import { mensajeDeError } from '../../../shared/api';
 import type { Servicio } from '../services/servicioService';
 import { listCategoriasRequest } from '../../eventos/services/categoriaService';
 import type { Categoria } from '../../eventos/services/categoriaService';
@@ -71,8 +74,8 @@ export function useEmpresaDashboard(usuarioId: number | undefined, token: string
     try {
       const datos = await listServiciosRequest(usuarioId, token);
       setServicios(datos);
-    } catch {
-      setMensaje('No se pudieron cargar los servicios');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar los servicios'));
     }
   }
 
@@ -160,8 +163,8 @@ export function useEmpresaDashboard(usuarioId: number | undefined, token: string
     try {
       const url = await subirImagenServicioRequest(usuarioId, archivo);
       setFormServicio((actual) => ({ ...actual, imagen: url }));
-    } catch {
-      setMensaje('No se pudo subir la imagen');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo subir la imagen'));
     } finally {
       setSubiendoImagen(false);
       e.target.value = '';
@@ -222,8 +225,8 @@ export function useEmpresaDashboard(usuarioId: number | undefined, token: string
       setFormServicioVisible(false);
       setServicioEditando(null);
       setFormServicio(servicioVacio);
-    } catch {
-      setMensaje('No se pudo guardar el servicio');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo guardar el servicio'));
     }
   }
 
@@ -239,7 +242,7 @@ export function useEmpresaDashboard(usuarioId: number | undefined, token: string
     } catch (error) {
       setMensajePago({
         tipo: 'error',
-        mensaje: error instanceof Error ? error.message : 'No se pudo iniciar el pago del plan Pro.'
+        mensaje: mensajeDeError(error, 'No se pudo iniciar el pago del plan Pro.')
       });
     } finally {
       setCreandoPagoPro(false);
@@ -254,8 +257,8 @@ export function useEmpresaDashboard(usuarioId: number | undefined, token: string
     try {
       await deleteServicioRequest(servicio.id, usuarioId, token);
       await cargarServicios();
-    } catch {
-      setMensaje('No se pudo borrar el servicio');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo borrar el servicio'));
     }
   }
 

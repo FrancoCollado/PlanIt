@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Servicio } from '../services/servicioService';
 import { addServicio, listTableros } from '../services/tableroService';
 import type { Tablero } from '../services/tableroService';
+import { mensajeDeError } from '../../../shared/api';
 
 // Esto es un servicio de la lista, lo hice aparte porque sino el dashboard quedaba muy largo
 export default function ItemServicio({ servicio, token }: { servicio: Servicio; token: string }) {
@@ -23,8 +24,8 @@ export default function ItemServicio({ servicio, token }: { servicio: Servicio; 
       const datos = await listTableros(token);
       setTableros(datos);
       setMostrarTableros(true);
-    } catch {
-      setMensaje('No se pudieron cargar los tableros');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar los tableros'));
     }
   }
 
@@ -39,8 +40,8 @@ export default function ItemServicio({ servicio, token }: { servicio: Servicio; 
       setMensaje('Guardado en el tablero');
       setMostrarTableros(false);
       setTableroElegido('');
-    } catch {
-      setMensaje('No se pudo guardar el servicio');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo guardar el servicio'));
     }
   }
 

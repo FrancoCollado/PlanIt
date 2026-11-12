@@ -9,6 +9,7 @@ import {
   updateTablero
 } from '../services/tableroService';
 import type { Tablero } from '../services/tableroService';
+import { mensajeDeError } from '../../../shared/api';
 
 // Pantalla donde el cliente maneja sus tableros
 export default function MisTableros({ token, onVolver }: { token: string; onVolver: () => void }) {
@@ -29,8 +30,8 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
 
         setTableros(misTableros);
         setEventos(listaEventos.filter((evento) => !evento.draft));
-      } catch {
-        setMensaje('No se pudieron cargar los tableros');
+      } catch (error) {
+        setMensaje(mensajeDeError(error, 'No se pudieron cargar los tableros'));
       }
     }
 
@@ -41,8 +42,8 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
     try {
       const datos = await listTableros(token);
       setTableros(datos);
-    } catch {
-      setMensaje('No se pudieron cargar los tableros');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudieron cargar los tableros'));
     }
   }
 
@@ -72,8 +73,8 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
       setTableroEditando(null);
       setNombre('');
       setEventoId('');
-    } catch {
-      setMensaje('No se pudo guardar el tablero');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo guardar el tablero'));
     }
   }
 
@@ -84,8 +85,8 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
     try {
       await deleteTablero(token, tablero.id);
       await cargarTableros();
-    } catch {
-      setMensaje('No se pudo borrar el tablero');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo borrar el tablero'));
     }
   }
 
@@ -94,8 +95,8 @@ export default function MisTableros({ token, onVolver }: { token: string; onVolv
     try {
       await removeServicio(token, tableroId, servicioId);
       await cargarTableros();
-    } catch {
-      setMensaje('No se pudo quitar el servicio');
+    } catch (error) {
+      setMensaje(mensajeDeError(error, 'No se pudo quitar el servicio'));
     }
   }
 

@@ -1,4 +1,4 @@
-import { API_URL } from '../../../config/api';
+import { headersConToken, requestJson } from '../../../shared/api';
 
 export interface Usuario {
   id: number;
@@ -11,33 +11,31 @@ export interface Usuario {
   activo: boolean;
   creadoEn?: string;
 }
-// Función para obtener la lista de usuarios según el rol
-export const listUsuariosRequest = async (rol: string | undefined, token: string): Promise<Usuario[]> => {
-  const query = rol ? `?rol=${encodeURIComponent(rol)}` : ''; 
-  const response = await fetch(`${API_URL}/api/usuarios${query}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al obtener los usuarios');
-  }
+type ListaUsuariosResponse = { usuarios: Usuario[] };
+type UsuarioResponse = { usuario: Usuario };
+
+export const listUsuariosRequest = async (rol: string | undefined, token: string): Promise<Usuario[]> => {
+  const query = rol ? `?rol=${encodeURIComponent(rol)}` : '';
+  const data = await requestJson<ListaUsuariosResponse>(
+    `/api/usuarios${query}`,
+    'Error al obtener los usuarios',
+    { headers: headersConToken(token) }
+  );
 
   return data.usuarios;
 };
 
 export const setUsuarioActivoRequest = async (id: number, activo: boolean, token: string): Promise<Usuario> => {
-  const response = await fetch(`${API_URL}/api/usuarios/${id}/activo`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ activo }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Error al actualizar el usuario');
-  }
+  const data = await requestJson<UsuarioResponse>(
+    `/api/usuarios/${id}/activo`,
+    'Error al actualizar el usuario',
+    {
+      method: 'PATCH',
+      headers: headersConToken(token, true),
+      body: JSON.stringify({ activo })
+    }
+  );
 
   return data.usuario;
 };
